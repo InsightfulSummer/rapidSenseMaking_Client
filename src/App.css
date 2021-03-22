@@ -1,0 +1,25 @@
+/* General Styles */
+.row {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+
+/* Header Styles */
+.headerIcon {
+  font-size: 25px;
+  cursor: pointer;
+  color: #e8eaf6 ;
+  padding: 5px;
+}
+
+/* ListView styles */
+.listContainer {
+  width: 100%;
+  border-radius: 5px;
+  border: solid .3px #dbdbdb;
+  background: #dbdbdb;
+  height: 92vh;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
