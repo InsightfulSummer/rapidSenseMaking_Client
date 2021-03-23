@@ -1,3 +1,6 @@
 export default {
-    ToggleListView : "ToggleListView"
+    ToggleListView : "ToggleListView",
+    FetchDocuments : "FetchDocuments",
+    SetActiveDocument : "SetActiveDocument",
+    UnSetActiveDocument : "UnSetActiveDocument"
 }

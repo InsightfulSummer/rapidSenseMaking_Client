@@ -7,3 +7,28 @@ export const toggleListView = () => {
         type : types.ToggleListView
     }
 }
+
+// data-related actions 
+
+export const fetchDocuments = () => {
+    return {
+        type : types.FetchDocuments
+    }
+}
+
+// interaction-related actions
+
+export const SetActiveDocument = (documentId) => {
+    return {
+        type : types.SetActiveDocument,
+        payload : {
+            documentId
+        }
+    }
+}
+
+export const UnSetActiveDocument = () => {
+    return {
+        type : types.UnSetActiveDocument
+    }
+}
