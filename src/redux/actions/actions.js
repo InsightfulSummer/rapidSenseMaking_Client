@@ -32,3 +32,13 @@ export const UnSetActiveDocument = () => {
         type : types.UnSetActiveDocument
     }
 }
+
+// canvas-related actions
+export const SetDimensions = (width, height) => {
+    return {
+        type : types.SetDimensions,
+        payload : {
+            width, height
+        }
+    }
+}

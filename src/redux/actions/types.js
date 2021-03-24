@@ -2,5 +2,6 @@ export default {
     ToggleListView : "ToggleListView",
     FetchDocuments : "FetchDocuments",
     SetActiveDocument : "SetActiveDocument",
-    UnSetActiveDocument : "UnSetActiveDocument"
+    UnSetActiveDocument : "UnSetActiveDocument",
+    SetDimensions : "SetDimensions"
 }
