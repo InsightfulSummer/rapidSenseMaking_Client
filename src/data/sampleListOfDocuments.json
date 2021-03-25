@@ -158,5 +158,113 @@
         },{
             "name":"Michael Brinkmeier"
         }]
+    },
+    {
+        "_id": "14",
+        "title": "Special Issue on Human-Computer Interaction",
+        "abstract" : "This special issue on HCI reflects some of the main roads of current research in HCI. It represents a nice multifaceted mix of world-renowned experts from many different disciplines. A good starting point for reading is the very first article of this special issue, “Human-Computer Interaction—Introduction and Overview”, which takes the reader from research to practice, from computer science to cognitive psychology, and from past to future. One of the highlights of this issue is the interview with Turing award winner Alan Kay, who reflects on past, present and future of HCI.",
+        "publishYear": "2012",
+        "authors":[{
+            "name":"Achim Ebert"
+        }]
+    },
+    {
+        "_id": "15",
+        "title": "Retraction Note to: Human–computer interaction using vision-based hand gesture recognition systems: a survey",
+        "abstract" : "Considerable effort has been put toward the development of intelligent and natural interfaces between users and computer systems. In line with this endeavor, several modes of information (e.g., visual, audio, and pen) that are used either individually or in combination have been proposed. The use of gestures to convey information is an important part of human communication. Hand gesture recognition is widely used in many applications, such as in computer games, machinery control (e.g., crane), and thorough mouse replacement. Computer recognition of hand gestures may provide a natural computer interface that allows people to point at or to rotate a computer-aided design model by rotating their hands. Hand gestures can be classified into two categories: static and dynamic. The use of hand gestures as a natural interface serves as a motivating force for research on gesture taxonomy, its representations, and recognition techniques. This paper summarizes the surveys carried out in human--computer interaction (HCI) studies and focuses on different application domains that use hand gestures for efficient interaction. This exploratory survey aims to provide a progress report on static and dynamic hand gesture recognition (i.e., gesture taxonomies, representations, and recognition techniques) in HCI and to identify future directions on this topic.",
+        "publishYear": "2013",
+        "authors":[{
+            "name":"Haitham Hasan"
+        },{
+            "name": "Sameem Abdul-Kareem"
+        }]
+    },
+    {
+        "_id": "16",
+        "title": "Vision based hand gesture recognition for human computer interaction: a survey",
+        "abstract" : "As computers become more pervasive in society, facilitating natural human–computer interaction (HCI) will have a positive impact on their use. Hence, there has been growing interest in the development of new approaches and technologies for bridging the human–computer barrier. The ultimate aim is to bring HCI to a regime where interactions with computers will be as natural as an interaction between humans, and to this end, incorporating gestures in HCI is an important research area. Gestures have long been considered as an interaction technique that can potentially deliver more natural, creative and intuitive methods for communicating with our computers. This paper provides an analysis of comparative surveys done in this area. The use of hand gestures as a natural interface serves as a motivating force for research in gesture taxonomies, its representations and recognition techniques, software platforms and frameworks which is discussed briefly in this paper. It focuses on the three main phases of hand gesture recognition i.e. detection, tracking and recognition. Different application which employs hand gestures for efficient interaction has been discussed under core and advanced application domains. This paper also provides an analysis of existing literature related to gesture recognition systems for human computer interaction by categorizing it under different key parameters. It further discusses the advances that are needed to further improvise the present hand gesture recognition systems for future perspective that can be widely used for efficient human computer interaction. The main goal of this survey is to provide researchers in the field of gesture based HCI with a summary of progress achieved to date and to help identify areas where further research is needed.",
+        "publishYear": "2012",
+        "authors":[{
+            "name":"Siddharth S. Rautaray"
+        },{
+            "name":"Anupam Agrawal"
+        }]
+    },
+    {
+        "_id": "17",
+        "title": "Guest Editorial: Human–Computer Interaction: Real-Time Vision Aspects of Natural User Interfaces",
+        "abstract" : "Computer vision for human–computer interaction has been in our living rooms for a few years now. We have witnessed an exponential growth in capability of vision systems for computer games, from Sony’s EyeToy for PlayStation 2 in 2003, Eye for PlayStation 3 in 2007, to Microsoft’s Kinect for XBOX 360 in 2010. In addition to enhancing our interaction with computer games, Kinect has had a deeper role in changing our expectations for human–machine interfaces of the future. We may need to wait a few more years to have computers like those in the science fiction movie Minority Report, but the games and hacks using Kinect show us that such interfaces are getting closer to reality. We now expect our TVs, smart phones, and tablets to have such capability and soon that will be a reality.",
+        "publishYear": "2012",
+        "authors":[{
+            "name":"Zoran Živković"
+        }, {
+            "name": "Nicu Sebe"
+        },{
+            "name": "Hamid Aghajan"
+        } , {
+            "name": "Branislav Kisačanin"
+        }]
+    },
+    {
+        "_id": "18",
+        "title": "Multimodal Interfaces of Human–Computer Interaction",
+        "abstract" : "An analytical review of state-of-the-art and future intelligent interfaces of human–computer interaction is presented; stages of their evolution are considered from command text to graphic and then to intelligent uni- and multimodal interfaces, based on the transfer of acoustic, visual, textual, and neural information. The principles of organization and the main characteristics and types of multimodal user interfaces, which employ concurrently several tools for automatic processing (recognition and synthesis) of userinputted heterogeneous information, are detailed. The combination of computers with speech and multimodal interfaces, designed for user-friendly information input/output, creates universal information–communicative technologies, man coming to the fore in the interaction between man and computer. Russian and foreign developments in this field are analyzed briefly.",
+        "publishYear": "2018",
+        "authors":[{
+            "name":"A. A. Karpov"
+        }, {
+            "name":"R. M. Yusupov"
+        }]
+    },
+    {
+        "_id": "19",
+        "title": "Human-Computer Interaction Problem in Learning: Could the Key Be Hidden Somewhere Between Social Interaction and Development of Tools?",
+        "abstract" : "Homo sapiens is not just a tool-using species, they also can invent and develop tools. This is the feature that distinguishes humans from other species. It is necessary to get rid of the perceptual dominance of the present state of the material to invent and develop a tool. It is based on a mental process: designing. So how was that possible? In this article, I propose an evolutionary hypothesis in response to this question: the referential triangle. Accordingly, the relationship that people establish with things is mentally indirect, but the relationship they establish with each other is mentally direct. The hypothesis claims that the mental solutions of people have naturally established with each other are also used to invent and develop tools. The latest and most interesting product of this mechanism is artificial intelligence. Because artificial intelligence also acts as an inorganic system. What distinguishes it from other machines in this context is its social behavior. Artificial intelligence can generate social signals. So can artificial intelligence be both a tool and a partner at the same time in the referential triangle established with the tools by the human? In other words, can children, for instance, socially interact with artificial intelligence, just as they do naturally with people around? The article draws attention to that this problem should be included in the cultural psychological research agenda.",
+        "publishYear": "2019",
+        "authors":[{
+            "name":"Tolga Yıldız"
+        }]
+    },
+    {
+        "_id": "20",
+        "title": "The Role of Cognitive Modeling for User Interface Design Representations: An Epistemological Analysis of Knowledge Engineering in the Context of Human-Computer Interaction",
+        "abstract" : "In this paper we review some problems with traditional approaches for acquiring and representing knowledge in the context of developing user interfaces. Methodological implications for knowledge engineering and for human-computer interaction are studied. It turns out that in order to achieve the goal of developing human-oriented (in contrast to technology-oriented) human-computer interfaces developers have to develop sound knowledge of the structure and the representational dynamics of the cognitive system which is interacting with the computer. \n\n We show that in a first step it is necessary to study and investigate the different levels and forms of representation that are involved in the interaction processes between computers and human cognitive systems. Only if designers have achieved some understanding about these representational mechanisms, user interfaces enabling individual experiences and skill development can be designed. In this paper we review mechanisms and processes for knowledge representation on a conceptual, epistemological, and methodologieal level, and sketch some ways out of the identified dilemmas for cognitive modeling in the domain of human-computer interaction.",
+        "publishYear": "1998",
+        "authors":[{
+            "name":"Markus F. Peschl"
+        },{
+            "name": "Chris Stary"
+        }]
+    },
+    {
+        "_id": "21",
+        "title": "The Epistemology and Ontology of Human-Computer Interaction",
+        "abstract" : "This paper analyzes epistemological and ontological dimensions of Human-Computer Interaction (HCI) through an analysis of the functions of computer systems in relation to their users. It is argued that the primary relation between humans and computer systems has historically been epistemic: computers are used as information-processing and problem-solving tools that extend human cognition, thereby creating hybrid cognitive systems consisting of a human processor and an artificial processor that process information in tandem. In this role, computer systems extend human cognition. Next, it is argued that in recent years, the epistemic relation between humans and computers has been supplemented by an ontic relation. Current computer systems are able to simulate virtual and social environments that extend the interactive possibilities found in the physical environment. This type of relationship is primarily ontic, and extends to objects and places that have a virtual ontology. Increasingly, computers are not just information devices, but portals to worlds that we inhabit. The aforementioned epistemic and ontic relationships are unique to information technology and distinguish human-computer relationships from other human-technology relationships.",
+        "publishYear": "2005",
+        "authors":[{
+            "name":"PHILIP BREY"
+        }]
+    },
+    {
+        "_id": "22",
+        "title": "The sorcerer and the apprentice. Human-computer interaction today",
+        "abstract" : "Human-computer interaction today has got a touch of magic: Without understanding the causal coherence, using a computer seems to become the art to use the right spell with the mouse as the magic wand — the sorcerer's staff. Goethes's poem admits an allegoric interpretation. We explicate the analogy between using a computer and casting a spell with emphasis on teaching magic skills. The art to create an ergonomic user interface has to take care of various levels of skills for the human operators. The problem of logical discontinuities as opposed to continuous control is the most serious obstacle for human-computer interaction.",
+        "publishYear": "1998",
+        "authors":[{
+            "name":"W. Oberschelp"
+        }]
+    },
+    {
+        "_id": "23",
+        "title": "Human-Engaged Computing: the future of Human–Computer Interaction",
+        "abstract" : "Debates regarding the nature and role of Human-Computer Interaction (HCI) have become increasingly common. This is because HCI lacks a clear philosophical foundation from which to derive a coherent vision and consistent aims and goals. This paper proposes a conceptual framework for ongoing discussion that can give more meaningful and pertinent direction to the future of HCI; we call the proposed approach Human-Engaged Computing (HEC). HEC is a focused yet adaptable philosophical approach which aims to establish “synergized interactions between engaged humans and engaging computers for high level wisdom which enhances our human survival probability and our full potential as humans”. In this paper, HEC is described through five perspectives—definition, components, principles, case studies and benefits. The paper concludes by suggesting future directions for HEC.",
+        "publishYear": "2019",
+        "authors":[{
+            "name":"Xiangshi Ren"
+        },{
+            "name":"Chaklam Silpasuwanchai"
+        }, {
+            "name": "John Cahill"
+        }]
     }
 ]

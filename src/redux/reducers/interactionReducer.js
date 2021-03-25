@@ -1,7 +1,8 @@
 import types from "../actions/types";
 
 const initialState = {
-    activeDocumentId : null
+    activeDocumentId : null,
+    sortMetric : "publishYear"
 }
 
 const reducer = (state=initialState, actions) => {

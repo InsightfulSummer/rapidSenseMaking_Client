@@ -3,10 +3,8 @@ import './App.css';
 import MainScreen from './screens/mainScreen';
 
 // redux imports
-import rootReducer from './redux/reducers/rootReducer'
-import {createStore} from 'redux'
 import {Provider} from 'react-redux'
-const store = createStore(rootReducer)
+import store from './redux/store'
 
 const App = () => {
   return (
