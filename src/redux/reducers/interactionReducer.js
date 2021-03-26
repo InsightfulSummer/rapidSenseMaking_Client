@@ -2,7 +2,8 @@ import types from "../actions/types";
 
 const initialState = {
     activeDocumentId : null,
-    sortMetric : "publishYear"
+    sortMetric : "publishYear",
+    cardinality : 5
 }
 
 const reducer = (state=initialState, actions) => {
@@ -15,6 +16,11 @@ const reducer = (state=initialState, actions) => {
         case types.UnSetActiveDocument:
             return {
                 ...state, activeDocumentId : null
+            }
+
+        case types.ChangeCardinality:
+            return {
+                ...state, cardinality : actions.payload.cardinality
             }
     
         default:

@@ -33,6 +33,15 @@ export const UnSetActiveDocument = () => {
     }
 }
 
+export const ChangeCardinality = (cardinality) => {
+    return {
+        type : types.ChangeCardinality,
+        payload : {
+            cardinality
+        }
+    }
+}
+
 // canvas-related actions
 export const SetDimensions = (width, height) => {
     return {

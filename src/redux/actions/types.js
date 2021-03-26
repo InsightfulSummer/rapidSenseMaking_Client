@@ -3,5 +3,6 @@ export default {
     FetchDocuments : "FetchDocuments",
     SetActiveDocument : "SetActiveDocument",
     UnSetActiveDocument : "UnSetActiveDocument",
-    SetDimensions : "SetDimensions"
+    SetDimensions : "SetDimensions",
+    ChangeCardinality : "ChangeCardinality"
 }

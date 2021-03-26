@@ -2,18 +2,19 @@ import React, { useEffect } from 'react'
 import * as d3 from 'd3'
 import {useDispatch, useSelector} from 'react-redux'
 import { scroller } from 'react-scroll'
-import {SetDimensions, SetActiveDocument, UnSetActiveDocument} from '../redux/actions/actions'
+import {SetDimensions, SetActiveDocument, UnSetActiveDocument, ChangeCardinality} from '../redux/actions/actions'
 
 const MainSection = () => {
 
     const dispatch = useDispatch()
 
-    const {width, height, documents, sortMetric, activeDocumentId} = useSelector(state => ({
+    const {width, height, documents, sortMetric, activeDocumentId, cardinality} = useSelector(state => ({
         width : state.canvasReducer.width,
         height : state.canvasReducer.height,
         documents : state.dataReducer.documents,
         sortMetric : state.interactionReducer.sortMetric,
-        activeDocumentId: state.interactionReducer.activeDocumentId
+        activeDocumentId: state.interactionReducer.activeDocumentId,
+        cardinality : state.interactionReducer.cardinality
     }))
 
     let domain = d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])})
@@ -123,8 +124,23 @@ const MainSection = () => {
             .attr("y2",height/2)
             .attr("class", "axisLine")
 
-        
+        let upArrow = g.append("text")
+            .attr("class", "fa axisIcon")
+            .attr("x", width - 30)
+            .attr("y", (height/2)-17.32)
+            .text("\uf077")
+        upArrow.on("click", () => {
+            dispatch(ChangeCardinality(cardinality + 1))
+        })
 
+        let downArrow = g.append("text")
+            .attr("class", "fa axisIcon")
+            .attr("x", width - 30)
+            .attr("y", (height/2)+30)
+            .text("\uf078")
+        downArrow.on("click", () => {
+            dispatch(ChangeCardinality(cardinality - 1))
+        })
     }
 
     const addEvents = () => {
@@ -152,7 +168,7 @@ const MainSection = () => {
         getDimensions();
         setTimeout(()=>{
             loadSVG();
-            addAxis(6)
+            addAxis(cardinality)
             loadNodes();
             addEvents();
         } , 250)
@@ -162,6 +178,10 @@ const MainSection = () => {
         updateNodes()
         addEvents()
     },[activeDocumentId])
+
+    useEffect(()=>{
+        addAxis(cardinality)
+    } , [cardinality])
 
     return (
         <div id="mainCanvas">
