@@ -4,5 +4,7 @@ export default {
     SetActiveDocument : "SetActiveDocument",
     UnSetActiveDocument : "UnSetActiveDocument",
     SetDimensions : "SetDimensions",
-    ChangeCardinality : "ChangeCardinality"
+    ChangeCardinality : "ChangeCardinality",
+    SetActiveAxisRange : "SetActiveAxisRange",
+    UnsetActiveAxisRange : "UnsetActiveAxisRange"
 }

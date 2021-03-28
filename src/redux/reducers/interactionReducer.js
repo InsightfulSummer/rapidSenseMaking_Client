@@ -3,7 +3,8 @@ import types from "../actions/types";
 const initialState = {
     activeDocumentId : null,
     sortMetric : "publishYear",
-    cardinality : 5
+    cardinality : 5,
+    activeAxisRange : null
 }
 
 const reducer = (state=initialState, actions) => {
@@ -21,6 +22,16 @@ const reducer = (state=initialState, actions) => {
         case types.ChangeCardinality:
             return {
                 ...state, cardinality : actions.payload.cardinality
+            }
+
+        case types.SetActiveAxisRange:
+            return {
+                ...state, activeAxisRange: actions.payload.activeAxisRange
+            }
+
+        case types.UnsetActiveAxisRange:
+            return {
+                ...state, activeAxisRange: null
             }
     
         default:

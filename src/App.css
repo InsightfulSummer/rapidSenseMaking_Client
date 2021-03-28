@@ -153,6 +153,8 @@ p{
   text-anchor: middle;
   fill: black;
   cursor: pointer;
-  -webkit-filter: drop-shadow( 3px 3px 2px rgba(195, 195, 195, 0.7));
-  filter: drop-shadow( 3px 3px 2px rgba(195, 195, 195, .7));
+}
+
+.tempAxisRange {
+  z-index: -10;
 }

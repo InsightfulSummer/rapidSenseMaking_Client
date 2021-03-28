@@ -2,33 +2,34 @@ import React, { useEffect } from 'react'
 import * as d3 from 'd3'
 import {useDispatch, useSelector} from 'react-redux'
 import { scroller } from 'react-scroll'
-import {SetDimensions, SetActiveDocument, UnSetActiveDocument, ChangeCardinality} from '../redux/actions/actions'
+import {SetDimensions, SetActiveDocument, UnSetActiveDocument, ChangeCardinality, SetActiveAxisRange, UnsetActiveAxisRange} from '../redux/actions/actions'
 
 const MainSection = () => {
 
     const dispatch = useDispatch()
 
-    const {width, height, documents, sortMetric, activeDocumentId, cardinality} = useSelector(state => ({
+    const {width, height, documents, sortMetric, activeDocumentId, cardinality, activeAxisRange} = useSelector(state => ({
         width : state.canvasReducer.width,
         height : state.canvasReducer.height,
         documents : state.dataReducer.documents,
         sortMetric : state.interactionReducer.sortMetric,
         activeDocumentId: state.interactionReducer.activeDocumentId,
-        cardinality : state.interactionReducer.cardinality
+        cardinality : state.interactionReducer.cardinality,
+        activeAxisRange : state.interactionReducer.activeAxisRange
     }))
 
     let domain = d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])})
     const aScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(width)/2)*0.9])
     const bScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(height)/2)*0.9])
-    const rScale = d3.scaleLinear().domain(domain).range([30,10])
-    const angleScale = d3.scaleLinear().domain([1 , documents.length]).range([15, 345])
+    const rScale = d3.scaleLinear().domain(domain).range([width/35,width/160])
+    const angleScale = d3.scaleLinear().domain([1 , documents.length]).range([30, 330]) // ????
 
     const getX = (item, index) => {
-        return (width/2)+(aScale(parseFloat(item[sortMetric]))*Math.cos(angleScale(index + 1)))
+        return (width/2)+(aScale(parseFloat(item[sortMetric]))*Math.cos(angleScale(index + 1)*Math.PI/180))
     }
 
     const getY = (item, index) => {
-        return (height/2)+(bScale(parseFloat(item[sortMetric]))*Math.sin(angleScale(index + 1)))
+        return (height/2)+(bScale(parseFloat(item[sortMetric]))*Math.sin(angleScale(index + 1)*Math.PI/180))
     }
 
     const getRadius = (item) => {
@@ -63,6 +64,7 @@ const MainSection = () => {
             .enter()
             .append("circle")
             .attr("class","docCircle")
+            .attr("text", (item, index) => {return Math.cos(angleScale((index + 1)*Math.PI/180))})
             .attr("r", doc => {return getRadius(doc)})
             .attr("cx", ()=>{return width/2})
             .attr("cy", ()=>{return height/2})
@@ -85,36 +87,80 @@ const MainSection = () => {
         })
     }
 
-    const addAxis = (cardinality) => {
+    const loadAxis = (cardinality) => {
         var g = d3.select(".canvasSVG")
             .append("g")
+            .attr("class", "axisContainer")
 
+        updateAxis(cardinality)
+    }
+
+    const updateAxis = (cardinality) => {
         let steps = []
         let stepMagnitude = (domain[1]-domain[0])/(cardinality-1)
         for (let index = 0; index < cardinality; index++) {
             steps.push(domain[0] + stepMagnitude*index)
         }
-
         steps = steps.reverse()
 
-        let axisEllipses = g.selectAll("ellipse")
+        let g = d3.select(".axisContainer")
+
+        var newEllipses = g.selectAll("axisEllipse")
             .data(steps)
-            .enter()
+
+        newEllipses.exit().remove()
+
+        newEllipses.enter()
             .append("ellipse")
             .attr("cx", width / 2)
             .attr("cy", height / 2)
             .attr("rx", item=>{return aScale(item)})
             .attr("ry", item=>{return bScale(item)})
             .attr("class", "axisEllipse")
+            .on("mouseover", function(event, data){
+                d3.select(this)
+                    .attr("class", "axisEllipse activeEllipse")
 
-        axisEllipses.on("mouseover", function(event, data){
-            d3.select(this)
-                .attr("class", "axisEllipse activeEllipse")
+                dispatch(SetActiveAxisRange(Math.floor(data - stepMagnitude), Math.floor(data)))
+            })
+            .on("mouseout", function(event, data){
+                d3.select(this)
+                    .attr("class", "axisEllipse")
+                console.log("mouseout")
+                dispatch(UnsetActiveAxisRange())
+            })
+        steps = steps.slice(0, steps.length-1)
+        var newLabels = g.selectAll("axisLabels")
+            .data(steps)
+
+        newLabels.exit().remove()
+
+        newLabels.enter()
+            .append("text")
+            .attr("x", item => {return width/2 + aScale(item)})
+            .attr("y", height / 2 + 30)
+            .attr("text-anchor", "middle")
+            .attr("class", "axisLabels")
+            .attr("transform", item => {return "rotate(-45,"+(width/2 + aScale(item))+","+height / 2 + 30+")"})
+            .text(item => {return Math.floor(item)})
+
+        let upArrow = g.append("text")
+            .attr("class", "fa axisIcon")
+            .attr("x", width - 30)
+            .attr("y", (height/2)-30)
+            .text("\uf077")
+        upArrow.on("click", () => {
+            console.log("up arrow clicked")
+            dispatch(ChangeCardinality(cardinality + 1))
         })
 
-        axisEllipses.on("mouseout", function(event, data){
-            d3.select(this)
-                .attr("class", "axisEllipse")
+        let downArrow = g.append("text")
+            .attr("class", "fa axisIcon")
+            .attr("x", width - 30)
+            .attr("y", (height/2)+56)
+            .text("\uf078")
+        downArrow.on("click", () => {
+            dispatch(ChangeCardinality(cardinality - 1))
         })
 
         let axisLine = g.append("line")
@@ -123,24 +169,30 @@ const MainSection = () => {
             .attr("x2",width)
             .attr("y2",height/2)
             .attr("class", "axisLine")
+    }
 
-        let upArrow = g.append("text")
-            .attr("class", "fa axisIcon")
-            .attr("x", width - 30)
-            .attr("y", (height/2)-17.32)
-            .text("\uf077")
-        upArrow.on("click", () => {
-            dispatch(ChangeCardinality(cardinality + 1))
-        })
+    const updateNodesOfAxisRange = (range) => {
+        if (range) {
+            var nodes = d3.selectAll(".docCircle")
+                .attr("fill", item => {
+                    return (parseInt(item.publishYear) >= range[0] && parseInt(item.publishYear) <= range[1]) ? "rgba(64, 81, 181, 0.9)" : "rgba(64, 81, 181, 0.25)"
+                })
+        } else {
+            d3.selectAll(".docCircle")
+                .attr("fill", "rgba(64, 81, 181, 0.8)")
+        }
+    }
 
-        let downArrow = g.append("text")
-            .attr("class", "fa axisIcon")
-            .attr("x", width - 30)
-            .attr("y", (height/2)+30)
-            .text("\uf078")
-        downArrow.on("click", () => {
-            dispatch(ChangeCardinality(cardinality - 1))
-        })
+    const updateAxisOfAxisRange = (range) => {
+        if (range) {
+            d3.selectAll(".axisLabels")
+                .transition()
+                .attr("font-weight", item => {return parseInt(item) == range[0] || parseInt(item) == range[1] ? "bold" : "lighter"})
+        } else {
+            d3.selectAll(".axisLabels")
+                .transition()
+                .attr("font-weight", "normal")
+        }
     }
 
     const addEvents = () => {
@@ -168,7 +220,7 @@ const MainSection = () => {
         getDimensions();
         setTimeout(()=>{
             loadSVG();
-            addAxis(cardinality)
+            loadAxis(cardinality)
             loadNodes();
             addEvents();
         } , 250)
@@ -180,8 +232,13 @@ const MainSection = () => {
     },[activeDocumentId])
 
     useEffect(()=>{
-        addAxis(cardinality)
+        updateAxis(cardinality)
     } , [cardinality])
+
+    useEffect(()=> {
+        updateNodesOfAxisRange(activeAxisRange)
+        updateAxisOfAxisRange(activeAxisRange)
+    }, [activeAxisRange])
 
     return (
         <div id="mainCanvas">

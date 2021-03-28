@@ -42,6 +42,21 @@ export const ChangeCardinality = (cardinality) => {
     }
 }
 
+export const SetActiveAxisRange = (start, end) => {
+    return {
+        type : types.SetActiveAxisRange,
+        payload : {
+            activeAxisRange : [start, end]
+        }
+    }
+}
+
+export const UnsetActiveAxisRange = () => {
+    return {
+        type : types.UnsetActiveAxisRange
+    }
+}
+
 // canvas-related actions
 export const SetDimensions = (width, height) => {
     return {
