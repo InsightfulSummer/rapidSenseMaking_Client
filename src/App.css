@@ -158,3 +158,9 @@ p{
 .tempAxisRange {
   z-index: -10;
 }
+
+.sortingIcon {
+  font-size: 25px;
+  text-anchor: middle;
+  fill: black;
+}

@@ -3,6 +3,7 @@ import * as d3 from 'd3'
 import {useDispatch, useSelector} from 'react-redux'
 import { scroller } from 'react-scroll'
 import {SetDimensions, SetActiveDocument, UnSetActiveDocument, ChangeCardinality, SetActiveAxisRange, UnsetActiveAxisRange} from '../redux/actions/actions'
+import {shuffleArray} from '../helper/helper'
 
 const MainSection = () => {
 
@@ -19,10 +20,10 @@ const MainSection = () => {
     }))
 
     let domain = d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])})
-    const aScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(width)/2)*0.9])
-    const bScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(height)/2)*0.9])
+    const aScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(width)/2)*0.85])
+    const bScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(height)/2)*0.95])
     const rScale = d3.scaleLinear().domain(domain).range([width/35,width/160])
-    const angleScale = d3.scaleLinear().domain([1 , documents.length]).range([30, 330]) // ????
+    const angleScale = d3.scaleLinear().domain([1 , documents.length]).range([30, 330])
 
     const getX = (item, index) => {
         return (width/2)+(aScale(parseFloat(item[sortMetric]))*Math.cos(angleScale(index + 1)*Math.PI/180))
@@ -60,7 +61,7 @@ const MainSection = () => {
         var g = d3.select(".canvasSVG")
             .append("g")
             .selectAll("circle")
-            .data(documents)
+            .data(shuffleArray(documents))
             .enter()
             .append("circle")
             .attr("class","docCircle")
@@ -157,7 +158,7 @@ const MainSection = () => {
         let downArrow = g.append("text")
             .attr("class", "fa axisIcon")
             .attr("x", width - 30)
-            .attr("y", (height/2)+56)
+            .attr("y", (height/2)+45)
             .text("\uf078")
         downArrow.on("click", () => {
             dispatch(ChangeCardinality(cardinality - 1))
@@ -173,10 +174,11 @@ const MainSection = () => {
 
     const updateNodesOfAxisRange = (range) => {
         if (range) {
-            var nodes = d3.selectAll(".docCircle")
-                .attr("fill", item => {
-                    return (parseInt(item.publishYear) >= range[0] && parseInt(item.publishYear) <= range[1]) ? "rgba(64, 81, 181, 0.9)" : "rgba(64, 81, 181, 0.25)"
-                })
+            d3.selectAll(".docCircle")
+                .attr("fill", "rgba(64, 81, 181, 0.4)")
+            d3.selectAll(".docCircle")
+                .filter(item => {return parseInt(item.publishYear) >= range[0] && parseInt(item.publishYear) <= range[1]})
+                .attr("fill", item => "rgba(64, 81, 181, 0.9)")
         } else {
             d3.selectAll(".docCircle")
                 .attr("fill", "rgba(64, 81, 181, 0.8)")
@@ -187,7 +189,11 @@ const MainSection = () => {
         if (range) {
             d3.selectAll(".axisLabels")
                 .transition()
-                .attr("font-weight", item => {return parseInt(item) == range[0] || parseInt(item) == range[1] ? "bold" : "lighter"})
+                .attr("font-weight" , "lighter")
+            d3.selectAll(".axisLabels")
+                .filter(item => {return parseInt(item) == range[0] || parseInt(item) == range[1]})
+                .transition()
+                .attr("font-weight", "bold")
         } else {
             d3.selectAll(".axisLabels")
                 .transition()
@@ -216,6 +222,22 @@ const MainSection = () => {
             })
     }
 
+    const loadSortingMetric = () => {
+        var g = d3.select(".canvasSVG")
+            .append("g")
+            .attr("class", "sortingContainer")
+
+        var sortingIcon = g.append("text")
+            .attr("class", "fa sortingIcon")
+            .attr("x", width - 30)
+            .attr("y", height/2 + 9)
+            .text("\uf1da")
+    }
+
+    const updateSortingMetric = () => {
+
+    }
+
     useEffect(()=>{
         getDimensions();
         setTimeout(()=>{
@@ -223,6 +245,7 @@ const MainSection = () => {
             loadAxis(cardinality)
             loadNodes();
             addEvents();
+            loadSortingMetric();
         } , 250)
     } , [width,height,sortMetric])
 
