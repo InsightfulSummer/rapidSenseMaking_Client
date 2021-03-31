@@ -8,6 +8,10 @@ p{
   margin-bottom: 0.5rem;
 }
 
+.md-form {
+  margin-bottom: 0;
+}
+
 /* Header Styles */
 .headerIcon {
   font-size: 25px;
@@ -163,4 +167,10 @@ p{
   font-size: 25px;
   text-anchor: middle;
   fill: black;
+}
+
+.sortingIcon_ {
+  margin-top: 1.5rem;
+    font-size: 25px;
+    text-align: center;
 }
