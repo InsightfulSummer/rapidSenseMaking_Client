@@ -20,7 +20,7 @@ const MainSection = () => {
     }))
 
     let domain = d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])})
-    const aScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(width)/2)*0.85])
+    const aScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(width)/2)-75])
     const bScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(height)/2)*0.95])
     const rScale = d3.scaleLinear().domain(domain).range([width/35,width/160])
     const angleScale = d3.scaleLinear().domain([1 , documents.length]).range([30, 330])
@@ -61,7 +61,7 @@ const MainSection = () => {
         var g = d3.select(".canvasSVG")
             .append("g")
             .selectAll("circle")
-            .data(shuffleArray(documents))
+            .data(documents)
             .enter()
             .append("circle")
             .attr("class","docCircle")

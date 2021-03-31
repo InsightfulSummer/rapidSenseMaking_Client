@@ -133,7 +133,7 @@ p{
   -webkit-filter: drop-shadow( 3px 3px 2px rgba(64, 81, 181, 0.7));
   filter: drop-shadow( 3px 3px 2px rgba(64, 81, 181, .7));
 }
-
+/* axis styles */
 .axisLine {
   stroke-width: 0.8px;
   stroke: #b7b7b7;
@@ -169,8 +169,42 @@ p{
   fill: black;
 }
 
+/* Action Center of List View */
+
+.actionCenter {
+  padding: 2%;
+  background: #6b6b6b;
+}
+
+.searchInListContainer{
+  flex: 9;
+}
+
+.sortingIconContainer_{
+  flex : 1;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
 .sortingIcon_ {
-  margin-top: 1.5rem;
-    font-size: 25px;
-    text-align: center;
+  font-size: 25px;
+  cursor: pointer;
+  color: white;
+}
+
+.sortingMenuContainer {
+  padding: 3%;
+}
+
+.sortingTitle {
+  font-weight: 500;
+  color: #f0f0f0;
+  font-size: 1.4em;
+}
+
+.sortingMenuOption {
+  font-weight: 100;
+  color: #dbdbdb;
+  font-size: 1em;
 }
