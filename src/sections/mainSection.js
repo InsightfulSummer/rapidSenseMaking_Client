@@ -3,26 +3,26 @@ import * as d3 from 'd3'
 import {useDispatch, useSelector} from 'react-redux'
 import { scroller } from 'react-scroll'
 import {SetDimensions, SetActiveDocument, UnSetActiveDocument, ChangeCardinality, SetActiveAxisRange, UnsetActiveAxisRange} from '../redux/actions/actions'
-import {shuffleArray} from '../helper/helper'
 
 const MainSection = () => {
 
     const dispatch = useDispatch()
 
-    const {width, height, documents, sortMetric, activeDocumentId, cardinality, activeAxisRange} = useSelector(state => ({
+    const {width, height, documents, sortMetric, activeDocumentId, cardinality, activeAxisRange, ascending} = useSelector(state => ({
         width : state.canvasReducer.width,
         height : state.canvasReducer.height,
         documents : state.dataReducer.documents,
         sortMetric : state.interactionReducer.sortMetric,
+        ascending : state.interactionReducer.ascending,
         activeDocumentId: state.interactionReducer.activeDocumentId,
         cardinality : state.interactionReducer.cardinality,
         activeAxisRange : state.interactionReducer.activeAxisRange
     }))
 
-    let domain = d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])})
+    let domain = ascending ? d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])}) : d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])}).reverse()
     const aScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(width)/2)-75])
     const bScale = d3.scaleLinear().domain(domain).range([0, (parseFloat(height)/2)*0.95])
-    const rScale = d3.scaleLinear().domain(domain).range([width/35,width/160])
+    const rScale = d3.scaleLinear().domain(domain).range([width/50,width/160])
     const angleScale = d3.scaleLinear().domain([1 , documents.length]).range([30, 330])
 
     const getX = (item, index) => {
@@ -231,7 +231,7 @@ const MainSection = () => {
             .attr("class", "fa sortingIcon")
             .attr("x", width - 30)
             .attr("y", height/2 + 9)
-            .text("\uf1da")
+            .text("\uf885")
     }
 
     const updateSortingMetric = () => {

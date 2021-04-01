@@ -16,6 +16,16 @@ export const fetchDocuments = () => {
     }
 }
 
+export const sortDocuments = (sortMetric, ascending=true) => {
+    return {
+        type : types.SortDocuments,
+        payload : {
+            sortMetric,
+            ascending
+        }
+    }
+}
+
 // interaction-related actions
 
 export const SetActiveDocument = (documentId) => {
@@ -54,6 +64,28 @@ export const SetActiveAxisRange = (start, end) => {
 export const UnsetActiveAxisRange = () => {
     return {
         type : types.UnsetActiveAxisRange
+    }
+}
+
+export const ToggleSortingInList = () => {
+    return {
+        type : types.ToggleSortingInList
+    }
+}
+
+export const ToggleSortingInCanvas = () => {
+    return {
+        type : types.ToggleSortingInCanvas
+    }
+}
+
+export const ChangeSortMetric = (sortMetric, ascending=true) => {
+    return {
+        type : types.ChangeSortMetric,
+        payload : {
+            sortMetric,
+            ascending
+        }
     }
 }
 

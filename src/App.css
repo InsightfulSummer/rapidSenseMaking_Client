@@ -207,4 +207,13 @@ p{
   font-weight: 100;
   color: #dbdbdb;
   font-size: 1em;
+  transition: all 500ms;
+  margin-left: 2%;
+}
+
+.sortingMenuOption:hover {
+  color: #ffffff;
+  cursor: pointer;
+  margin-left: 4%;
+  font-size: 1.05em;
 }

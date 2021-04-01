@@ -6,5 +6,9 @@ export default {
     SetDimensions : "SetDimensions",
     ChangeCardinality : "ChangeCardinality",
     SetActiveAxisRange : "SetActiveAxisRange",
-    UnsetActiveAxisRange : "UnsetActiveAxisRange"
+    UnsetActiveAxisRange : "UnsetActiveAxisRange",
+    ToggleSortingInList : "ToggleSortingInList",
+    ToggleSortingInCanvas : "ToggleSortingInCanvas",
+    ChangeSortMetric : "ChangeSortMetric",
+    SortDocuments : "SortDocuments"
 }

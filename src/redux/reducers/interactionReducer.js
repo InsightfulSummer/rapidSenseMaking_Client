@@ -3,8 +3,11 @@ import types from "../actions/types";
 const initialState = {
     activeDocumentId : null,
     sortMetric : "publishYear",
+    ascending : true,
     cardinality : 5,
-    activeAxisRange : null
+    activeAxisRange : null,
+    sortingInList : false,
+    sortingInCanvas : false
 }
 
 const reducer = (state=initialState, actions) => {
@@ -32,6 +35,21 @@ const reducer = (state=initialState, actions) => {
         case types.UnsetActiveAxisRange:
             return {
                 ...state, activeAxisRange: null
+            }
+
+        case types.ToggleSortingInList:
+            return {
+                ...state, sortingInList: !state.sortingInList
+            }
+
+        case types.ToggleSortingInCanvas:
+            return {
+                ...state, sortingInCanvas : !state.sortingInCanvas
+            }
+
+        case types.ChangeSortMetric: 
+            return {
+                ...state, sortMetric : actions.payload.sortMetric, ascending : actions.payload.ascending
             }
     
         default:
