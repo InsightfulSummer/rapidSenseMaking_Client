@@ -98,3 +98,22 @@ export const SetDimensions = (width, height) => {
         }
     }
 }
+
+    // for visualization 2
+export const SetZ = (z) => {
+    return {
+        type : types.SetZ,
+        payload : {
+            z
+        }
+    }
+}
+
+export const setSliderHeightPorportion = (sliderHeightPorportion) => {
+    return {
+        type : types.SetSliderHeightPorportion,
+        payload : {
+            sliderHeightPorportion
+        }
+    }
+}

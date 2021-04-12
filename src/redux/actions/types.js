@@ -10,5 +10,8 @@ export default {
     ToggleSortingInList : "ToggleSortingInList",
     ToggleSortingInCanvas : "ToggleSortingInCanvas",
     ChangeSortMetric : "ChangeSortMetric",
-    SortDocuments : "SortDocuments"
+    SortDocuments : "SortDocuments",
+    // for visualiztion 2
+    SetZ : "SetZ",
+    SetSliderHeightPorportion : "SetSliderHeightPorportion"
 }
