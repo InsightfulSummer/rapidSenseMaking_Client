@@ -335,5 +335,285 @@
         "relevancy":"8",
         "citing": "55",
         "cited" : "3"
+    },
+    {
+        "_id" : "24",
+        "title" : "Bringing the Field into the Lab: Large-Scale Visualization of Animal Movement Trajectories within a Virtual Island",
+        "abstract" : "Animal behavior research is becoming an increasingly data-driven field, enabled by advancements in GPS tracking. Rather than directly observe movement and behavior in small numbers of animals, over short time-spans and in small areas, researchers can use GPS collars to track many animals, over large areas and long time spans. These large datasets have the potential to provide rich information about animal behavior. However, this tracking data needs to be integrated with geospatial data about the environment in order to put the movements and estimated behaviors into context. We present an immersive visualization which integrates high resolution topological data from Barro Colorado Island, a 4000 acre island located in the Panama Canal, with GPS tracking data from close to two dozen primates captured over several months. Our application leverages parallelization for rapid filtering of the movement data, allowing researchers to explore the data in a large-scale, immersive environment (CAVE2). We present this work in order to explore the possibility of creating virtual field environments from data, to bring the field into the lab and enable big data animal behavior research.",
+        "publishYear": "2019",
+        "authors":[
+            {
+                "name" : "Jillian Aurisano"
+            },
+            {
+                "name" : "James Hwang"
+            },
+            {
+                "name" : "Andrew Johnson"
+            },
+            {
+                "name" : "Lance Long"
+            },
+            {
+                "name" : "Margaret Crofoot"
+            },
+            {
+                "name" : "Tanya Berger-Wolf"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "11",
+        "cited" : "1"
+    },
+    {
+        "_id" : "25",
+        "title" : "On the Impact of the Medium in the Effectiveness of 3D Software Visualizations",
+        "abstract" : "Many visualizations have proven to be effective in supporting various software related tasks. Although multiple media can be used to display a visualization, the standard computer screen is used the most. We hypothesize that the medium has a role in their effectiveness. We investigate our hypotheses by conducting a controlled user experiment. In the experiment we focus on the 3D city visualization technique used for software comprehension tasks. We deploy 3D city visualizations across a standard computer screen (SCS), an immersive 3D environment (I3D), and a physical 3D printed model (P3D). We asked twenty-seven participants (whom we divided in three groups for each medium) to visualize software systems of various sizes, solve a set of uniform comprehension tasks, and complete a questionnaire. We measured the effectiveness of visualizations in terms of performance, recollection, and user experience. We found that even though developers using P3D required the least time to identify outliers, they perceived the least difficulty when visualizing systems based on SCS. Moreover, developers using I3D obtained the highest recollection.",
+        "publishYear": "2017",
+        "authors":[
+            {
+                "name" : "Leonel Merino"
+            },
+            {
+                "name" : "Johannes Fuchs"
+            },
+            {
+                "name" : "Michael Blumenschein"
+            },
+            {
+                "name" : "Craig Anslow"
+            },
+            {
+                "name" : "Mohammad Ghafari"
+            },
+            {
+                "name" : "Oscar Nierstrasz"
+            },
+            {
+                "name" : "Michael Behrisch"
+            },
+            {
+                "name" : "Daniel A. Keim"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "36",
+        "cited" : "10"
+    },
+    {
+        "_id" : "26",
+        "title" : "Uncluttered Single-Image Visualization of Vascular Structures Using GPU and Integer Programming",
+        "abstract" : "Direct projection of 3D branching structures, such as networks of cables, blood vessels, or neurons onto a 2D image creates the illusion of intersecting structural parts and creates challenges for understanding and communication. We present a method for visualizing such structures, and demonstrate its utility in visualizing the abdominal aorta and its branches, whose tomographic images might be obtained by computed tomography or magnetic resonance angiography, in a single 2D stylistic image, without overlaps among branches. The visualization method, termed uncluttered single-image visualization (USIV), involves optimization of geometry. This paper proposes a novel optimization technique that utilizes an interesting connection of the optimization problem regarding USIV to the protein structure prediction problem. Adopting the integer linear programming-based formulation for the protein structure prediction problem, we tested the proposed technique using 30 visualizations produced from five patient scans with representative anatomical variants in the abdominal aortic vessel tree. The novel technique can exploit commodity-level parallelism, enabling use of general-purpose graphics processing unit (GPGPU) technology that yields a significant speedup. Comparison of the results with the other optimization technique previously reported elsewhere suggests that, in most aspects, the quality of the visualization is comparable to that of the previous one, with a significant gain in the computation time of the algorithm.",
+        "publishYear": "2012",
+        "authors":[
+            {
+                "name" : "Joong-Ho Won"
+            },
+            {
+                "name" : "Yongkweon Jeon"
+            },
+            {
+                "name" : "Jarrett K. Rosenberg"
+            },
+            {
+                "name" : "Sungroh Yoon"
+            },
+            {
+                "name" : "Geoffrey D. Rubin"
+            },
+            {
+                "name" : "Sandy Napel"
+            }
+        ],
+        "relevancy": "4",
+        "citing": "39",
+        "cited" : "2"
+    },
+    {
+        "_id" : "27",
+        "title" : "Glyph-Based Comparative Visualization for Diffusion Tensor Fields",
+        "abstract" : "Diffusion Tensor Imaging (DTI) is a magnetic resonance imaging modality that enables the in-vivo reconstruction and visualization of fibrous structures. To inspect the local and individual diffusion tensors, glyph-based visualizations are commonly used since they are able to effectively convey full aspects of the diffusion tensor. For several applications it is necessary to compare tensor fields, e.g., to study the effects of acquisition parameters, or to investigate the influence of pathologies on white matter structures. This comparison is commonly done by extracting scalar information out of the tensor fields and then comparing these scalar fields, which leads to a loss of information. If the glyph representation is kept, simple juxtaposition or superposition can be used. However, neither facilitates the identification and interpretation of the differences between the tensor fields. Inspired by the checkerboard style visualization and the superquadric tensor glyph, we design a new glyph to locally visualize differences between two diffusion tensors by combining juxtaposition and explicit encoding. Because tensor scale, anisotropy type, and orientation are related to anatomical information relevant for DTI applications, we focus on visualizing tensor differences in these three aspects. As demonstrated in a user study, our new glyph design allows users to efficiently and effectively identify the tensor differences. We also apply our new glyphs to investigate the differences between DTI datasets of the human brain in two different contexts using different b-values, and to compare datasets from a healthy and HIV-infected subject.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Changgong Zhang"
+            },
+            {
+                "name" : "Thomas Schultz"
+            },
+            {
+                "name" : "Kai Lawonn"
+            },
+            {
+                "name" : "Elmar Eisemann"
+            },
+            {
+                "name" : "Anna Vilanova"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "43",
+        "cited" : "23"
+    },
+    {
+        "_id" : "28",
+        "title" : "An Enhanced Visualization Process Model for Incremental Visualization",
+        "abstract" : "With today's technical possibilities, a stable visualization scenario can no longer be assumed as a matter of course, as underlying data and targeted display setup are much more in flux than in traditional scenarios. Incremental visualization approaches are a means to address this challenge, as they permit the user to interact with, steer, and change the visualization at intermediate time points and not just after it has been completed. In this paper, we put forward a model for incremental visualizations that is based on the established Data State Reference Model, but extends it in ways to also represent partitioned data and visualization operators to facilitate intermediate visualization updates. In combination, partitioned data and operators can be used independently and in combination to strike tailored compromises between output quality, shown data quantity, and responsiveness-i.e., frame rates. We showcase the new expressive power of this model by discussing the opportunities and challenges of incremental visualization in general and its usage in a real world scenario in particular.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Hans-Jörg Schulz"
+            },
+            {
+                "name" : "Marco Angelini"
+            },
+            {
+                "name" : "Giuseppe Santucci"
+            },
+            {
+                "name" : "Heidrun Schumann"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "42",
+        "cited" : "20"
+    },
+    {
+        "_id" : "29",
+        "title" : "Multiscale Time Activity Data Exploration via Temporal Clustering Visualization Spreadsheet",
+        "abstract" : "Time-varying data is usually explored by animation or arrays of static images. Neither is particularly effective for classifying data by different temporal activities. Important temporal trends can be missed due to the lack of ability to find them with current visualization methods. In this paper, we propose a method to explore data at different temporal resolutions to discover and highlight data based upon time-varying trends. Using the wavelet transform along the time axis, we transform data points into multi-scale time series curve sets. The time curves are clustered so that data of similar activity are grouped together, at different temporal resolutions. The data are displayed to the user in a global time view spreadsheet where she is able to select temporal clusters of data points, and filter and brush data across temporal scales. With our method, a user can interact with data based on time activities and create expressive visualizations.",
+        "publishYear": "2008",
+        "authors":[
+            {
+                "name" : "Jonathan Woodring"
+            },
+            {
+                "name" : "Han-Wei Shen"
+            }
+        ],
+        "relevancy": "4",
+        "citing": "31",
+        "cited" : "42"
+    },
+    {
+        "_id" : "30",
+        "title" : "Noise-Based Volume Rendering for the Visualization of Multivariate Volumetric Data",
+        "abstract" : "Analysis of multivariate data is of great importance in many scientific disciplines. However, visualization of 3D spatially-fixed multivariate volumetric data is a very challenging task. In this paper we present a method that allows simultaneous real-time visualization of multivariate data. We redistribute the opacity within a voxel to improve the readability of the color defined by a regular transfer function, and to maintain the see-through capabilities of volume rendering. We use predictable procedural noise - random-phase Gabor noise - to generate a high-frequency redistribution pattern and construct an opacity mapping function, which allows to partition the available space among the displayed data attributes. This mapping function is appropriately filtered to avoid aliasing, while maintaining transparent regions. We show the usefulness of our approach on various data sets and with different example applications. Furthermore, we evaluate our method by comparing it to other visualization techniques in a controlled user study. Overall, the results of our study indicate that users are much more accurate in determining exact data values with our novel 3D volume visualization method. Significantly lower error rates for reading data values and high subjective ranking of our method imply that it has a high chance of being adopted for the purpose of visualization of multivariate 3D data.",
+        "publishYear": "2013",
+        "authors":[
+            {
+                "name" : "Rostislav Khlebnikov"
+            },
+            {
+                "name" : "Bernhard Kainz"
+            },
+            {
+                "name" : "Markus Steinberger"
+            },
+            {
+                "name" : "Dieter Schmalstieg"
+            }
+        ],
+        "relevancy": "5",
+        "citing": "29",
+        "cited" : "9"
+    },
+    {
+        "_id" : "31",
+        "title" : "cpmViz: A Web-Based Visualization Tool for Uncertain Spatiotemporal Data",
+        "abstract" : "The goal of the VAST challenge 2019 Mini Challenge 2 was to visualize radioactive contaminations measured by mobile and static sensors and their changes over time, allowing city officials to determine the severity of the leakage at the city's nuclear power plant. We propose cpmViz, a web-based tool that allows for interactive data exploration of the sensor readings in both of the spatial and temporal dimensions. The tool consists out of three views that are connected via linking and scrolling. We visualize static sensor uncertainty by introducing Voronoi cells to illustrate how much space is covered by an individual measurement unit. For mobile sensors, we showcase their activity periods and introduce the concept of sensor streaks as periods of uninterrupted recordings as a temporal uncertainty measure. As for spatial uncertainty, we color individual districts based on the amount of data that was recorded inside the user's selected time window. Using our system, we were able to easily spot major events like the city's initial earthquake in the sensor readings. Certain southern districts are clearly visible as areas of concern that we consider in need of more static sensors. Furthermore, we were also able to identify static as well as moving contaminations.",
+        "publishYear": "2019",
+        "authors":[
+            {
+                "name" : "Fabian Nagel"
+            },
+            {
+                "name" : "Giuliano Castiglia"
+            },
+            {
+                "name" : "Gemza Ademaj"
+            },
+            {
+                "name" : "Juri Buchmller"
+            },
+            {
+                "name" : "Udo Schlegel"
+            },
+            {
+                "name" : "Daniel A. Keim"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "0",
+        "cited" : "0"
+    },
+    {
+        "_id" : "32",
+        "title" : "Uncertainty Visualization for Secondary Structures of Proteins",
+        "abstract" : "We present a technique that conveys the uncertainty in the secondary structure of proteins-an abstraction model based on atomic coordinates. While protein data inherently contains uncertainty due to the acquisition method or the simulation algorithm, we argue that it is also worth investigating uncertainty induced by analysis algorithms that precede visualization. Our technique helps researchers investigate differences between multiple secondary structure assignment methods. We modify established algorithms for fuzzy classification and introduce a discrepancy-based approach to project an ensemble of sequences to a single importance-weighted sequence. In 2D, we depict the aggregated secondary structure assignments based on the per-residue deviation in a collapsible sequence diagram. In 3D, we extend the ribbon diagram using visual variables such as transparency, wave form, frequency, or amplitude to facilitate qualitative analysis of uncertainty. We evaluated the effectiveness and acceptance of our technique through expert reviews using two example applications: the combined assignment against established algorithms and time-dependent structural changes originating from simulated protein dynamics.",
+        "publishYear": "2018",
+        "authors":[
+            {
+                "name" : "Christoph Schulz"
+            },
+            {
+                "name" : "Karsten Schatz"
+            },
+            {
+                "name" : "Michael Krone"
+            },
+            {
+                "name" : "Matthias Braun"
+            },
+            {
+                "name" : "Thomas Ertl"
+            },
+            {
+                "name" : "Daniel Weiskopf"
+            }
+        ],
+        "relevancy": "4",
+        "citing": "47",
+        "cited" : "2"
+    },
+    {
+        "_id" : "33",
+        "title" : "Learning Visualizations by Analogy: Promoting Visual Literacy through Visualization Morphing",
+        "abstract" : "We propose the concept of teaching (and learning) unfamiliar visualizations by analogy, that is, demonstrating an unfamiliar visualization method by linking it to another more familiar one, where the in-betweens are designed to bridge the gap of these two visualizations and explain the difference in a gradual manner. As opposed to a textual description, our morphing explains an unfamiliar visualization through purely visual means. We demonstrate our idea by ways of four visualization pair examples: data table and parallel coordinates, scatterplot matrix and hyperbox, linear chart and spiral chart, and hierarchical pie chart and treemap. The analogy is commutative i.e. any member of the pair can be the unfamiliar visualization. A series of studies showed that this new paradigm can be an effective teaching tool. The participants could understand the unfamiliar visualization methods in all of the four pairs either fully or at least significantly better after they observed or interacted with the transitions from the familiar counterpart. The four examples suggest how helpful visualization pairings be identified and they will hopefully inspire other visualization morphings and associated transition strategies to be identified.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Puripant Ruchikachorn"
+            },
+            {
+                "name" : "Klaus Mueller"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "50",
+        "cited" : "18"
+    },
+    {
+        "_id" : "34",
+        "title" : "The Explanatory Visualization Framework: An Active Learning Framework for Teaching Creative Computing Using Explanatory Visualizations",
+        "abstract" : "Visualizations are nowadays appearing in popular media and are used everyday in the workplace. This democratisation of visualization challenges educators to develop effective learning strategies, in order to train the next generation of creative visualization specialists. There is high demand for skilled individuals who can analyse a problem, consider alternative designs, develop new visualizations, and be creative and innovative. Our three-stage framework, leads the learner through a series of tasks, each designed to develop different skills necessary for coming up with creative, innovative, effective, and purposeful visualizations. For that, we get the learners to create an explanatory visualization of an algorithm of their choice. By making an algorithm choice, and by following an active-learning and project-based strategy, the learners take ownership of a particular visualization challenge. They become enthusiastic to develop good results and learn different creative skills on their learning journey.",
+        "publishYear": "2017",
+        "authors":[
+            {
+                "name" : "Jonathan C. Roberts"
+            },
+            {
+                "name" : "Panagiotis D. Ritsos"
+            },
+            {
+                "name" : "James R. Jackson"
+            },
+            {
+                "name" : "Christopher Headleand"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "70",
+        "cited" : "2"
     }
 ]

@@ -124,6 +124,7 @@ p{
 .canvasSVG {
   box-shadow: 1px 1px 3px 1px rgb(160, 160, 160);
   border-radius: 5px;
+  background: #e6e6e6;
 }
 
 .docCircle {
