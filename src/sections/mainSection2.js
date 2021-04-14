@@ -19,7 +19,7 @@ const MainSection = () => {
     }))
 
     //define your scales here ...
-    let domain = ascending ? d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])}) : d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])}).reverse()
+    let domain = ascending ? d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])}).reverse() : d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])})
     const widthScale = d3.scaleLinear().domain(domain).range([0.5,1])
 
     const sliderDragHandler = d3.drag()
@@ -72,11 +72,11 @@ const MainSection = () => {
                 .attr("stop-color" , "#e6e6e6")
 
             slideBodyGradient.append("stop")
-                .attr("offset" , "20%")
+                .attr("offset" , "5%")
                 .attr("stop-color" , "#fff")
 
             slideBodyGradient.append("stop")
-                .attr("offset" , "80%")
+                .attr("offset" , "95%")
                 .attr("stop-color" , "#fff")
 
             slideBodyGradient.append("stop")
@@ -187,7 +187,7 @@ const MainSection = () => {
             .append("rect")
             .merge(newElements)
             .transition()
-            .attr("x",width/22)
+            .attr("x",125)
             .attr("y",(item, index)=>{
                 return index < n_z ? (index)*(t_z+margin) : index < n_z+n_x ? n_z*(t_z + margin) + (index - n_z)*(t_x*t_z + margin) : n_z*(t_z + margin) + n_x*(t_x*t_z + margin) + (index - n_z - n_x)*(t_z+margin)
             })
@@ -197,29 +197,40 @@ const MainSection = () => {
             .attr("height" , (item , index ) => {
                 return index < n_z ? t_z : index < n_z + n_x ? t_x * t_z : t_z
             })
-            .attr("fill", "black")
+            .attr("fill", "#3f51b5")
             .attr("class", "docElement")
+            .attr("opacity", (item, index) => {
+                return index < n_z ? 0.65 : index < n_z + n_x ? 0.95 : 0.65
+            })
 
     }
 
     const loadAxis = (cardinality) => {
+        // cardinality can be dynamic later
         d3.select(".mainContainer")
             .append("g")
             .attr("class", "axisContainer")
 
         let steps_ = []
-        let stepMagnitude = (domain[1]-domain[0])/(cardinality-1)
+        console.log(domain)
+        let stepMagnitude = (domain[0]-domain[1])/(cardinality-1)
         for (let index = 0; index < cardinality; index++) {
             steps_.push({
-                label : parseInt(domain[0] + stepMagnitude*index)
+                label : parseInt(domain[1] + stepMagnitude*index)
             })
         }
         steps_[0].n = 0
+        steps_[0].label = steps_[0].label-1
         steps_.slice(1).map((step, index) => {
             step.n = documents.filter(item => {
-                return ascending ? item[sortMetric] >= steps_[index].label && item[sortMetric] <= step.label : item[sortMetric] <= steps_[index].label && item[sortMetric] >= step.label
+                return ascending ? item[sortMetric] > steps_[index].label && item[sortMetric] <= step.label : item[sortMetric] < steps_[index].label && item[sortMetric] >= step.label
             }).length
             step.n += steps_[index].n
+        })
+        steps_ = steps_.filter((item , index) => {
+            return steps_.findIndex(step => {
+                return step.n == item.n
+            }) == index
         })
         setSteps(steps_)
         updateAxis()
@@ -231,22 +242,24 @@ const MainSection = () => {
         var n_z = Math.floor((z/(1-slideHeightPorportion))*(documents.length - n_x))
         let t_x = Math.pow((1/slideHeightPorportion), 2) // thickness of each element within the sliding window
         let t_z = (height - documents.length*margin) / (t_x*n_x + (documents.length - n_x)) // thickness of each element outisde of the sliding window
+        t_x = t_x*t_z
 
         let axisContainer = d3.select(".axisContainer")
-        var axisElements = axisContainer.selectAll(".axisElements")
+        var axisLines = axisContainer.selectAll(".axisLines")
             .data(steps)
-
-        axisElements.exit().remove()
-        axisElements
+        var axisText = axisContainer.selectAll(".axisText")
+            .data(steps)
+        // there can also be a rectangle for each axis step and hovering it the docs of that range should appear brighter or so ...
+        axisLines.exit().remove()
+        axisText.exit().remove()
+        axisLines
             .enter()
             .append("line")
-            .attr("class", "axisElements")
-            .attr("x1",65)
+            .attr("x1",105)
             .attr("x2", width)
-            .merge(axisElements)
+            .merge(axisLines)
             .transition()
             .attr("y1", step => {
-                console.log(step.n > n_z + n_x, n_z*(t_z+margin) + n_x*(t_x+margin) + (step.n-n_x-n_z) * (t_z+margin))
                 return step.n > n_z ? step.n > n_z + n_x ? n_z*(t_z+margin) + n_x*(t_x+margin) + (step.n-n_x-n_z) * (t_z+margin) :
                     n_z*(t_z+margin) + (step.n-n_z) * (t_x + margin) : 
                     step.n * (t_z + margin)
@@ -256,7 +269,24 @@ const MainSection = () => {
                     n_z*(t_z+margin) + (step.n-n_z) * (t_x + margin) : 
                     step.n * (t_z + margin)
             })
-            .attr("stroke" , "blue")
+            .attr("stroke" , "#b6b6b6")
+            .attr("stroke-dasharray","5")
+            .attr("class", "axisLines")
+
+        axisText
+            .enter()
+            .append("text")
+            .attr("x", 85)
+            .attr("text-anchor", "middle")
+            .text(step => step.label)
+            .merge(axisText)
+            .transition()
+            .attr("y", step => {
+                return step.n > n_z ? step.n > n_z + n_x ? n_z*(t_z+margin) + n_x*(t_x+margin) + (step.n-n_x-n_z) * (t_z+margin) :
+                    n_z*(t_z+margin) + (step.n-n_z) * (t_x + margin) : 
+                    step.n * (t_z + margin)
+            })
+            .attr("class", "axisText")
     }
 
     useEffect(()=>{
@@ -264,7 +294,7 @@ const MainSection = () => {
         setTimeout(()=>{
             loadSVG();
             loadSlider();
-            loadAxis(3);
+            loadAxis(10);
             loadDocs();
         } , 250)
     } , [width, height])
