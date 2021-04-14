@@ -224,3 +224,15 @@ p{
   margin-left: 4%;
   font-size: 1.05em;
 }
+
+/* vis 2 */
+.slideController {
+  rx: 5px;
+  cursor: pointer;
+}
+
+.slideControllerText{
+  text-anchor: middle;
+  fill: #eee;
+  font-weight: 600;
+}
