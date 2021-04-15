@@ -21,6 +21,7 @@ const MainSection = () => {
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])}).reverse() : d3.extent(documents, doc=>{return parseFloat(doc[sortMetric])})
     const widthScale = d3.scaleLinear().domain(domain).range([0.5,1])
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
 
     const sliderDragHandler = d3.drag()
             .on("drag", function(d){

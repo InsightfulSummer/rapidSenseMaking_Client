@@ -13,5 +13,11 @@ export default {
     SortDocuments : "SortDocuments",
     // for visualiztion 2
     SetZ : "SetZ",
-    SetSliderHeightPorportion : "SetSliderHeightPorportion"
+    SetSliderHeightPorportion : "SetSliderHeightPorportion",
+    // for clustering 
+    AutoClustering : "AutoClustering",
+    AddOneCluster : "AddOneCluster",
+    RemoveOneCluster : "RemoveOneCluster",
+    ChangeClusterOfDocument : "ChangeClusterOfDocument",
+    RenameCluster : "RenameCluster"
 }

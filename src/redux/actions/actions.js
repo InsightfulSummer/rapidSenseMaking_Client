@@ -117,3 +117,50 @@ export const setSliderHeightPorportion = (sliderHeightPorportion) => {
         }
     }
 }
+
+// clustering related actions
+
+export const autoCluster = (n_clusters) => {
+    return {
+        type : types.AutoClustering,
+        payload : {
+            n_clusters
+        }
+    }
+}
+
+export const addOneCluster = (cluster_name=null) => {
+    return {
+        type : types.AddOneCluster,
+        payload : {
+            cluster_name
+        }
+    }
+}
+
+export const removeOneCluster = (cluster_id) => {
+    return {
+        type : types.RemoveOneCluster,
+        payload : {
+            cluster_id
+        }
+    }
+}
+
+export const changeClusterOfDocument = (document_id, cluster_id) => {
+    return {
+        type : types.ChangeClusterOfDocument,
+        payload : {
+            document_id, cluster_id
+        }
+    }
+}   
+
+export const renameCluster = (cluster_id, new_name) => {
+    return {
+        type : types.RenameCluster,
+        payload : {
+            cluster_id, new_name
+        }
+    }
+}
