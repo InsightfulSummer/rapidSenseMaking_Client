@@ -615,5 +615,208 @@
         "relevancy": "7",
         "citing": "70",
         "cited" : "2"
+    },
+    {
+        "_id" : "35",
+        "title" : "Human-Document Interaction Systems -- A New Frontier for Document Image Analysis",
+        "abstract" : "All indications show that paper documents will not cede in favour of their digital counterparts, but will instead be used increasingly in conjunction with digital information. An open challenge is how to seamlessly link the physical with the digital -- how to continue taking advantage of the important affordances of paper, without missing out on digital functionality. This paper presents the authors' experience with developing systems for Human-Document Interaction based on augmented document interfaces and examines new challenges and opportunities arising for the document image analysis field in this area. The system presented combines state of the art camera-based document image analysis techniques with a range of complementary technologies to offer fluid Human-Document Interaction. Both fixed and nomadic setups are discussed that have gone through user testing in real-life environments, and use cases are presented that span the spectrum from business to educational applications.",
+        "publishYear": "2016",
+        "authors":[
+            {
+                "name" : "Dimosthenis Karatzas"
+            },
+            {
+                "name" : "Vincent Poulain d'Andecy"
+            },
+            {
+                "name" : "Marçal Rusiñol"
+            },
+            {
+                "name" : "Antonio Chica"
+            },
+            {
+                "name" : "Pere-Pau Vazquez"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "31",
+        "cited" : "5"
+    },
+    {
+        "_id" : "36",
+        "title" : "Iterative Analysis of Pages in Document Collections for Efficient User Interaction",
+        "abstract" : "The analysis of sets of degraded documents, like historical ones, is error-prone and requires human help to achieve acceptable quality levels. However, human interaction raises 3 main issues when processing important amounts of pages: none of the user or the system should wait for work, information provided by a human operator should not be restricted to local isolated corrections, but rather produce durable changes in the system, the ability to interact with a human operator should not increase the complexity of document models nor duplicate them between analysis and human interaction processes. To solve those issues, we propose an iterative approach, based on a special mechanism called visual memory, to reintegrate external information during page analysis. So as to demonstrate the interest for existing systems, we explain how we adapted a (rule-based) page analysis tool to enable, in this iterative approach, a delayed interaction with a human operator based on an adaptation of error recovery principles for compilers and the well-known exception handling mechanism. We validated our iterative approach on sales registers from the 18th century.",
+        "publishYear": "2011",
+        "authors":[
+            {
+                "name" : "Joseph Chazalon"
+            },
+            {
+                "name" : "Bertrand Couasnon"
+            },
+            {
+                "name" : "Aurelie Lemaitre"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "7",
+        "cited" : "3"
+    },
+    {
+        "_id" : "37",
+        "title" : "Semi-synthetic Document Image Generation Using Texture Mapping on Scanned 3D Document Shapes",
+        "abstract" : "This article presents a method for generating semi-synthetic images of old documents where the pages might be torn (not flat). By using only 2D deformation models, most existing methods give non-realistic synthetic document images. Thus, we propose to use 3D approach for reproducing geometric distortions in real documents. First, a new proposed texture coordinate generation technique extracts texture coordinates of each vertex in the document shape (mesh) resulting from 3D scanning of a real degraded document. Then, any 2D document image can be overlayed on the mesh by using an existing texture image mapping method. As a result, many complex real geometric distortions can be integrated in generated synthetic images. These images then can be used for enriching training sets or for performance evaluation. The degradation method here is jointly used with the character degradation model we proposed in [1] to generate the 6000 semi-synthetic degraded images of the music score removal staff line competition of ICDAR 2013.",
+        "publishYear": "2013",
+        "authors":[
+            {
+                "name" : "V.C. Kieu"
+            },
+            {
+                "name" : "Nicholas Journet"
+            },
+            {
+                "name" : "Muriel Visani"
+            },
+            {
+                "name" : "Rémy Mullot"
+            },
+            {
+                "name" : "Jean Phillipe Domenger"
+            }
+        ],
+        "relevancy": "8",
+        "citing": "15",
+        "cited" : "9"
+    },
+    {
+        "_id" : "38",
+        "title" : "A User-Centered Segmentation Method for Complex Historical Manuscripts Based on Document Graphs",
+        "abstract" : "In historical manuscripts, humans can detect handwritten words, lines, and decorations with lightness even if they do not know the language or the script. Yet for automatic processing this task has proven elusive, especially in the case of handwritten documents with complex layouts, which is why semiautomatic methods that integrate the human user into the process are needed. In this paper, we introduce a user-centered segmentation method based on document graphs and scribbling interaction. The graphs capture a sparse representation of the document's structure that can then be edited by the user with a stylus on a touch-sensitive screen. We evaluate the proposed method on a newly introduced database of historical manuscripts with complex layout and demonstrate, first, that the document graphs are already close to the desired segmentation and, second, that scribbling allows a natural and efficient interaction.",
+        "publishYear": "2016",
+        "authors":[
+            {
+                "name" : "Angelika Garz"
+            },
+            {
+                "name" : "Mathias Seuret"
+            },
+            {
+                "name" : "Andreas Fischer"
+            },
+            {
+                "name" : "Rolf Ingold"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "71",
+        "cited" : "4"
+    },
+    {
+        "_id" : "39",
+        "title" : "Logical structure analysis of document images based on emergent computation",
+        "abstract" : "A new method for logical structure analysis of document images is proposed in this paper as the basis for a document reader which can extract logical information from various printed documents. The proposed system consists of five basic modules: typography analysis, object recognition, object segmentation, object grouping and object modification. Emergent computation, which is a key concept of artificial life, is adopted for the cooperative interaction among the modules in the system in order to achieve an effective and flexible behavior of the whole system. It has two principal advantages over other methods: adaptive system configuration for various and complex logical structures, and robust document analysis that is tolerant of erroneous feature detection.",
+        "publishYear": "1999",
+        "authors":[
+            {
+                "name" : "Y. Ishitani"
+            }
+        ],
+        "relevancy": "8",
+        "citing": "3",
+        "cited" : "13"
+    },
+    {
+        "_id" : "40",
+        "title" : "Intelligent document understanding: Understanding photographs with captions",
+        "abstract" : "The interaction of textual and photographic information in document understanding is explored. Specifically, a computational model whereby textual captions are used as collateral information in the interpretation of the corresponding photographs is presented. The final understanding of the picture and caption reflects a consolidation of the information obtained from each of the two sources and can thus be used in intelligent information retrieval tasks. The problem of performing general-purpose vision without apriori knowledge is very difficult at best. The concept of using collateral information in scene understanding has been explored in systems that use general scene context in the task of object identification. The work described extends this notion by incorporating picture specific information. Finally, as a test of the model, a multi-stage system PICTION which uses captions to identify humans in an accompanying photograph is described. This provides a computationally less expensive alternative to traditional methods of face recognition since it does not require a pre-stored database of face models for all people to be identified.",
+        "publishYear": "1993",
+        "authors":[
+            {
+                "name" : "R.K. Srihari"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "6",
+        "cited" : "2"
+    },
+    {
+        "_id" : "41",
+        "title" : "Finger gesture interaction on large tabletop for sharing digital documents among multiple users",
+        "abstract" : "Sharing digital documents among multiple users on large tabletop is one of the typical application scenarios for tabletop systems. In this paper, we elaborate the guidelines of designing user interface for this application scenario. A set of finger gestures are then defined into the interface which includes single finger operation for selecting, moving and delivering a digital document among multiple users, double finger operation for resizing and rotating a digital document, trajectory operation for creating and deleting a user working area, creating, deleting and copying a digital document. A prototype tabletop application called JuTable is developed to explore these gestures. At last, we make a discussion on learnability, usability and naturalness of our interface design for this application scenario.",
+        "publishYear": "2008",
+        "authors":[
+            {
+                "name" : "Yue Shi"
+            },
+            {
+                "name" : "Chun Yu"
+            },
+            {
+                "name" : "Yuanchun Shi"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "11",
+        "cited" : "2"
+    },
+    {
+        "_id" : "42",
+        "title" : "A layout preserving online document glancing technique",
+        "abstract" : "Internet has become the largest repository for documents. PDF documents distribution through Internet is prevalent, as the cost is almost zero. At present, files are mostly downloaded from the Internet and users go through cursorily over entire document and then they decide to store it in their hard disk or not. To facilitate the user-document interaction, a novel document distribution technique is proposed. The proposed method creates lean documents that contain only entities that would aid the user's decision making process, while the rest are replaced with aesthetically pleasing pseudo-text. The proposed lean documents will not only have less file size, they significantly reduce the cognitive and Internet resources requirement.",
+        "publishYear": "2012",
+        "authors":[
+            {
+                "name" : "Diwakar R. Marur"
+            },
+            {
+                "name" : "Vidhyacharan Bhaskar"
+            }
+        ],
+        "relevancy": "8",
+        "citing": "13",
+        "cited" : "1"
+    },
+    {
+        "_id" : "43",
+        "title" : "Word-level script identification for handwritten Indic scripts",
+        "abstract" : "Automatic script identification from handwritten document images facilitates many important applications such as indexing, sorting and triage. A given Optical Character Recognition (OCR) system is typically trained on only a single script but for documents or collections containing different scripts, there must be some way to automatically identify the script prior to OCR. For Indic script research, some results have been reported in the literature but the task is far from solved. In this paper, we propose a word-level script identification technique for six handwritten Indic scripts- Bangla, Devanagari, Gurumukhi, Malayalam, Oriya Telugu and the Roman script. A set of 82 features has been designed using a combination of elliptical and polygonal approximation techniques. Our approach has been evaluated on a dataset of 7000 handwritten text words, using multiple classifiers. A Multi-Layer Perceptron (MLP) classifier was found to be the best classifier resulting in 95.35% accuracy. The result is progressive considering the complexities and shape variations of the Indic scripts.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Pawan Kumar Singh"
+            },
+            {
+                "name" : "Ram Sarkar"
+            },
+            {
+                "name" : "Mita Nasipuri"
+            },
+            {
+                "name" : "David Doermann"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "15",
+        "cited" : "11"
+    },
+    {
+        "_id" : "44",
+        "title" : "The emergency department triage of community-acquired pneumonia project data and documentation systems: a model for multicenter clinical trials",
+        "abstract" : "Multicenter clinical trials are complex undertakings that require significant resources to ensure efficient, high quality research. This paper describes the goals, design, and implementation of a multicenter clinical trial database management system to support this aim. A large number of study sites or patients, and the goal of automatically generating large portions of data management infrastructure from common metadata, motivated the development of the system. This paper also describes extensions for a generalized project documentation system, and discusses plans for further extensions and improvements based on observed strengths, limitations, and anticipated technological change",
+        "publishYear": "2006",
+        "authors":[
+            {
+                "name" : "D.S. Obrosky"
+            },
+            {
+                "name" : "S.M. Edick"
+            },
+            {
+                "name" : "M.J. Fine"
+            }
+        ],
+        "relevancy": "5",
+        "citing": "11",
+        "cited" : "1"
     }
 ]

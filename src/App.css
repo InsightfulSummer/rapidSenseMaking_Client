@@ -227,7 +227,6 @@ p{
 
 /* vis 2 */
 .slideController {
-  rx: 5px;
   cursor: pointer;
 }
 
@@ -235,4 +234,12 @@ p{
   text-anchor: middle;
   fill: #eee;
   font-weight: 600;
+}
+
+.clusterElement {
+  cursor: pointer;
+}
+
+.addClusterIcon{
+  cursor: pointer;
 }

@@ -13,8 +13,6 @@ const initialState = {
     }]
 }
 
-
-
 const reducer = (state = initialState, actions) => {
     switch (actions.type) {
         case types.FetchDocuments:
@@ -38,7 +36,7 @@ const reducer = (state = initialState, actions) => {
         case types.AutoClustering : 
             let tmpClusters = state.clusters;
             let tmpDocuments_ = state.documents;
-            for (let i=2; i<= actions.payload.n_cluster; i++){
+            for (let i=2; i<= actions.payload.n_clusters && tmpClusters.length < actions.payload.n_clusters; i++){
                 tmpClusters.push({
                     name : "cluster_"+ i,
                     color : colorScale(i),
@@ -49,7 +47,7 @@ const reducer = (state = initialState, actions) => {
                 let index_ = Math.floor(Math.random()*tmpClusters.length + 1)
                 doc.cluster = tmpClusters[index_-1]
             })
-            return {...state, clusters: tmpClusters, documents: tmpDocuments}
+            return {...state, clusters: tmpClusters, documents: tmpDocuments_}
 
         case types.AddOneCluster : 
             let tmpClusters_ = state.clusters;
@@ -72,17 +70,17 @@ const reducer = (state = initialState, actions) => {
                 return doc_f.cluster.id == actions.payload.cluster_id
             }).map(doc_m => {
                 let index__ = Math.floor(Math.random()*tmpClusters__.length + 1)
-                doc_m.cluster = tmpClusters__[index_-1]
+                doc_m.cluster = tmpClusters__[index__-1]
             })
             return {...state, clusters: tmpClusters__, documents: tmpDocuments__}
 
         case types.ChangeClusterOfDocument :
             let _tmpDocs_ = state.documents;
             let _index__ = _tmpDocs_.findIndex(item => {
-                item.id == actions.payload.document_id
+                return item.id == actions.payload.document_id
             })
             let clusterItem = state.clusters.find(item => {
-                item.id == actions.payload.cluster_id
+                return item.id == actions.payload.cluster_id
             })
             _tmpDocs_[_index__].cluster = clusterItem
             return {...state, documents: _tmpDocs_}
@@ -90,7 +88,7 @@ const reducer = (state = initialState, actions) => {
         case types.RenameCluster :
             let tmpClusters___ = state.clusters;
             let _index_ = tmpClusters___.findIndex(item => {
-                item.id == actions.payload.cluster_id
+                return item.id == actions.payload.cluster_id
             })
             tmpClusters___[_index_].name = actions.payload.new_name
             return {...state, clusters: tmpDocuments__}
