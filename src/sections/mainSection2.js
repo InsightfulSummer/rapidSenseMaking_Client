@@ -19,10 +19,11 @@ const MainSection = () => {
     const [slideHeightPorportion, setSliderHeightPorportion] = useState(1 / 2)
     const [margin, setMargin] = useState(5)
     const [steps, setSteps] = useState([])
-    const [barMargin, setBarMargin] = useState(50)
+    const [barMargin, setBarMargin] = useState(40)
     const [topMargin, setTopMargin] = useState(80)
     const [bottomMargin, setBottomMargin] = useState(20)
     const [rightMargin, setRightMargin] = useState(80)
+    const [cardinality, setCardinality] = useState(10)
 
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
@@ -176,7 +177,7 @@ const MainSection = () => {
 
     const loadDocs = () => {
         dispatch(sortDocuments(sortMetric, ascending))
-        dispatch(autoCluster(1))
+        dispatch(autoCluster(3))
         d3.select(".mainContainer")
             .append("g")
             .attr("class", "docsContainer")
@@ -232,6 +233,11 @@ const MainSection = () => {
             .append("g")
             .attr("class", "axisContainer")
 
+        updateSteps(cardinality)
+        updateAxis()
+    }
+
+    const updateSteps = (cardinality) => {
         let steps_ = []
         let stepMagnitude = (domain[0] - domain[1]) / (cardinality - 1)
         for (let index = 0; index < cardinality; index++) {
@@ -252,11 +258,21 @@ const MainSection = () => {
                 return step.n == item.n
             }) == index
         })
+        console.log(steps_, "at the end of update steps")
         setSteps(steps_)
-        updateAxis()
     }
 
     const updateAxis = () => {
+
+        let axisContainer = d3.select(".axisContainer")
+        var axisLines = axisContainer.selectAll(".axisLines")
+            .data(steps)
+        var axisText = axisContainer.selectAll(".axisText")
+            .data(steps)
+        console.log(steps, "after feeding data")
+        // there can also be a rectangle for each axis step and hovering it the docs of that range should appear brighter or so ...
+        axisLines.exit().remove()
+        axisText.exit().remove()
 
         var n_x = Math.floor(Math.pow(slideHeightPorportion, 2) * documents.length)
         var n_z = Math.floor((z / (1 - slideHeightPorportion)) * (documents.length - n_x))
@@ -264,14 +280,7 @@ const MainSection = () => {
         let t_z = (height - documents.length * margin) / (t_x * n_x + (documents.length - n_x)) // thickness of each element outisde of the sliding window
         t_x = t_x * t_z
 
-        let axisContainer = d3.select(".axisContainer")
-        var axisLines = axisContainer.selectAll(".axisLines")
-            .data(steps)
-        var axisText = axisContainer.selectAll(".axisText")
-            .data(steps)
-        // there can also be a rectangle for each axis step and hovering it the docs of that range should appear brighter or so ...
-        axisLines.exit().remove()
-        axisText.exit().remove()
+        
         axisLines
             .enter()
             .append("line")
@@ -328,6 +337,14 @@ const MainSection = () => {
 
         stops.exit().remove()
 
+        var clusterController = d3.select(".clustersContainer")
+        clusterController.selectAll(".clusterContainerRect").remove()
+
+        var clusterElements = clusterController.selectAll(".clusterElement")
+            .data(clusters)
+
+        clusterElements.exit().remove()
+
         stops.enter()
             .append("stop")
             .merge(stops)
@@ -340,8 +357,7 @@ const MainSection = () => {
             })
 
         let barWidth = (width - 125 - (clusters.length * 40)) / clusters.length
-        var clusterController = d3.select(".clustersContainer")
-        clusterController.selectAll(".clusterContainerRect").remove()
+        
         clusterController.append("rect")
             .attr("fill", "url('#clustersGradient')")
             .attr("x", 0)
@@ -350,10 +366,7 @@ const MainSection = () => {
             .attr("height", topMargin * 2 / 3)
             .attr("class", "clusterContainerRect")
 
-        var clusterElements = clusterController.selectAll(".clusterElement")
-            .data(clusters)
-
-        clusterElements.exit().remove()
+        
 
         clusterElements.enter()
             .append("text")
@@ -419,7 +432,7 @@ const MainSection = () => {
             loadSVG();
             loadClusterController();
             loadSlider();
-            loadAxis(10);
+            loadAxis(cardinality);
             loadDocs();
         }, 250)
     }, [width, height])
@@ -430,7 +443,15 @@ const MainSection = () => {
         updateAxis();
     }, [slideHeightPorportion, z, steps])
 
-    
+    useEffect(()=>{
+        updateSteps(cardinality);
+        updateAxis();
+        updateDocs();
+    } , [sortMetric, ascending, documents])
+
+    useEffect(()=>{
+        updateAxis();
+    }, [steps])
 
     return (
         <div id="mainCanvas_2">
