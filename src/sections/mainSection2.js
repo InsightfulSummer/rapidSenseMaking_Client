@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import { useSelector, useDispatch } from 'react-redux'
-import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments } from '../redux/actions/actions'
+import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ToggleSortingInCanvas } from '../redux/actions/actions'
 import { hexToRgbA } from '../helper/helper'
 
 const MainSection = () => {
 
-    const { width, height, documents, sortMetric, ascending, clusters } = useSelector(state => ({
+    const { width, height, documents, sortMetric, ascending, clusters, sortingInCanvas } = useSelector(state => ({
         width: state.canvasReducer.width,
         height: state.canvasReducer.height,
         documents: state.dataReducer.documents,
         sortMetric: state.interactionReducer.sortMetric,
         ascending: state.interactionReducer.ascending,
-        clusters: state.dataReducer.clusters
+        clusters: state.dataReducer.clusters,
+        sortingInCanvas : state.interactionReducer.sortingInCanvas
     }))
 
     const [z, setZ] = useState(0)
@@ -65,36 +66,30 @@ const MainSection = () => {
             .attr("height", height + (topMargin + bottomMargin))
             .attr("class", "canvasSVG")
 
-        canvas.append("g")
-            .attr("class", "actionsContainer")
+        
         canvas
             .append("g")
             .attr("class", "mainContainer")
             .attr("transform", "translate(0," + topMargin + ")")
 
+            canvas.append("g")
+            .attr("class", "actionsContainer")
+
         // define your linear gradient here ...
         var defs = d3.select(".mainContainer")
             .append("defs")
+    }
 
-        var slideController = defs.append("linearGradient")
-            .attr("id", "slideControllerGradient")
-            .attr("gradientTransform", "rotate(90)")
-
-        slideController.append("stop")
-            .attr("offset", "0%")
-            .attr("stop-color", "#e6e6e6")
-
-        slideController.append("stop")
-            .attr("offset", "35%")
-            .attr("stop-color", "#737373")
-
-        slideController.append("stop")
-            .attr("offset", "65%")
-            .attr("stop-color", "#737373")
-
-        slideController.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", "#e6e6e6")
+    const loadGeneralEvents = () => {
+        // this is used to close any menu open if user clicks on some other area of the canvas or the whole window
+        d3.select(document)
+        .on("click", (event)=>{
+            console.log(event.target.id, sortingInCanvas)
+            if ((event.target.id != "sortingMenuInCanvas" || event.target.id != "sortingIconInCanvas") && sortingInCanvas) {
+                console.log("here")
+                dispatch(ToggleSortingInCanvas())
+            }
+        })
     }
 
     const loadSlider = () => {
@@ -149,7 +144,7 @@ const MainSection = () => {
         slideController = slider.append("rect")
             .attr("width", 55)
             .attr("x", 0)
-            .attr("fill", "url('#slideControllerGradient')")
+            .attr("fill", "#737373")
             .attr("class", "slideController")
             .merge(slideController)
             .attr("y", z * height)
@@ -233,8 +228,56 @@ const MainSection = () => {
             .append("g")
             .attr("class", "axisContainer")
 
+        d3.select(".actionsContainer")
+            .append("g")
+            .attr("class","sortingContainer")
+
+        updateSortingCenter()
         updateSteps(cardinality)
         updateAxis()
+    }
+
+    const updateSortingCenter = () => {
+        var sortingContainer = d3
+            .select(".sortingContainer")
+            .raise()
+        sortingContainer.selectAll(".sortingIcon_").remove()
+        sortingContainer
+            .append("text")
+            .attr("x", 85)
+            .attr("y", 25)
+            .attr("class", "fa sortingIcon_")
+            .attr("id", "sortingIconInCanvas")
+            .attr("alignment-baseline", "middle")
+            .on("click", ()=>{
+                // pop up a new window and show the sorting menu
+                dispatch(ToggleSortingInCanvas())
+                if (sortingInCanvas) {
+                    updateDocs();
+                    sortingContainer.selectAll(".sortingMenu_")
+                    .remove()
+
+                } else {
+                    d3.selectAll(".docElement")
+                        .attr("opacity", 0.1)
+                    sortingContainer.append("rect")
+                        .transition()
+                        .attr("width", 350)
+                        .attr("height", 350)
+                        .attr("fill", "red")
+                        .attr("x", 110)
+                        .attr("y", 40)
+                        .attr("class", "sortingMenu_")
+                        .attr("id", "sortingMenuInCanvas")
+                }
+            })
+            .transition()
+            .attr("fill", ()=>{
+                return sortingInCanvas ? "black" : "#737373"
+            })
+            .attr("text-anchor", "middle")
+            .attr("cursor","pointer")
+            .text("\uf885") 
     }
 
     const updateSteps = (cardinality) => {
@@ -246,7 +289,7 @@ const MainSection = () => {
             })
         }
         steps_[0].n = 0
-        steps_[0].label = steps_[0].label - 1
+        steps_[0].label = ascending ? steps_[0].label - 1 : steps_[0].label + 1
         steps_.slice(1).map((step, index) => {
             step.n = documents.filter(item => {
                 return ascending ? item[sortMetric] > steps_[index].label && item[sortMetric] <= step.label : item[sortMetric] < steps_[index].label && item[sortMetric] >= step.label
@@ -258,27 +301,26 @@ const MainSection = () => {
                 return step.n == item.n
             }) == index
         })
-        console.log(steps_, "at the end of update steps")
+        steps_[0].label = ascending ? steps_[0].label + 1 : steps_[0].label - 1
         setSteps(steps_)
     }
 
     const updateAxis = () => {
-
-        let axisContainer = d3.select(".axisContainer")
-        var axisLines = axisContainer.selectAll(".axisLines")
-            .data(steps)
-        var axisText = axisContainer.selectAll(".axisText")
-            .data(steps)
-        console.log(steps, "after feeding data")
-        // there can also be a rectangle for each axis step and hovering it the docs of that range should appear brighter or so ...
-        axisLines.exit().remove()
-        axisText.exit().remove()
 
         var n_x = Math.floor(Math.pow(slideHeightPorportion, 2) * documents.length)
         var n_z = Math.floor((z / (1 - slideHeightPorportion)) * (documents.length - n_x))
         let t_x = Math.pow((1 / slideHeightPorportion), 2) // thickness of each element within the sliding window
         let t_z = (height - documents.length * margin) / (t_x * n_x + (documents.length - n_x)) // thickness of each element outisde of the sliding window
         t_x = t_x * t_z
+
+        let axisContainer = d3.select(".axisContainer")
+        var axisLines = axisContainer.selectAll(".axisLines")
+            .data(steps)
+        var axisText = axisContainer.selectAll(".axisText")
+            .data(steps)
+        // there can also be a rectangle for each axis step and hovering it the docs of that range should appear brighter or so ...
+        axisLines.exit().remove()
+        axisText.exit().remove()
 
         
         axisLines
@@ -287,6 +329,7 @@ const MainSection = () => {
             .attr("x1", 105)
             .attr("x2", width)
             .merge(axisLines)
+            .attr("class", "axisLines")
             .transition()
             .attr("y1", step => {
                 return step.n > n_z ? step.n > n_z + n_x ? n_z * (t_z + margin) + n_x * (t_x + margin) + (step.n - n_x - n_z) * (t_z + margin) :
@@ -300,22 +343,23 @@ const MainSection = () => {
             })
             .attr("stroke", "#b6b6b6")
             .attr("stroke-dasharray", "5")
-            .attr("class", "axisLines")
+            
 
         axisText
             .enter()
             .append("text")
             .attr("x", 85)
             .attr("text-anchor", "middle")
-            .text(step => step.label)
             .merge(axisText)
+            .text(step => step.label)
+            .attr("class", "axisText")
             .transition()
             .attr("y", step => {
                 return step.n > n_z ? step.n > n_z + n_x ? n_z * (t_z + margin) + n_x * (t_x + margin) + (step.n - n_x - n_z) * (t_z + margin) :
                     n_z * (t_z + margin) + (step.n - n_z) * (t_x + margin) :
                     step.n * (t_z + margin)
             })
-            .attr("class", "axisText")
+            
     }
 
     const loadClusterController = () => {
@@ -430,10 +474,11 @@ const MainSection = () => {
         getDimensions();
         setTimeout(() => {
             loadSVG();
-            loadClusterController();
+            loadGeneralEvents();
             loadSlider();
-            loadAxis(cardinality);
             loadDocs();
+            loadClusterController();
+            loadAxis(cardinality);
         }, 250)
     }, [width, height])
 
@@ -441,17 +486,19 @@ const MainSection = () => {
         updateSlider();
         updateDocs();
         updateAxis();
-    }, [slideHeightPorportion, z, steps])
+    }, [slideHeightPorportion, z])
 
     useEffect(()=>{
         updateSteps(cardinality);
-        updateAxis();
-        updateDocs();
-    } , [sortMetric, ascending, documents])
+    } , [sortMetric, ascending])
 
     useEffect(()=>{
         updateAxis();
-    }, [steps])
+    }, [JSON.stringify(steps)])
+
+    useEffect(()=>{
+        updateSortingCenter()
+    }, [sortingInCanvas])
 
     return (
         <div id="mainCanvas_2">

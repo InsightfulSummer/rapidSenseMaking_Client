@@ -19,5 +19,5 @@ export default {
     AddOneCluster : "AddOneCluster",
     RemoveOneCluster : "RemoveOneCluster",
     ChangeClusterOfDocument : "ChangeClusterOfDocument",
-    RenameCluster : "RenameCluster"
+    RenameCluster : "RenameCluster",
 }
