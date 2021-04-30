@@ -247,3 +247,8 @@ p{
 .sortingMenu_{
   rx : 5
 }
+
+.lensMenuContainer {
+  stroke: #737373;
+    stroke-width: 0.2;
+}

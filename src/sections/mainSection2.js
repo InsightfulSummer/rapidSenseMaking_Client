@@ -26,6 +26,9 @@ const MainSection = () => {
     const [rightMargin, setRightMargin] = useState(80)
     const [cardinality, setCardinality] = useState(10)
     const [sortingInCanvas, ToggleSortingInCanvas] = useState(false)
+    const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
+    const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
+    const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
 
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
@@ -33,6 +36,7 @@ const MainSection = () => {
 
     const sliderDragHandler = d3.drag()
         .on("drag", function (d) {
+            ToggleLensMenuOpen(false)
             let barHeight = parseInt(d3.select(this).attr("height"))
             if (d.y > 0 && d.y + barHeight < height) {
                 d3.select(this)
@@ -145,18 +149,47 @@ const MainSection = () => {
             .attr("y", (z * height) + (height * slideHeightPorportion / 2))
             .text(Math.ceil(Math.pow(slideHeightPorportion, 2) * 100) + "%")
 
-
+        slider.append("text")
+            .attr("class" , "fa slideControllerText")
+            .attr("id", "lensMenuIcon_")
+            .attr("x", 55 / 2)
+            .attr("y", (z * height) + (height * slideHeightPorportion) - (height * slideHeightPorportion / 9))
+            .attr("cursor", "pointer")
+            .text("\uf0c9")
+            .on("click", ()=>{
+                ToggleLensMenuOpen(!isLensMenuOpen)            
+            })
         sliderDragHandler(slideController)
 
         slideController.on("wheel", (event) => {
-            if (event.deltaY < 0 && slideHeightPorportion * 100 > 9) {
+            if (event.deltaY < 0 && Math.pow(slideHeightPorportion, 2) * 100 > slideBarMinimum) {
                 // mouse wheel up
                 setSliderHeightPorportion((slideHeightPorportion * 100 - 1) / 100)
-            } else if (event.deltaY > 0 && slideHeightPorportion * 100 < 91) {
+            } else if (event.deltaY > 0 && Math.pow(slideHeightPorportion, 2) * 100 < slideBarMaximum && slideHeightPorportion + z < 1.01) {
                 // mouse wheel down
                 setSliderHeightPorportion((slideHeightPorportion * 100 + 1) / 100)
             }
         })
+    }
+
+    const updateLensMenu = () => {
+        var mainContainer = d3.select(".mainContainer")
+        mainContainer.selectAll(".lensMenuContainer").remove()
+        if (isLensMenuOpen) {
+            d3.selectAll(".docElement")
+                .attr("opacity", "0.1")
+            mainContainer.append("rect")
+                .attr("height", slideHeightPorportion*height)
+                .attr("class", "lensMenuContainer")
+                .attr("id", "lensMenuContainer_")
+                .attr("x", 60)
+                .attr("y", z * height)
+                .transition()
+                .attr("width", width + rightMargin - 60)
+                .attr("fill", "rgba(230,230,230,0.85)")
+        } else {
+            updateDocs()
+        }
     }
 
     const loadDocs = () => {
@@ -499,6 +532,16 @@ const MainSection = () => {
             })
     }
 
+    const loadGeneralEvents = () => {
+        d3.select(document)
+            .on("click", (event)=>{
+                console.log(event.target.id, isLensMenuOpen)
+                if (event.target.id != "lensMenuContainer_" && event.target.id != "lensMenuIcon_" && isLensMenuOpen) {
+                    ToggleLensMenuOpen(false)
+                }
+            })
+    }
+
     useEffect(() => {
         updateDocs();
         updateSlider();
@@ -513,6 +556,7 @@ const MainSection = () => {
             loadDocs();
             loadClusterController();
             loadAxis(cardinality);
+            loadGeneralEvents();
         }, 250)
     }, [width, height])
 
@@ -534,6 +578,12 @@ const MainSection = () => {
     useEffect(() => {
         updateSortingCenter()
     }, [sortingInCanvas])
+
+    useEffect(()=>{
+        loadGeneralEvents()
+        updateSlider() // important
+        updateLensMenu()
+    }, [isLensMenuOpen])
 
     return (
         <div id="mainCanvas_2">

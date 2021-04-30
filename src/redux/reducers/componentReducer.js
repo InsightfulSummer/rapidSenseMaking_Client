@@ -1,6 +1,6 @@
 import types from '../actions/types'
 const initialState = {
-    listViewOpen : true
+    listViewOpen : false
 }
 
 const reducer = (state=initialState, actions) => {

@@ -27,9 +27,15 @@ const MainScreen = () => {
                         </MDBCol>
                     </MDBRow>
                 ) : (
-                    <MDBContainer>
-                        <MainSection_ />
-                    </MDBContainer>
+                    <MDBRow>
+                        <MDBCol size="1">
+                        </MDBCol>
+                        <MDBCol size="10">
+                            <MainSection_ />
+                        </MDBCol>
+                        <MDBCol size="1">
+                        </MDBCol>
+                    </MDBRow>
                 )
             }
         </div>
