@@ -243,3 +243,7 @@ p{
 .addClusterIcon{
   cursor: pointer;
 }
+
+.sortingMenu_{
+  rx : 5
+}

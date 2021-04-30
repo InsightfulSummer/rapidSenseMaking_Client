@@ -4,11 +4,42 @@ import types from "../actions/types";
 const initialState = {
     activeDocumentId: null,
     sortMetric: "publishYear",
+    sortingMetrics : [
+        {
+            label : "Publishing Date (Ascending)",
+            metric : "publishYear",
+            ascending : true
+        },
+        {
+            label : "Publishing Date (Descending)",
+            metric : "publishYear",
+            ascending : false
+        },
+        {
+            label : "Reletivity",
+            metric : "relevancy",
+            ascending : false
+        },
+        {
+            label : "Reletivity To a Custom Document",
+            metric : "relevancy", // change it later
+            ascending : false
+        },
+        {
+            label : "Most Cited Documents",
+            metric : "cited",
+            ascending : false
+        },
+        {
+            label : "Most Citing Documents",
+            metric : "citing",
+            ascending : false
+        }
+    ],
     ascending: true,
     cardinality: 5,
     activeAxisRange: null,
     sortingInList: false,
-    sortingInCanvas: false,
 }
 
 
@@ -43,11 +74,6 @@ const reducer = (state = initialState, actions) => {
         case types.ToggleSortingInList:
             return {
                 ...state, sortingInList: !state.sortingInList
-            }
-
-        case types.ToggleSortingInCanvas:
-            return {
-                ...state, sortingInCanvas: !state.sortingInCanvas
             }
 
         case types.ChangeSortMetric:

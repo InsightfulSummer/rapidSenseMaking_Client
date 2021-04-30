@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import { useSelector, useDispatch } from 'react-redux'
-import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ToggleSortingInCanvas } from '../redux/actions/actions'
+import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric } from '../redux/actions/actions'
 import { hexToRgbA } from '../helper/helper'
 
 const MainSection = () => {
 
-    const { width, height, documents, sortMetric, ascending, clusters, sortingInCanvas } = useSelector(state => ({
+    const { width, height, documents, sortMetric, ascending, clusters, sortingMetrics } = useSelector(state => ({
         width: state.canvasReducer.width,
         height: state.canvasReducer.height,
         documents: state.dataReducer.documents,
         sortMetric: state.interactionReducer.sortMetric,
         ascending: state.interactionReducer.ascending,
         clusters: state.dataReducer.clusters,
-        sortingInCanvas : state.interactionReducer.sortingInCanvas
+        sortingMetrics: state.interactionReducer.sortingMetrics
     }))
 
     const [z, setZ] = useState(0)
@@ -25,6 +25,7 @@ const MainSection = () => {
     const [bottomMargin, setBottomMargin] = useState(20)
     const [rightMargin, setRightMargin] = useState(80)
     const [cardinality, setCardinality] = useState(10)
+    const [sortingInCanvas, ToggleSortingInCanvas] = useState(false)
 
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
@@ -66,30 +67,18 @@ const MainSection = () => {
             .attr("height", height + (topMargin + bottomMargin))
             .attr("class", "canvasSVG")
 
-        
+
         canvas
             .append("g")
             .attr("class", "mainContainer")
             .attr("transform", "translate(0," + topMargin + ")")
 
-            canvas.append("g")
+        canvas.append("g")
             .attr("class", "actionsContainer")
 
         // define your linear gradient here ...
         var defs = d3.select(".mainContainer")
             .append("defs")
-    }
-
-    const loadGeneralEvents = () => {
-        // this is used to close any menu open if user clicks on some other area of the canvas or the whole window
-        d3.select(document)
-        .on("click", (event)=>{
-            console.log(event.target.id, sortingInCanvas)
-            if ((event.target.id != "sortingMenuInCanvas" || event.target.id != "sortingIconInCanvas") && sortingInCanvas) {
-                console.log("here")
-                dispatch(ToggleSortingInCanvas())
-            }
-        })
     }
 
     const loadSlider = () => {
@@ -230,7 +219,7 @@ const MainSection = () => {
 
         d3.select(".actionsContainer")
             .append("g")
-            .attr("class","sortingContainer")
+            .attr("class", "sortingContainer")
 
         updateSortingCenter()
         updateSteps(cardinality)
@@ -249,35 +238,81 @@ const MainSection = () => {
             .attr("class", "fa sortingIcon_")
             .attr("id", "sortingIconInCanvas")
             .attr("alignment-baseline", "middle")
-            .on("click", ()=>{
+            .on("click", () => {
                 // pop up a new window and show the sorting menu
-                dispatch(ToggleSortingInCanvas())
                 if (sortingInCanvas) {
                     updateDocs();
                     sortingContainer.selectAll(".sortingMenu_")
-                    .remove()
-
+                        .remove()
+                    sortingContainer.selectAll(".sortingText").remove()
+                    ToggleSortingInCanvas(!sortingInCanvas)
                 } else {
                     d3.selectAll(".docElement")
                         .attr("opacity", 0.1)
-                    sortingContainer.append("rect")
-                        .transition()
-                        .attr("width", 350)
-                        .attr("height", 350)
-                        .attr("fill", "red")
-                        .attr("x", 110)
-                        .attr("y", 40)
-                        .attr("class", "sortingMenu_")
-                        .attr("id", "sortingMenuInCanvas")
+                    // update sortingMenu
+                    ToggleSortingInCanvas(!sortingInCanvas)
+                    updateSortingMenu(true)
                 }
+                
             })
             .transition()
-            .attr("fill", ()=>{
+            .attr("fill", () => {
                 return sortingInCanvas ? "black" : "#737373"
             })
             .attr("text-anchor", "middle")
-            .attr("cursor","pointer")
-            .text("\uf885") 
+            .attr("cursor", "pointer")
+            .text("\uf885")
+    }
+
+    const updateSortingMenu = (active) => {
+
+        if (active) {
+            var sortingContainer = d3
+            .select(".sortingContainer")
+            .raise()
+            sortingContainer.selectAll(".sortingMenu_")
+                        .remove()
+            sortingContainer.append("rect")
+                .attr("x", 110)
+                .attr("y", 40)
+                .transition()
+                .attr("width", 350)
+                .attr("height", 25 * sortingMetrics.length + 15)
+                .attr("fill", "#737373")
+                .attr("class", "sortingMenu_")
+                .attr("id", "sortingMenuInCanvas")
+
+            var sortingText = sortingContainer.selectAll(".sortingText")
+                .data(sortingMetrics)
+
+            sortingText.exit().remove()
+
+            sortingText.enter()
+                .append("text")
+                .attr("class", "sortingText")
+                .text(item => {
+                    return item.label
+                })
+                .merge(sortingText)
+                .on("click", (event, metric)=>{
+                    dispatch(ChangeSortMetric(metric.metric, metric.ascending));
+                    dispatch(sortDocuments(metric.metric, metric.ascending));
+                })
+                .attr("font-weight", item => {
+                    return (ascending == item.ascending && sortMetric == item.metric) ? "bold" : "normal"
+                })
+                .attr("x", item => {
+                    return (ascending == item.ascending && sortMetric == item.metric) ? 135 : 120
+                })
+                .transition()
+                .attr("fill", "#fff")
+                .attr("alignment-baseline", "middle")
+                .attr("y", (item, index) => {
+                    return 60 + index * 25
+                })
+
+            d3.selectAll(".sortingText").raise()
+        }
     }
 
     const updateSteps = (cardinality) => {
@@ -322,7 +357,7 @@ const MainSection = () => {
         axisLines.exit().remove()
         axisText.exit().remove()
 
-        
+
         axisLines
             .enter()
             .append("line")
@@ -343,7 +378,7 @@ const MainSection = () => {
             })
             .attr("stroke", "#b6b6b6")
             .attr("stroke-dasharray", "5")
-            
+
 
         axisText
             .enter()
@@ -359,7 +394,7 @@ const MainSection = () => {
                     n_z * (t_z + margin) + (step.n - n_z) * (t_x + margin) :
                     step.n * (t_z + margin)
             })
-            
+
     }
 
     const loadClusterController = () => {
@@ -401,7 +436,7 @@ const MainSection = () => {
             })
 
         let barWidth = (width - 125 - (clusters.length * 40)) / clusters.length
-        
+
         clusterController.append("rect")
             .attr("fill", "url('#clustersGradient')")
             .attr("x", 0)
@@ -410,27 +445,27 @@ const MainSection = () => {
             .attr("height", topMargin * 2 / 3)
             .attr("class", "clusterContainerRect")
 
-        
+
 
         clusterElements.enter()
             .append("text")
             .attr("y", topMargin / 3)
             .attr("alignment-baseline", "middle")
-            .on("mouseover", function(event, data){
+            .on("mouseover", function (event, data) {
                 d3.selectAll(".docElement")
                     .transition()
-                    .attr("opacity", (item)=>{
+                    .attr("opacity", (item) => {
                         return item.cluster.id == data.id ? "0.9" : "0.3"
                     })
             })
-            .on("mouseout", function(){
+            .on("mouseout", function () {
                 updateDocs()
             })
             .merge(clusterElements)
             .transition()
-            .attr("text-anchor","middle")
+            .attr("text-anchor", "middle")
             .attr("x", item => {
-                return ((item.id - 1) * barWidth + (item.id) * barMargin + 126)  + (barWidth-barMargin)/2
+                return ((item.id - 1) * barWidth + (item.id) * barMargin + 126) + (barWidth - barMargin) / 2
             })
             .attr("class", "clusterElement")
             .attr("fill", "#3a3a3a")
@@ -445,10 +480,10 @@ const MainSection = () => {
             .attr("text-anchor", "middle")
             .attr("alignment-baseline", "middle")
             .attr("x", width + rightMargin - 25)
-            .attr("y" , 25)
+            .attr("y", 25)
             .attr("fill", "#3a3a3a")
             .text("\uf067")
-            .on("click", function(){
+            .on("click", function () {
                 dispatch(addOneCluster())
             })
 
@@ -456,25 +491,24 @@ const MainSection = () => {
             .attr("class", "fa addClusterIcon")
             .attr("alignment-baseline", "middle")
             .attr("x", width + rightMargin - 60)
-            .attr("y" , 25)
+            .attr("y", 25)
             .attr("fill", "#3a3a3a")
             .text("\uf58e")
-            .on("click", function(){
+            .on("click", function () {
                 dispatch(autoCluster(3))
             })
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         updateDocs();
         updateSlider();
         updateClusterController();
-    },[JSON.stringify(documents), JSON.stringify(clusters)])
+    }, [JSON.stringify(documents), JSON.stringify(clusters)])
 
     useEffect(() => {
         getDimensions();
         setTimeout(() => {
             loadSVG();
-            loadGeneralEvents();
             loadSlider();
             loadDocs();
             loadClusterController();
@@ -488,15 +522,16 @@ const MainSection = () => {
         updateAxis();
     }, [slideHeightPorportion, z])
 
-    useEffect(()=>{
+    useEffect(() => {
         updateSteps(cardinality);
-    } , [sortMetric, ascending])
+        updateSortingMenu(sortingInCanvas);
+    }, [sortMetric, ascending])
 
-    useEffect(()=>{
+    useEffect(() => {
         updateAxis();
     }, [JSON.stringify(steps)])
 
-    useEffect(()=>{
+    useEffect(() => {
         updateSortingCenter()
     }, [sortingInCanvas])
 

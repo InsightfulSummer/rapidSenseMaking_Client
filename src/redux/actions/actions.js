@@ -73,12 +73,6 @@ export const ToggleSortingInList = () => {
     }
 }
 
-export const ToggleSortingInCanvas = () => {
-    return {
-        type : types.ToggleSortingInCanvas
-    }
-}
-
 export const ChangeSortMetric = (sortMetric, ascending=true) => {
     return {
         type : types.ChangeSortMetric,

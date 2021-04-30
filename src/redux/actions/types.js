@@ -8,7 +8,6 @@ export default {
     SetActiveAxisRange : "SetActiveAxisRange",
     UnsetActiveAxisRange : "UnsetActiveAxisRange",
     ToggleSortingInList : "ToggleSortingInList",
-    ToggleSortingInCanvas : "ToggleSortingInCanvas",
     ChangeSortMetric : "ChangeSortMetric",
     SortDocuments : "SortDocuments",
     // for visualiztion 2
