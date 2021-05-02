@@ -26,6 +26,12 @@ export const sortDocuments = (sortMetric, ascending=true) => {
     }
 }
 
+export const CreateRandomLinks = () => {
+    return {
+        type : types.CreateRandomLinks
+    }
+}
+
 // interaction-related actions
 
 export const SetActiveDocument = (documentId) => {

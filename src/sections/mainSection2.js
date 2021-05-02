@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import { useSelector, useDispatch } from 'react-redux'
-import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric } from '../redux/actions/actions'
-import { hexToRgbA } from '../helper/helper'
+import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks } from '../redux/actions/actions'
+import { hexToRgbA, linkPathGenerator } from '../helper/helper'
 
 const MainSection = () => {
 
@@ -194,12 +194,16 @@ const MainSection = () => {
 
     const loadDocs = () => {
         dispatch(sortDocuments(sortMetric, ascending))
+        dispatch(CreateRandomLinks())
         dispatch(autoCluster(3))
+        console.log(documents)
         d3.select(".mainContainer")
             .append("g")
             .attr("class", "docsContainer")
 
-        updateDocs()
+        setTimeout(() => {
+            updateDocs()
+        } , 1000)
     }
 
     const updateDocs = () => {
@@ -242,6 +246,37 @@ const MainSection = () => {
                 return index < n_z ? 0.65 : index < n_z + n_x ? 0.95 : 0.65
             })
 
+            //here the magic begins ...
+            // documents.map((doc, index)=>{
+            //     if (index >= n_z && index < n_z+n_x) {
+            //         doc.links.map(linkId => {
+            //             let index_ = documents.findIndex(item => {
+            //                 return item._id == linkId
+            //             })
+            //             let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+            //             let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
+            //             docsContainer.append("path")
+            //                 .attr("stroke-width", 1)
+            //                 .attr("class", "linkPath")
+            //                 .attr("stroke", doc.cluster.color)
+            //                 .attr("fill", "none")
+            //                 .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1, y2))
+            //         })
+            //     }
+            // })
+            documents[0].links.map(linkId => {
+                let index_ = documents.findIndex(item => {
+                    return item._id == linkId
+                })
+                let y1 = 0 < n_z ? (0) * (t_z + margin) : 0 < n_z + n_x ? n_z * (t_z + margin) + (0 - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (0 - n_z - n_x) * (t_z + margin)
+                let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
+                docsContainer.append("path")
+                    .attr("stroke-width", 1)
+                    .attr("class", "linkPath")
+                    .attr("stroke", documents[0].cluster.color)
+                    .attr("fill", "none")
+                    .attr("d", linkPathGenerator(documents[0], documents[index_],barMargin, barWidth, y1, y2))
+            })
     }
 
     const loadAxis = (cardinality) => {

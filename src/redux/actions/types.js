@@ -13,10 +13,12 @@ export default {
     // for visualiztion 2
     SetZ : "SetZ",
     SetSliderHeightPorportion : "SetSliderHeightPorportion",
+    CreateRandomLinks : "CreateRandomLinks",
     // for clustering 
     AutoClustering : "AutoClustering",
     AddOneCluster : "AddOneCluster",
     RemoveOneCluster : "RemoveOneCluster",
     ChangeClusterOfDocument : "ChangeClusterOfDocument",
     RenameCluster : "RenameCluster",
+    
 }

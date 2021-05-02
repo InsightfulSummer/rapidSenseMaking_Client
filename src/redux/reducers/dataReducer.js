@@ -92,6 +92,22 @@ const reducer = (state = initialState, actions) => {
             })
             tmpClusters___[_index_].name = actions.payload.new_name
             return {...state, clusters: tmpDocuments__}
+
+        // random links - just for demo
+        case types.CreateRandomLinks :
+            state.documents.map(doc => {
+                let randomLength = Math.floor(Math.random() * (15 - 3) + 3)
+                let links =[]
+                for(let i = 0; i<randomLength; i++){
+                    let randomId = Math.floor(Math.random() * (state.documents.length - 1) + 1)
+                    if (randomId+"" != doc.id_) {
+                        links.push(randomId)
+                    }
+                }
+                doc.links = links
+            })
+            // generate a random number 3 -> 15
+            // iterate as much as the random number generated and create a random number 1 to documents.length
         default:
             return state;
     }

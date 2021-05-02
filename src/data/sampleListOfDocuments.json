@@ -818,5 +818,229 @@
         "relevancy": "5",
         "citing": "11",
         "cited" : "1"
+    },
+    {
+        "_id" : "45",
+        "title" : "A Comparative Literature Analysis of the Health Informatics Curricula",
+        "abstract" : "The use of Electronic Medical Information and Health Systems, by both health and IT professionals, support staff and patients, is continually growing. However, to use or develop such systems properly, these users require well-founded training, which has increasingly become part of their formal university education. In this education, a necessary set of health informatics topics need to be covered by lectures for both computer science students, as developers of such systems, and health students, as future users of these systems, to be able to master the needed skills. Within the ERASMUS PLUS HiCure project, which aims to develop an integrated health informatics curricula, this work was conducted to identify the necessary topics and needed skills. To achieve, a literature analysis was conducted to gain a comprehensive insight of existing health informatics curricula and recommendations of both scientific community and professional bodies. This analysis resulted in identifying some key competencies, that students should learn within a health informatics education, to gain the critical skills needed for specifying, evaluating and developing health information systems as well as performing health information management.",
+        "publishYear": "2019",
+        "authors":[
+            {
+                "name" : "Bernhard Breil"
+            },
+            {
+                "name" : "Lisanne Kremer"
+            },
+            {
+                "name" : "Adel Taweel"
+            },
+            {
+                "name" : "Thomas Lux"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "14",
+        "cited" : "0"
+    },
+    {
+        "_id" : "46",
+        "title" : "Does e-Health technology design affect m-Health informatics acceptance? A case study",
+        "abstract" : "This paper explores and analysis the influence of e-Health technology design on intention to use m-Health informatics, from users' perceptions, viewpoint, and experience. This study assesses the influence and the relationship between e-Health technology design as the independent variable (predictor) and the intention to use m-Health as a dependent variable. The results indicated that there is a direct significant relation between e-Health technology design and intention to use m-Health informatics. The results also confirmed that intention to use m-Health informatics is influenced by the perceptions of the user of e-Health technology in terms of the design approach, especially in relation to the navigation and the data presentation. This suggests that a well-structured e-Health technology design will increase the intention to use m-Health informatics.",
+        "publishYear": "2012",
+        "authors":[
+            {
+                "name" : "Abdul Hakim H. M. Mohamed"
+            },
+            {
+                "name": "Hissam Tawfik"
+            },
+            {
+                "name": "Lin Norton"
+            },
+            {
+                "name": "Dhiya Al-Jumeily"
+            }
+        ],
+        "relevancy": "5",
+        "citing": "20",
+        "cited" : "2"
+    },
+    {
+        "_id" : "47",
+        "title" : "Big Data for Health",
+        "abstract" : "This paper provides an overview of recent developments in big data in the context of biomedical and health informatics. It outlines the key characteristics of big data and how medical and health informatics, translational bioinformatics, sensor informatics, and imaging informatics will benefit from an integrated approach of piecing together different aspects of personalized information from a diverse range of data sources, both structured and unstructured, covering genomics, proteomics, metabolomics, as well as imaging, clinical diagnosis, and long-term continuous physiological sensing of an individual. It is expected that recent advances in big data will expand our knowledge for testing new hypotheses about disease management from diagnosis to prevention to personalized treatment. The rise of big data, however, also raises challenges in terms of privacy, security, data ownership, data stewardship, and governance. This paper discusses some of the existing activities and future opportunities related to big data for health, outlining some of the key underlying issues that need to be tackled.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Javier Andreu-Perez"
+            },
+            {
+                "name" : "Carmen C. Y. Poon"
+            },
+            {
+                "name" : "Robert D. Merrifield"
+            },
+            {
+                "name" : "Stephen T. C. Wong"
+            },
+            {
+                "name" : "Guang-Zhong Yang"
+            }
+        ],
+        "relevancy": "8",
+        "citing": "146",
+        "cited" : "319"
+    },
+    {
+        "_id" : "48",
+        "title" : "Behavioral Informatics and Computational Modeling in Support of Proactive Health Management and Care",
+        "abstract" : "Health-related behaviors are among the most significant determinants of health and quality of life. Improving health behavior is an effective way to enhance health outcomes and mitigate the escalating challenges arising from an increasingly aging population and the proliferation of chronic diseases. Although it has been difficult to obtain lasting improvements in health behaviors on a wide scale, advances at the intersection of technology and behavioral science may provide the tools to address this challenge. In this paper, we describe a vision and an approach to improve health behavior interventions using the tools of behavioral informatics, an emerging transdisciplinary research domain based on system-theoretic principles in combination with behavioral science and information technology. The field of behavioral informatics has the potential to optimize interventions through monitoring, assessing, and modeling behavior in support of providing tailored and timely interventions. We describe the components of a closed-loop system for health interventions. These components range from fine grain sensor characterizations to individual-based models of behavior change. We provide an example of a research health coaching platform that incorporates a closed-loop intervention based on these multiscale models. Using this early prototype, we illustrate how the optimized and personalized methodology and technology can support self-management and remote care. We note that despite the existing examples of research projects and our platform, significant future research is required to convert this vision to full-scale implementations.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Misha Pavel"
+            },
+            {
+                "name" : "Holly B. Jimison"
+            },
+            {
+                "name" : "Ilkka Korhonen"
+            },
+            {
+                "name" : "Christine M. Gordon"
+            },
+            {
+                "name" : "Niilo Saranummi"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "85",
+        "cited" : "22"
+    },
+    {
+        "_id" : "49",
+        "title" : "A mobile health based smart hybrid epidemic surveillance system to support epidemic control programme in public health informatics",
+        "abstract" : "Detecting epidemic out breaks as early as possible and gathering reports to substantiate the cause and carrying out immediate actions for alerting public and taking action are major targets of a public health epidemic surveillance. Challenges for an epidemiologist lies in reaching out and collecting information from a territory especially in getting informal reports from public rather than gathering formal reports from clinical trial people like doctors and micro biologists. The smart phones and internet usage is reaching out common people rapidly due to the technological growth over past 15 years. Hence technology adaptation using mobile apps would not be a major constraint in reaching out people for conducting surveillance. Our proposed methodology suggested for public health surveillance programme part of public health informatics is a smart phone based surveillance system where epidemiologist can trigger survey queries through web portal and notify them to all the intended community through mobile app of registered smart phone users. The information retrieved back as reply for the queries can be easily stored in centralized real time database and can be analyzed by using machine Learning techniques. Prediction messages, alert messages and precautionary messages are send to targeted group of community under epidemic surveillance as common message as well as individual messages specifically addressing an individual who had participated in the survey. Real time databases are ideal foil to the mobile health based epidemic surveillance system. The pilot testing of the proposed prototype provided the instant benefit of immediate reachability of survey to selected and intended group. Mobile app based surveillance provided much improved reporting of information in quick time on diseases, symptoms, factors and more. Information gathered was analyzed for substantiating cause and alert and preventive messages were immediately send through the same app.",
+        "publishYear": "2017",
+        "authors":[
+            {
+                "name" : "K. Navin"
+            },
+            {
+                "name" : "M.B. Mukesh Krishnan"
+            },
+            {
+                "name" : "S. Lavanya"
+            },
+            {
+                "name" : "A. Shanthini"
+            }
+        ],
+        "relevancy": "4",
+        "citing": "10",
+        "cited" : "2"
+    },
+    {
+        "_id" : "50",
+        "title" : "Data Analytics in Healthcare Informatics",
+        "abstract" : "In recent years, the introduction of data analytics to large amounts of healthcare data collected on daily basis opened numerous new opportunities and challenges in the field of medical informatics. By definition, healthcare informatics refers to the process of leveraging information technologies to improve the quality of healthcare. Many researchers are focusing on basic and translational research to achieve this goal by proposing novel or applying and adapting the state-of-the-art data analytics techniques to vast amounts of recently collected data. Recent adoption of Electronic Health Records (EHR) opens additional opportunities for data analytics, as we are able to access structured and unstructured data that is systematically collected for each event in the healthcare system or even contributed by the patients themselves. This tutorial covers different data analytics techniques and their translational value in improving the quality of healthcare. In the introductory part of the tutorial, we will outline the basics of data analytics in healthcare and continue with description of data representation that is specific to this field. The second part of the tutorial will present concrete state-of-the-art approaches that can be applied in healthcare informatics. Participants will gain a better understanding of risk estimation and stratification, patient similarity, privacy-preserving predictive modelling and patient-based classification. All methods presented in the tutorial have great translational value and can be implemented as a stand-alone solution or a part of health information systems. The intended audience of this tutorial are healthcare professionals and researchers from all fields of healthcare informatics. No specific knowledge will be required since the tutorial is self-contained and most fundamental concepts will be introduced during the presentation.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Fei Wang"
+            },
+            {
+                "name" : "Gregor Stiglic"
+            }
+        ],
+        "relevancy": "7",
+        "citing": "0",
+        "cited" : "3"
+    },
+    {
+        "_id" : "51",
+        "title" : "e-health for improving community healthcare: Encouraging clinical experience of simple e-prescription system and m-health system development for mother and childcare",
+        "abstract" : "In this paper, we describe the eleven month encouraging clinical implementation experience of our e-prescription system in a community health center and further development activities of a mobile e-health system for mother and childcare. The e-prescription system has been developed for supporting the patient and medicine data recording, retrieving and reporting systems, as well as for minimizing the possible medication errors through improving the prescribing process. Several months of clinical experience have been used to enhance further development activities in our m-health system dedicated for supporting mother and childcare (especially the safe motherhood program). The m-health system consists of an SMS (short messaging system) manager module which is responsible for sending short messages with four different operating modes.",
+        "publishYear": "2011",
+        "authors":[
+            {
+                "name" : "S. Soegijoko"
+            },
+            {
+                "name" : "I.M. Puspitasari"
+            },
+            {
+                "name" : "A. Aridarma"
+            },
+            {
+                "name" : "I.D. Jani"
+            }
+        ],
+        "relevancy": "4",
+        "citing": "6",
+        "cited" : "2"
+    },
+    {
+        "_id" : "52",
+        "title" : "Study of data analysis model based on big data technology",
+        "abstract" : "The traditional data analysis are based on the cause and effect relationship, formed a sample microscopic analysis, qualitative and quantitative analysis, the thinking mode of trend extrapolation analysis. Big data has a fundamental impact on the traditional data analysis. Big data analysis based on correlation, formed global macro analysis, data and technical analysis, correlation analysis and new thinking mode of correlation analysis. Namely, from causal analysis to correlation analysis and knowledge discovery, from model fitting to data mining, from logical reasoning to association rules. Data analysis in the era of big data have taken great changes, Namely, Big data analysis, from the analysis of objects, the mode of data processing, analytical methods and tools, analytical thinking.",
+        "publishYear": "2016",
+        "authors":[
+            {
+                "name" : "Jinhua Chen"
+            },
+            {
+                "name" : "Qin Jiang"
+            },
+            {
+                "name" : "Yuxin Wang"
+            },
+            {
+                "name" : "Jing Tang"
+            }
+        ],
+        "relevancy": "6",
+        "citing": "21",
+        "cited" : "9"
+    },
+    {
+        "_id" : "53",
+        "title" : "SMART-SPI: A data analysis model proposal for software process improvement",
+        "abstract" : "Over time, software development organizations have been interested into the implementation of best practices that facilitate the improvement of its software processes with the firm purpose of improving products quality. One of the best approaches to improve software processes is to adopt a Software Process Improvement (SPI) initiative, which evaluates current practices and the way software products and services are developed. However, the rapid increase of data, an inappropriate knowledge management, a misunderstanding about information and knowledge, among other current issues and challenges, have complicated these SPI initiatives. From a data perspective, a recent study identifies the required elements to be adopted in SPI to succeed and suggests the creation of a data analysis model for SPI. The purpose of this paper is to present SMART-SPI, a data analysis model proposal for SPI, which provides a solution to the identified issues and challenges through the adoption of methodologies highly used in the academia, industry and government environments.",
+        "publishYear": "2017",
+        "authors":[
+            {
+                "name" : "Jezreel Mejía"
+            },
+            {
+                "name" : "Freddy Iñiguez"
+            },
+            {
+                "name" : "Mirna Muñoz"
+            }
+        ],
+        "relevancy": "5",
+        "citing": "17",
+        "cited" : "0"
+    },
+    {
+        "_id" : "54",
+        "title" : "Evaluation and Analysis of Knowledge Management Best Practices in Software Process Improvement a Multicase Experience",
+        "abstract" : "Software is important for our day-to-day lives and its impact is rising constantly. The quality of the developed software is straightforwardly dependent on the quality of the development process, researchers and practitioners primarily focus on improvement of the software process. Software Process Improvement (SPI) is a systematic and well-organized approach for development of the capabilities of software organizations and it is done through the evaluation of the existing practices of the organization and development of the software processes based on the competencies and experiences of the practitioners of the organization. There are a number of studies that focus on the practical use of KM in SPI. In this research work it has been explored though multicase analysis how KM can be significant and supports SPI.",
+        "publishYear": "2015",
+        "authors":[
+            {
+                "name" : "Mitali Chugh"
+            },
+            {
+                "name" : "Neeraj Chugh"
+            },
+            {
+                "name" : "Devendra Kumar Punia"
+            }
+        ],
+        "relevancy": "5",
+        "citing": "32",
+        "cited" : "4"
     }
 ]
