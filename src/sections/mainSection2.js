@@ -20,7 +20,7 @@ const MainSection = () => {
     const [slideHeightPorportion, setSliderHeightPorportion] = useState(1 / 2)
     const [margin, setMargin] = useState(5)
     const [steps, setSteps] = useState([])
-    const [barMargin, setBarMargin] = useState(40)
+    const [barMargin, setBarMargin] = useState(10)
     const [topMargin, setTopMargin] = useState(80)
     const [bottomMargin, setBottomMargin] = useState(20)
     const [rightMargin, setRightMargin] = useState(80)
@@ -29,6 +29,8 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
+    const [activeMainLens, setActiveMainLens] = useState("linkLens")
+    const [focusedDoc, SetFocusedDoc] = useState("")
 
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
@@ -37,6 +39,7 @@ const MainSection = () => {
     const sliderDragHandler = d3.drag()
         .on("drag", function (d) {
             ToggleLensMenuOpen(false)
+            SetFocusedDoc("")
             let barHeight = parseInt(d3.select(this).attr("height"))
             if (d.y > 0 && d.y + barHeight < height) {
                 d3.select(this)
@@ -83,6 +86,12 @@ const MainSection = () => {
         // define your linear gradient here ...
         var defs = d3.select(".mainContainer")
             .append("defs")
+    }
+
+    const loadData = () => {
+        dispatch(sortDocuments(sortMetric, ascending))
+        dispatch(CreateRandomLinks())
+        dispatch(autoCluster(3))
     }
 
     const loadSlider = () => {
@@ -193,17 +202,10 @@ const MainSection = () => {
     }
 
     const loadDocs = () => {
-        dispatch(sortDocuments(sortMetric, ascending))
-        dispatch(CreateRandomLinks())
-        dispatch(autoCluster(3))
-        console.log(documents)
         d3.select(".mainContainer")
             .append("g")
             .attr("class", "docsContainer")
-
-        setTimeout(() => {
-            updateDocs()
-        } , 1000)
+        updateDocs()
     }
 
     const updateDocs = () => {
@@ -211,20 +213,42 @@ const MainSection = () => {
         var n_z = Math.floor((z / (1 - slideHeightPorportion)) * (documents.length - n_x))
         let t_x = Math.pow((1 / slideHeightPorportion), 2) // thickness of each element within the sliding window
         let t_z = (height - documents.length * margin) / (t_x * n_x + (documents.length - n_x)) // thickness of each element outisde of the sliding window
-
-        let barWidth = (width - 125 - (clusters.length * 40)) / clusters.length
-
+        
         var docsContainer = d3.select(".docsContainer")
 
         var newElements = docsContainer.selectAll(".docElement")
             .data(documents)
 
         newElements.exit().remove()
-
+        let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
         newElements
             .enter()
             .append("rect")
             .merge(newElements)
+            .on("mouseover",(event,doc)=>{
+                if(focusedDoc == ""){
+                    docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+                }
+            })
+            .on("click", (event, doc)=>{
+                if (focusedDoc != "") {
+                    if (focusedDoc == doc._id) {
+                        SetFocusedDoc("");
+                        updateDocs()
+                    } else {
+                        SetFocusedDoc(doc._id)
+                        docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+                    }
+                } else {
+                    SetFocusedDoc(doc._id)
+                    docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+                }
+            })
+            .on("mouseout", () => {
+                if (focusedDoc == "") {
+                    updateDocs()
+                }
+            })
             .transition()
             .attr("x", item => {
                 return (item.cluster.id - 1) * barWidth + (item.cluster.id) * barMargin + 126
@@ -245,38 +269,79 @@ const MainSection = () => {
             .attr("opacity", (item, index) => {
                 return index < n_z ? 0.65 : index < n_z + n_x ? 0.95 : 0.65
             })
+            
 
             //here the magic begins ...
-            // documents.map((doc, index)=>{
-            //     if (index >= n_z && index < n_z+n_x) {
-            //         doc.links.map(linkId => {
-            //             let index_ = documents.findIndex(item => {
-            //                 return item._id == linkId
-            //             })
-            //             let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-            //             let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
-            //             docsContainer.append("path")
-            //                 .attr("stroke-width", 1)
-            //                 .attr("class", "linkPath")
-            //                 .attr("stroke", doc.cluster.color)
-            //                 .attr("fill", "none")
-            //                 .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1, y2))
-            //         })
-            //     }
-            // })
-            documents[0].links.map(linkId => {
-                let index_ = documents.findIndex(item => {
-                    return item._id == linkId
+            if(documents[0].links != undefined && focusedDoc == ""){
+                d3.selectAll(".linkPath").remove()
+                documents.map((doc, index)=>{
+                    if (index >= n_z && index < n_z+n_x) {
+                        doc.links.map(linkId => {
+                            let index_ = documents.findIndex(item => {
+                                return item._id == linkId
+                            })
+                            let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                            let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
+                            docsContainer.append("path")
+                                .attr("class", "linkPath")
+                                .attr("stroke", doc.cluster.color)
+                                .attr("fill", "none")
+                                .attr("opacity", Math.pow(0.9-slideHeightPorportion, 2))
+                                .transition()
+                                .attr("stroke-width", t_z/4)
+                                .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
+                        })
+                    }
                 })
-                let y1 = 0 < n_z ? (0) * (t_z + margin) : 0 < n_z + n_x ? n_z * (t_z + margin) + (0 - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (0 - n_z - n_x) * (t_z + margin)
-                let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
-                docsContainer.append("path")
-                    .attr("stroke-width", 1)
-                    .attr("class", "linkPath")
-                    .attr("stroke", documents[0].cluster.color)
-                    .attr("fill", "none")
-                    .attr("d", linkPathGenerator(documents[0], documents[index_],barMargin, barWidth, y1, y2))
-            })
+            }
+    }
+
+    const docOver = (activeLens , doc, n_z, n_x, t_z, t_x) => {
+        let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
+        var docsContainer = d3.select(".docsContainer")
+        switch (activeLens) {
+            case "linkLens":
+                d3.selectAll(".linkPath")
+                    .transition()
+                    .attr("opacity", "0.05")
+                    .attr("stroke-width", t_z/5)
+
+                d3.selectAll(".docElement")
+                    .attr("opacity", "0.3")
+                d3.selectAll(".docElement")
+                    .filter(item => {
+                        return item._id == doc._id
+                    })
+                    .attr("opacity","1")
+
+                let index = documents.findIndex(item => {
+                    return doc._id == item._id
+                })
+                let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                doc.links.map(linkId => {
+                    let index_ = documents.findIndex(item => {
+                        return item._id == linkId
+                    })
+                    d3.selectAll(".docElement")
+                        .filter(item => {
+                            return item._id == documents[index_]._id
+                        })
+                        .attr("opacity","0.80")
+                    let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
+                    docsContainer.append("path")
+                        .attr("class", "linkPath")
+                        .attr("stroke", doc.cluster.color)
+                        .attr("fill", "none")
+                        .attr("stroke-width", t_z/5)
+                        .transition()
+                        .attr("stroke-width", t_z/2)
+                        .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
+                })
+                break;
+        
+            default:
+                break;
+        }
     }
 
     const loadAxis = (cardinality) => {
@@ -503,7 +568,7 @@ const MainSection = () => {
                 return hexToRgbA(item.color, 0.45)
             })
 
-        let barWidth = (width - 125 - (clusters.length * 40)) / clusters.length
+        let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
 
         clusterController.append("rect")
             .attr("fill", "url('#clustersGradient')")
@@ -533,7 +598,7 @@ const MainSection = () => {
             .transition()
             .attr("text-anchor", "middle")
             .attr("x", item => {
-                return ((item.id - 1) * barWidth + (item.id) * barMargin + 126) + (barWidth - barMargin) / 2
+                return ((item.id - 1)*barWidth + (item.id)*barMargin + 126) + (barWidth - barMargin) / 2 
             })
             .attr("class", "clusterElement")
             .attr("fill", "#3a3a3a")
@@ -570,14 +635,33 @@ const MainSection = () => {
     const loadGeneralEvents = () => {
         d3.select(document)
             .on("click", (event)=>{
-                console.log(event.target.id, isLensMenuOpen)
                 if (event.target.id != "lensMenuContainer_" && event.target.id != "lensMenuIcon_" && isLensMenuOpen) {
                     ToggleLensMenuOpen(false)
                 }
             })
     }
 
+    const configBarMargin = (activeLens) => {
+        let total = (width - 165) / clusters.length
+        console.log("total: ", total)
+        if(total > 0) {
+            switch (activeLens) {
+                case "linkLens":
+                    setBarMargin(Math.abs(total*0.7 / 2))
+                    break;
+            
+                default:
+                    setBarMargin(Math.abs(total*0.2 / 2))
+                    break;
+            }
+            setTimeout(()=>{
+                updateDocs();
+            }, 300)
+        }
+    }
+
     useEffect(() => {
+        configBarMargin(activeMainLens);
         updateDocs();
         updateSlider();
         updateClusterController();
@@ -585,6 +669,7 @@ const MainSection = () => {
 
     useEffect(() => {
         getDimensions();
+        loadData();
         setTimeout(() => {
             loadSVG();
             loadSlider();
@@ -619,6 +704,15 @@ const MainSection = () => {
         updateSlider() // important
         updateLensMenu()
     }, [isLensMenuOpen])
+
+    useEffect(()=>{
+        updateDocs()
+    },[focusedDoc])
+
+    useEffect(()=>{
+        configBarMargin(activeMainLens);
+    },[activeMainLens,width])
+
 
     return (
         <div id="mainCanvas_2">
