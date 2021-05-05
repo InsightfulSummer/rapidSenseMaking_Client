@@ -287,6 +287,7 @@ const MainSection = () => {
                                 .attr("stroke", doc.cluster.color)
                                 .attr("fill", "none")
                                 .attr("opacity", Math.pow(0.9-slideHeightPorportion, 2))
+                                .attr("stroke-width", t_z/5)
                                 .transition()
                                 .attr("stroke-width", t_z/4)
                                 .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
