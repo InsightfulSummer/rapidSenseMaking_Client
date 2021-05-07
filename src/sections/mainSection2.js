@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import { useSelector, useDispatch } from 'react-redux'
-import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks } from '../redux/actions/actions'
+import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { hexToRgbA, linkPathGenerator } from '../helper/helper'
 
 const MainSection = () => {
@@ -29,7 +29,7 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState("linkLens")
+    const [activeMainLens, setActiveMainLens] = useState("overview")
     const [focusedDoc, SetFocusedDoc] = useState("")
 
     //define your scales here ...
@@ -92,6 +92,8 @@ const MainSection = () => {
         dispatch(sortDocuments(sortMetric, ascending))
         dispatch(CreateRandomLinks())
         dispatch(autoCluster(3))
+        dispatch(dataCompeleting())
+        console.log(documents)
     }
 
     const loadSlider = () => {
@@ -272,26 +274,74 @@ const MainSection = () => {
             
 
             //here the magic begins ...
-            if(documents[0].links != undefined && focusedDoc == ""){
-                d3.selectAll(".linkPath").remove()
-                documents.map((doc, index)=>{
+            // if(documents[0].links != undefined && focusedDoc == ""){
+            //     d3.selectAll(".linkPath").remove()
+            //     documents.map((doc, index)=>{
+            //         if (index >= n_z && index < n_z+n_x) {
+            //             doc.links.map(linkId => {
+            //                 let index_ = documents.findIndex(item => {
+            //                     return item._id == linkId
+            //                 })
+            //                 if(index_ >= n_z && index_ < n_z+n_x){
+            //                     let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+            //                     let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
+            //                     docsContainer.append("path")
+            //                         .attr("class", "linkPath")
+            //                         .attr("stroke", doc.cluster.color)
+            //                         .attr("fill", "none")
+            //                         .attr("opacity", 1-slideHeightPorportion)
+            //                         .attr("stroke-width", t_z/8)
+            //                         .transition()
+            //                         .attr("stroke-width", t_z/3)
+            //                         .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
+            //                 }
+            //             })
+            //         }
+            //     })
+            // }
+
+            if(documents[0].journal != undefined && focusedDoc == ""){
+                // d3.selectAll(".overviewGroup").remove()
+                // we should go with the style of original rectangles using enter and data methods and avoid using map function and pure java script
+                // for tommorrow :)
+                var overviewGroup = docsContainer.append("g")
+                            .attr("class", "overviewGroup")
+                d3.selectAll(".overviewLeftRect").remove()
+                d3.selectAll(".overviewBottomRect").remove()
+                d3.selectAll(".overviewBars").remove()
+                d3.selectAll(".overviewBar").remove()
+                d3.selectAll(".overviewPublishYear").remove()
+                d3.selectAll(".overviewJournal").remove()
+
+                documents.map((doc,index) => {
                     if (index >= n_z && index < n_z+n_x) {
-                        doc.links.map(linkId => {
-                            let index_ = documents.findIndex(item => {
-                                return item._id == linkId
-                            })
-                            let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-                            let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
-                            docsContainer.append("path")
-                                .attr("class", "linkPath")
-                                .attr("stroke", doc.cluster.color)
-                                .attr("fill", "none")
-                                .attr("opacity", Math.pow(0.9-slideHeightPorportion, 2))
-                                .attr("stroke-width", t_z/5)
-                                .transition()
-                                .attr("stroke-width", t_z/4)
-                                .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
-                        })
+                        
+                        
+                        overviewGroup.append("rect")
+                            .attr("class", "overviewLeftRect")
+
+                        overviewGroup.append("text")
+                            .attr("class", "overviewPublishYear")
+
+                        overviewGroup.append("rect")
+                            .transition()
+                            .attr("x",(doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 126)
+                            .attr("width", barWidth - barMargin)
+                            .attr("fill","white")
+                            .attr("height",t_x * t_z/5)
+                            .attr("y",n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + (4*t_x * t_z/5))
+                            .attr("class", "overviewBottomRect")
+                        
+                        overviewGroup.append("text")
+                            .attr("class", "overviewJournal")
+
+                        let bars = overviewGroup.append("g")
+                            .attr("class", "overviewBars")
+
+                        let bar = bars.selectAll(".overviewBar").data(doc["relevancies"])
+                        bar.enter()
+                            .append("rect")
+                            .attr("class", "overviewBar")
                     }
                 })
             }

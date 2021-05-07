@@ -32,6 +32,12 @@ export const CreateRandomLinks = () => {
     }
 }
 
+export const dataCompeleting = () => {
+    return {
+        type : types.DataCompeleting
+    }
+} 
+
 // interaction-related actions
 
 export const SetActiveDocument = (documentId) => {

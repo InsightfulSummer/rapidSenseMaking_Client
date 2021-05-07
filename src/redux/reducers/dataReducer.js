@@ -106,8 +106,27 @@ const reducer = (state = initialState, actions) => {
                 }
                 doc.links = links
             })
-            // generate a random number 3 -> 15
-            // iterate as much as the random number generated and create a random number 1 to documents.length
+
+        case types.DataCompeleting : 
+            let journalLists = [
+                "International Journal of Computer Vision",
+                "IEEE Transactions on Pattern Analysis and Machine Intelligence"
+                ,"ACM Computing Surveys"
+                ,"ACM Transactions on Graphics"
+                ,"IEEE Transactions on Multimedia"
+            ]
+            state.documents.map((doc,index) => {
+                doc.relevancies = []
+                doc.journal = journalLists[index%5]
+                state.clusters.map(c =>{
+                    let randomRelevancyScore = Math.floor(Math.random() * (10 - 5) + 5)
+                    let randomRelevancy = {
+                        cluster : c,
+                        score : randomRelevancyScore
+                    }
+                    doc.relevancies.push(randomRelevancy)
+                })
+            })
         default:
             return state;
     }
