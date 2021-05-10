@@ -170,3 +170,41 @@ export const renameCluster = (cluster_id, new_name) => {
         }
     }
 }
+
+// group related actions
+
+export const addOneGroup = (group_name=null) => {
+    return {
+        type : types.AddOneGroup,
+        payload : {
+            group_name
+        }
+    }
+}
+
+export const removeOneGroup = (group_id) => {
+    return {
+        type : types.RemoveOneGroup,
+        payload : {
+            group_id
+        }
+    }
+}
+
+export const changeGroupOfDocument = (document_id, group_id) => {
+    return {
+        type : types.ChangeGroupOfDocument,
+        payload : {
+            document_id, group_id
+        }
+    }
+}   
+
+export const renameGroup = (group_id, new_name) => {
+    return {
+        type : types.RenameGroup,
+        payload : {
+            group_id, new_name
+        }
+    }
+}

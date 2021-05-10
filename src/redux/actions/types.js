@@ -20,5 +20,9 @@ export default {
     RemoveOneCluster : "RemoveOneCluster",
     ChangeClusterOfDocument : "ChangeClusterOfDocument",
     RenameCluster : "RenameCluster",
-    DataCompeleting : "DataCompeleting"
+    DataCompeleting : "DataCompeleting",
+    AddOneGroup : "AddOneGroup",
+    RemoveOneGroup : "RemoveOneGroup",
+    ChangeGroupOfDocument : "ChangeGroupOfDocument",
+    RenameGroup : "RenameGroup"
 }

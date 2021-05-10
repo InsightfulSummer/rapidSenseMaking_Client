@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import * as d3 from 'd3'
+import { textwrap } from 'd3-textwrap';
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { hexToRgbA, linkPathGenerator } from '../helper/helper'
 
 const MainSection = () => {
 
-    const { width, height, documents, sortMetric, ascending, clusters, sortingMetrics } = useSelector(state => ({
+    const { width, height, documents, sortMetric, ascending, clusters, sortingMetrics, groups } = useSelector(state => ({
         width: state.canvasReducer.width,
         height: state.canvasReducer.height,
         documents: state.dataReducer.documents,
         sortMetric: state.interactionReducer.sortMetric,
         ascending: state.interactionReducer.ascending,
         clusters: state.dataReducer.clusters,
-        sortingMetrics: state.interactionReducer.sortingMetrics
+        sortingMetrics: state.interactionReducer.sortingMetrics,
+        groups : state.dataReducer.groups
     }))
 
     const [z, setZ] = useState(0)
@@ -29,7 +31,7 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState("overview")
+    const [activeMainLens, setActiveMainLens] = useState("summary")
     const [focusedDoc, SetFocusedDoc] = useState("")
 
     //define your scales here ...
@@ -114,31 +116,39 @@ const MainSection = () => {
         d3.selectAll("#slideBodyGradient").remove()
         var slideBodyGradient = d3.select("defs")
             .append("linearGradient")
-            .attr("id", "slideBodyGradient")
+            .attr("id", "slideBodyGradient")   
 
         var stops = slideBodyGradient.selectAll("stop")
             .data(clusters)
 
         stops.exit().remove()
 
+        slideBodyGradient.append("stop")
+            .attr("offset","0%")
+            .attr("stop-color","#e6e6e6")   
+
         stops.enter()
             .append("stop")
             .merge(stops)
             .transition()
             .attr("offset", (item, index) => {
-                return ((index + 1) / clusters.length) * 100 + "%"
+                return ((index + 1) / clusters.length) * 100 - (1/clusters.length*50) + "%"
             })
             .attr("stop-color", item => {
-                return hexToRgbA(item.color, 0.15)
+                return hexToRgbA(item.color, 0.25)
             })
+
+        slideBodyGradient.append("stop")
+            .attr("offset","100%")
+            .attr("stop-color","#e6e6e6")   
 
         slideBody.remove()
         slideController.remove()
         slideControllerText.remove()
 
         slideBody = slider.append("rect")
-            .attr("width", width + (rightMargin))
-            .attr("x", 0)
+            .attr("width", width-(rightMargin))
+            .attr("x", 105)
             .attr("fill", "url('#slideBodyGradient')")
             .attr("class", "slideBody")
             .merge(slideBody)
@@ -253,7 +263,18 @@ const MainSection = () => {
             })
             .transition()
             .attr("x", item => {
-                return (item.cluster.id - 1) * barWidth + (item.cluster.id) * barMargin + 126
+                if (item.groups != undefined && item.groups != null) {
+                    // it has a group
+                    let group_index = groups.findIndex(group => {
+                        return group.id == item.group.id
+                    })
+                    return clusters.length * (barWidth + barMargin) + (group_index) * barWidth + (group_index + 1) * barMargin + 126
+                } else {
+                    let clusterIndex = clusters.findIndex(cluster => {
+                        return cluster.id == item.cluster.id
+                    })
+                    return (clusterIndex) * barWidth + (clusterIndex + 1) * barMargin + 126
+                }
             })
             .attr("y", (item, index) => {
                 return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
@@ -300,51 +321,149 @@ const MainSection = () => {
             //     })
             // }
 
-            if(documents[0].journal != undefined && focusedDoc == ""){
-                // d3.selectAll(".overviewGroup").remove()
-                // we should go with the style of original rectangles using enter and data methods and avoid using map function and pure java script
-                // for tommorrow :)
-                var overviewGroup = docsContainer.append("g")
-                            .attr("class", "overviewGroup")
-                d3.selectAll(".overviewLeftRect").remove()
-                d3.selectAll(".overviewBottomRect").remove()
-                d3.selectAll(".overviewBars").remove()
-                d3.selectAll(".overviewBar").remove()
-                d3.selectAll(".overviewPublishYear").remove()
-                d3.selectAll(".overviewJournal").remove()
+            // if(documents[0].journal != undefined && focusedDoc == ""){
 
-                documents.map((doc,index) => {
-                    if (index >= n_z && index < n_z+n_x) {
-                        
-                        
-                        overviewGroup.append("rect")
-                            .attr("class", "overviewLeftRect")
+            //     var overviewBottomRect = docsContainer.selectAll(".overviewBottomRect").data(documents)
+            //     var overviewMainRect = docsContainer.selectAll(".overviewMainRect").data(documents)
+            //     var overviewJournal = docsContainer.selectAll(".overviewJournal").data(documents)
+            //     var overviewPublishYear = docsContainer.selectAll(".overviewPublishYear").data(documents)
 
-                        overviewGroup.append("text")
-                            .attr("class", "overviewPublishYear")
+            //     overviewBottomRect.exit().remove()
+            //     overviewMainRect.exit().remove()
+            //     overviewJournal.exit().remove()
+            //     overviewPublishYear.exit().remove()
+            //     overviewBottomRect.enter()
+            //         .append("rect")
+            //         .merge(overviewBottomRect)
+            //         .transition()
+            //         .attr("width",(doc,index) => {
+            //             return barWidth - barMargin
+            //         })
+            //         .attr("height",(doc,index) => {
+            //             return (index >= n_z && index < n_z+n_x) ? t_x*t_z / 5 : 0
+            //         })
+            //         .attr("x",(item,index)=>{
+            //             if (item.groups != undefined && item.groups != null) {
+            //                 // it has a group
+            //                 let group_index = groups.findIndex(group => {
+            //                     return group.id == item.group.id
+            //                 })
+            //                 return clusters.length * (barWidth + barMargin) + (group_index) * barWidth + (group_index + 1) * barMargin + 126
+            //             } else {
+            //                 let clusterIndex = clusters.findIndex(cluster => {
+            //                     return cluster.id == item.cluster.id
+            //                 })
+            //                 console.log(clusterIndex)
+            //                 return (clusterIndex) * barWidth + (clusterIndex + 1) * barMargin + 126
+            //             }
+            //         })
+            //         .attr("y" , (doc,index) => {
+            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + 4*t_x*t_z/5 : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+            //         })
+            //         .attr("stroke",(doc)=>{
+            //             return doc.cluster.color
+            //         })
+            //         .attr("class", "overviewBottomRect")
 
-                        overviewGroup.append("rect")
-                            .transition()
-                            .attr("x",(doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 126)
-                            .attr("width", barWidth - barMargin)
-                            .attr("fill","white")
-                            .attr("height",t_x * t_z/5)
-                            .attr("y",n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + (4*t_x * t_z/5))
-                            .attr("class", "overviewBottomRect")
-                        
-                        overviewGroup.append("text")
-                            .attr("class", "overviewJournal")
+            //     overviewMainRect.enter()
+            //         .append("rect")
+            //         .merge(overviewMainRect)
+            //         .transition()
+            //         .attr("width",(doc,index) => {
+            //             return (barWidth - barMargin) / 2
+            //         })
+            //         .attr("height",(doc,index) => {
+            //             return (index >= n_z && index < n_z+n_x) ? t_x*t_z * 4 / 5 : 0
+            //         })
+            //         .attr("x",(doc,index)=>{
+            //             return (doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 126
+            //         })
+            //         .attr("y" , (doc,index) => {
+            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+            //         })
+            //         .attr("stroke",(doc)=>{
+            //             return doc.cluster.color
+            //         })
+            //         .attr("class", "overviewMainRect")
 
-                        let bars = overviewGroup.append("g")
-                            .attr("class", "overviewBars")
+            //     let titleWrap = textwrap()
+            //         .bounds({width : barWidth-barMargin})
+                
+            //         overviewJournal.enter()
+            //         .append("text")
+            //         .merge(overviewJournal)
+            //         .transition()
+            //         .attr("class","overviewJournal wrap")
+            //         .attr("x",(doc,index)=>{
+            //             return (doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 126 + 5
+            //         })
+            //         .attr("y" , (doc,index) => {
+            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + 9*t_x*t_z/10 : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+            //         })
+            //         .attr("width",barWidth-barMargin)
+            //         .attr("alignment-baseline","middle")
+            //         .attr("font-size",(t_x*t_z / 5 * 0.8))
+            //         .attr("fill","white")
+            //         .text((doc,index) => {
+            //             return (index >= n_z && index < n_z+n_x) ? doc.title : ""
+            //         })
+                
 
-                        let bar = bars.selectAll(".overviewBar").data(doc["relevancies"])
-                        bar.enter()
-                            .append("rect")
-                            .attr("class", "overviewBar")
-                    }
-                })
+            //     overviewPublishYear.enter()
+            //         .append("text")
+            //         .merge(overviewPublishYear)
+            //         .transition()
+            //         .attr("class","overviewPublishYear")
+            //         .attr("text-anchor","end")
+            //         .attr("x",(doc,index)=>{
+            //             return (doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 121 + (barWidth - barMargin) / 2
+            //         })
+            //         .attr("y" , (doc,index) => {
+            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + 4*t_x*t_z/10 : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+            //         })
+            //         .attr("font-size", (t_x*t_z*4 / 5 * 0.8))
+            //         .attr("fill","white")
+            //         .attr("alignment-baseline","middle")
+            //         .text((doc,index) => {
+            //             return (index >= n_z && index < n_z+n_x) ? doc.publishYear : ""
+            //         })
+            // }
+
+            if(focusedDoc == "" && activeMainLens == "summary"){
+                let summaryRect = docsContainer.selectAll(".summaryRect").data(documents)
+                summaryRect.exit().remove()
+                summaryRect.enter()
+                    .append("rect")
+                    .merge(summaryRect)
+                    .transition()
+                    .attr("class","summaryRect")
+                    .attr("width", (doc,index) => {
+                        return barWidth - barMargin
+                    })
+                    .attr("height", (doc,index)=>{
+                        return (index >= n_z && index < n_z + n_x) ? t_x * t_z : 0
+                    })
+                    .attr("fill", "red")
+                    .attr("x" , (item,index)=>{
+                        if (index >= n_z && index < n_z + n_x) {
+                            if (item.groups != undefined && item.groups != null) {
+                                // it has a group
+                                let group_index = groups.findIndex(group => {
+                                    return group.id == item.group.id
+                                })
+                                return clusters.length * (barWidth + barMargin) + (group_index) * barWidth + (group_index + 1) * barMargin + 126
+                            } else {
+                                let clusterIndex = clusters.findIndex(cluster => {
+                                    return cluster.id == item.cluster.id
+                                })
+                                return (clusterIndex) * barWidth + (clusterIndex + 1) * barMargin + 126
+                            }
+                        } else {
+                            return 0
+                        }
+                    })
             }
+
     }
 
     const docOver = (activeLens , doc, n_z, n_x, t_z, t_x) => {
@@ -598,6 +717,10 @@ const MainSection = () => {
         var stops = clustersGradient.selectAll("stop")
             .data(clusters)
 
+        clustersGradient.append("stop")
+            .attr("offset","0%")
+            .attr("stop-color","#e6e6e6")
+
         stops.exit().remove()
 
         var clusterController = d3.select(".clustersContainer")
@@ -613,19 +736,23 @@ const MainSection = () => {
             .merge(stops)
             .transition()
             .attr("offset", (item, index) => {
-                return ((index + 1) / clusters.length) * 100 + "%"
+                return (((index + 1) / clusters.length) * 100) - (1/clusters.length*50) + "%"
             })
             .attr("stop-color", item => {
                 return hexToRgbA(item.color, 0.45)
             })
 
+        clustersGradient.append("stop")
+            .attr("offset","100%")
+            .attr("stop-color","#e6e6e6")
+
         let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
 
         clusterController.append("rect")
             .attr("fill", "url('#clustersGradient')")
-            .attr("x", 0)
+            .attr("x", 105)
             .attr("y", 0)
-            .attr("width", width + (rightMargin))
+            .attr("width", width - rightMargin)
             .attr("height", topMargin * 2 / 3)
             .attr("class", "clusterContainerRect")
 
@@ -671,16 +798,16 @@ const MainSection = () => {
                 dispatch(addOneCluster())
             })
 
-        clusterController.append("text")
-            .attr("class", "fa addClusterIcon")
-            .attr("alignment-baseline", "middle")
-            .attr("x", width + rightMargin - 60)
-            .attr("y", 25)
-            .attr("fill", "#3a3a3a")
-            .text("\uf58e")
-            .on("click", function () {
-                dispatch(autoCluster(3))
-            })
+        // clusterController.append("text")
+        //     .attr("class", "fa addClusterIcon")
+        //     .attr("alignment-baseline", "middle")
+        //     .attr("x", width + rightMargin - 60)
+        //     .attr("y", 25)
+        //     .attr("fill", "#3a3a3a")
+        //     .text("\uf58e")
+        //     .on("click", function () {
+        //         dispatch(autoCluster(3))
+        //     })
     }
 
     const loadGeneralEvents = () => {

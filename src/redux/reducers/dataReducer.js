@@ -10,7 +10,8 @@ const initialState = {
         name : "mainCluster",
         id : 1,
         color : colorScale(1)
-    }]
+    }],
+    groups : []
 }
 
 const reducer = (state = initialState, actions) => {
@@ -95,7 +96,8 @@ const reducer = (state = initialState, actions) => {
 
         // random links - just for demo
         case types.CreateRandomLinks :
-            state.documents.map(doc => {
+            let tmpDocs = state.documents
+            tmpDocs.map(doc => {
                 let randomLength = Math.floor(Math.random() * (15 - 3) + 3)
                 let links =[]
                 for(let i = 0; i<randomLength; i++){
@@ -106,8 +108,10 @@ const reducer = (state = initialState, actions) => {
                 }
                 doc.links = links
             })
+            return {...state,documents: tmpDocs}
 
         case types.DataCompeleting : 
+            let tmpDocs_ = state.documents
             let journalLists = [
                 "International Journal of Computer Vision",
                 "IEEE Transactions on Pattern Analysis and Machine Intelligence"
@@ -115,7 +119,7 @@ const reducer = (state = initialState, actions) => {
                 ,"ACM Transactions on Graphics"
                 ,"IEEE Transactions on Multimedia"
             ]
-            state.documents.map((doc,index) => {
+            tmpDocs_.map((doc,index) => {
                 doc.relevancies = []
                 doc.journal = journalLists[index%5]
                 state.clusters.map(c =>{
@@ -127,6 +131,46 @@ const reducer = (state = initialState, actions) => {
                     doc.relevancies.push(randomRelevancy)
                 })
             })
+            return {...state,documents:tmpDocs_}
+
+        case types.AddOneGroup :
+            let tmpGroups = state.groups; //tmpClusters_[tmpClusters_.length-1].id
+            let last_group_id = tmpGroups.length > 0 ? tmpGroups[tmpGroups.length-1].id : 0
+            let group_name = actions.payload.group_name ? actions.payload.group_name : "group_"+(last_group_id+1)
+            tmpClusters_.push({
+                name : group_name,
+                id : last_group_id+1
+            })
+            return {...state, groups: tmpGroups}
+
+        case types.RemoveOneGroup : 
+            let tmpGroups_ = state.groups.filter(group => {
+                return group.id != actions.payload.group_id
+            })
+
+            let tmp_Documents__ = state.documents
+            tmp_Documents__.filter(doc => {
+                return doc.group.id == actions.payload.group_id
+            }).map(doc_m => {
+                doc_m.group = null
+            })
+            return {...state, groups: tmpGroups_, documents: tmp_Documents__}
+        case types.RenameGroup :
+            let tmpGroups__ = state.groups;
+            let groupIndex = tmpGroups__.findIndex(item => {
+                return item.id == actions.payload.group_id
+            })
+            tmpGroups__[groupIndex].name = actions.payload.new_name
+            return {...state, groups: tmpGroups__}
+        case types.ChangeGroupOfDocument : 
+            let _tmp_Documents = state.documents;
+            let documentIndex = _tmp_Documents.findIndex(item => {
+                return item.id == actions.payload.document_id
+            })
+            let groupItem = state.groups.find(item => {
+                return item.id == actions.payload.group_id
+            })
+            _tmp_Documents[documentIndex].group = groupItem
         default:
             return state;
     }
