@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import * as d3 from 'd3'
-import { textwrap } from 'd3-textwrap';
+import * as cloud from 'd3-cloud'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
-import { hexToRgbA, linkPathGenerator } from '../helper/helper'
+import { calculatePopUpPosition, docX, fontSizeCalculator, hexToRgbA, linkPathGenerator } from '../helper/helper'
 
 const MainSection = () => {
 
@@ -31,17 +31,21 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState("summary")
+    const [activeMainLens, setActiveMainLens] = useState("overview")
     const [focusedDoc, SetFocusedDoc] = useState("")
 
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
     const widthScale = d3.scaleLinear().domain(domain).range([0.5, 1])
+    const referenceScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["citing"])))).range([0,100])
+    const citationScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["cited"])))).range([0,100])
+    const relevancyScaler = d3.scaleLinear().domain([0,10]).range([20,100])
 
     const sliderDragHandler = d3.drag()
         .on("drag", function (d) {
             ToggleLensMenuOpen(false)
             SetFocusedDoc("")
+            d3.selectAll(".summaryBody").remove()
             let barHeight = parseInt(d3.select(this).attr("height"))
             if (d.y > 0 && d.y + barHeight < height) {
                 d3.select(this)
@@ -95,7 +99,6 @@ const MainSection = () => {
         dispatch(CreateRandomLinks())
         dispatch(autoCluster(3))
         dispatch(dataCompeleting())
-        console.log(documents)
     }
 
     const loadSlider = () => {
@@ -257,25 +260,12 @@ const MainSection = () => {
                 }
             })
             .on("mouseout", () => {
-                if (focusedDoc == "") {
+                if (focusedDoc == "" && activeMainLens == "linkLens") {
                     updateDocs()
                 }
             })
             .transition()
-            .attr("x", item => {
-                if (item.groups != undefined && item.groups != null) {
-                    // it has a group
-                    let group_index = groups.findIndex(group => {
-                        return group.id == item.group.id
-                    })
-                    return clusters.length * (barWidth + barMargin) + (group_index) * barWidth + (group_index + 1) * barMargin + 126
-                } else {
-                    let clusterIndex = clusters.findIndex(cluster => {
-                        return cluster.id == item.cluster.id
-                    })
-                    return (clusterIndex) * barWidth + (clusterIndex + 1) * barMargin + 126
-                }
-            })
+            .attr("x", item => docX(item, barWidth, barMargin, groups, clusters))
             .attr("y", (item, index) => {
                 return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
             })
@@ -283,7 +273,7 @@ const MainSection = () => {
                 return barWidth - barMargin /* widthScale(doc[sortMetric]) */
             })
             .attr("height", (item, index) => {
-                return index < n_z ? t_z : index < n_z + n_x ? t_x * t_z : t_z
+                return (index >= n_z && index < n_z+n_x && (activeMainLens == "overview")) ? 0 : index < n_z ? t_z : index < n_z + n_x ? t_x * t_z : t_z 
             })
             .attr("fill", item => {
                 return item.cluster.color
@@ -292,183 +282,245 @@ const MainSection = () => {
             .attr("opacity", (item, index) => {
                 return index < n_z ? 0.65 : index < n_z + n_x ? 0.95 : 0.65
             })
+            // summaryLens(n_x,n_z,t_x,t_z,barWidth)
+            // linkLense(n_x,n_z,t_x,t_z,barWidth)
+            overviewLens(n_x,n_z,t_x,t_z,barWidth)
+    }
+
+    const linkLense = (n_x, n_z, t_x, t_z, barWidth) => {
+            if(documents[0].links != undefined && focusedDoc == ""){
+                var docsContainer = d3.select(".docsContainer")
+                d3.selectAll(".linkPath").remove()
+                documents.map((doc, index)=>{
+                    if (index >= n_z && index < n_z+n_x) {
+                        doc.links.map(linkId => {
+                            let index_ = documents.findIndex(item => {
+                                return item._id == linkId
+                            })
+                            if(index_ >= n_z && index_ < n_z+n_x){
+                                let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                                let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
+                                docsContainer.append("path")
+                                    .attr("class", "linkPath")
+                                    .attr("stroke", doc.cluster.color)
+                                    .attr("fill", "none")
+                                    .attr("opacity", 1-slideHeightPorportion)
+                                    .attr("stroke-width", t_z/8)
+                                    .transition()
+                                    .attr("stroke-width", t_z/3)
+                                    .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
+                            }
+                        })
+                    }
+                })
+            }
+    }
+
+    const overviewLens = (n_x, n_z, t_x, t_z, barWidth) => {
+        if(documents[0].journal != undefined && focusedDoc == ""){
+            var docsContainer = d3.select(".docsContainer")
+            // title section
+            var titleForeignObject = docsContainer.selectAll(".titleForeignObject").data(documents)
+            titleForeignObject.exit().remove()
+            titleForeignObject.enter()
+                .append("foreignObject")
+                .merge(titleForeignObject)
+                .attr("class", "titleForeignObject")
+                
+            titleForeignObject.transition()
+                .attr("width", (doc, index) => {
+                    return barWidth - barMargin
+                })
+                .attr("height", (doc, index) => {
+                    return (index >= n_z && index < n_z + n_x) ? t_x * t_z / 4 : 0
+                })
+                .attr("x", (item,) => docX(item, barWidth, barMargin, groups, clusters))
+                .attr("y", (doc, index) => {
+                    return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + 3 * t_x * t_z / 4 : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                })
+            titleForeignObject.selectAll(".titleForeignObjectDiv").remove()
+            titleForeignObject.append("xhtml:div")
+                .attr("class","titleForeignObjectDiv")
+                .attr("style", doc => "font-size:"+fontSizeCalculator(barWidth-barMargin, t_x*t_z/4, 64)+"px; border-color:"+doc.cluster.color)
+                .text((doc,index) => (index >= n_z && index < n_z+n_x) ? doc.title.substring(0,60)+ "..." : null)
+
+            // publish date section
+            var publishDateForeignObject = docsContainer.selectAll(".publishDateForeignObject").data(documents)
+            publishDateForeignObject.exit().remove()
+            publishDateForeignObject.enter()
+                .append("foreignObject")
+                .merge(publishDateForeignObject)
+                .attr("class","publishDateForeignObject")
+
+            publishDateForeignObject.transition()
+                .attr("width", (doc, index) => {
+                    return (barWidth - barMargin) / 4
+                })
+                .attr("height", (doc, index) => {
+                    return (index >= n_z && index < n_z + n_x) ? t_x * t_z * 3 / 4 : 0
+                })
+                .attr("x", (item,) => docX(item, barWidth, barMargin, groups, clusters) + (barWidth - barMargin) / 4)
+                .attr("y", (doc, index) => {
+                    return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin): n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                })
+
+            publishDateForeignObject.selectAll(".publishDateForeignObjectDiv").remove()
+            publishDateForeignObject.append("xhtml:div")
+                .attr("class", "publishDateForeignObjectDiv")
+                .attr("style",doc => "font-size:"+fontSizeCalculator((barWidth - barMargin) / 4, t_x * t_z * 3 / 4, 4)+"px; color:"+doc.cluster.color)
+                .text((doc,index) => (index >= n_z && index < n_z+n_x) ? doc.publishYear : null)
+
+            // references section
+            var referenceForeignObject = docsContainer.selectAll(".referenceForeignObject").data(documents)
+            referenceForeignObject.exit().remove()
+            referenceForeignObject.enter()
+                .append("foreignObject")
+                .merge(referenceForeignObject)
+                .attr("class","referenceForeignObject")
+
+            referenceForeignObject.transition()
+                .attr("width", (doc, index) => {
+                    return (barWidth - barMargin) / 4
+                })
+                .attr("height", (doc, index) => {
+                    return (index >= n_z && index < n_z + n_x) ? t_x * t_z * 3 / 8 : 0
+                })
+                .attr("x", (item,) => docX(item, barWidth, barMargin, groups, clusters))
+                .attr("y", (doc, index) => {
+                    return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin): n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                })
+            referenceForeignObject.selectAll(".referenceForeignObjectDiv").remove()
+            referenceForeignObject.append("xhtml:div")
+                .attr("class", "referenceForeignObjectDiv")
+                .attr("style",(doc)=>"background-color:"+doc.cluster.color+"; border-top-left-radius:"+(100-referenceScale(doc["citing"]))+"%; font-size:"+fontSizeCalculator((barWidth - barMargin) / 4, t_x * t_z * 2 / 8, doc.citing.length+2)+ "px") 
+                .text((doc,index) => (index >= n_z && index < n_z+n_x) ? doc.citing + " R" : null)
+
+            // citation section
+            var citationForeignObject = docsContainer.selectAll(".citationForeignObject").data(documents)
+            citationForeignObject.exit().remove()
+            citationForeignObject.enter()
+                .append("foreignObject")
+                .merge(citationForeignObject)
+                .attr("class", "citationForeignObject")
+
+            citationForeignObject.transition()
+                .attr("width", (doc, index) => {
+                    return (barWidth - barMargin) / 4
+                })
+                .attr("height", (doc, index) => {
+                    return (index >= n_z && index < n_z + n_x) ? t_x * t_z * 3 / 8 : 0
+                })
+                .attr("x", (item,) => docX(item, barWidth, barMargin, groups, clusters))
+                .attr("y", (doc, index) => {
+                    return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + t_x*t_z*3/8: n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                })
+
+            citationForeignObject.selectAll(".citationForeignObjectDiv").remove()
+            citationForeignObject.append("xhtml:div")
+                .attr("class", "citationForeignObjectDiv")
+                .attr("style",(doc)=>"background-color:"+doc.cluster.color+"; border-bottom-left-radius:"+(100-citationScale(doc["cited"]))+"%; font-size:"+fontSizeCalculator((barWidth - barMargin) / 4, t_x * t_z * 2 / 8, doc.citing.length+2)+ "px") // border top left radius and font - size
+                .text((doc,index) => (index >= n_z && index < n_z+n_x) ? doc.cited + " C" : null)
+
+            // bars section
+            var barsGroup = docsContainer.selectAll(".barsGroup").data(documents)
+            barsGroup.exit().remove()
+            barsGroup.enter()
+                .append("g")
+                .merge(barsGroup)
+                .attr("class","barsGroup")
+                
+            var barRect = barsGroup.selectAll(".barRect").data((doc,index) => {
+                let baseX = docX(doc, barWidth, barMargin, groups, clusters)
+                let baseY = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                let shouldView = (index >= n_z && index < n_z+n_x) ? true : false
+                doc.relevancies.map(item => {
+                    item.baseX = baseX
+                    item.baseY = baseY
+                    item.shouldView = shouldView
+                })
+                return doc.relevancies
+            })
+            barRect.exit().remove()
+            var relevancyBarWidth = ((barWidth - barMargin) / 2) / clusters.length
+
+            barRect.enter()
+                .append("rect")
+                .merge(barRect)
+                .transition()
+                .attr("class", "barRect")
+                .attr("width", relevancyBarWidth)
+                .attr("x", (item, index) => index*relevancyBarWidth + item.baseX + ((barWidth-barMargin) /2))
+                .attr("y", (item,index) => ((100 - relevancyScaler(item.score))/100) * t_x * t_z * 3 / 4 + item.baseY)
+                .attr("height" , (item, index) => item.shouldView ? relevancyScaler(item.score)/100 * t_x * t_z * 3 / 4 : 0)
+                .attr("fill", item => item.cluster.color)
+
+            // overlay section
+            var overLay = docsContainer.selectAll(".overLayRect").data(documents)
+            overLay.exit().remove()
+            overLay.enter()
+                .append("rect")
+                .merge(overLay)
+                .on("mouseover", (event,doc)=>{
+                    docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+                })
+                .transition()
+                .attr("width", barWidth - barMargin)
+                .attr("height", (doc,index) => (index >= n_z && index < n_z+n_x) ? t_x*t_z : 0)
+                .attr("x", doc => docX(doc, barWidth, barMargin, groups, clusters))
+                .attr("y", (doc, index)=>{
+                    return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                })
+                .attr("opacity", "0")
+                .attr("class","overLayRect")
+        }
+    }
+
+    const summaryLens = (n_x, n_z, t_x, t_z, barWidth) => {
+        if(focusedDoc == ""){
+            var docsContainer = d3.select(".docsContainer")
+            let summaryRect = docsContainer.selectAll(".summaryRect").data(documents)
+            summaryRect.exit().remove()
+            summaryRect = summaryRect.enter()
+                .append("foreignObject")
+                .merge(summaryRect)
+                .attr("class","summaryRect")
+                
+            summaryRect
+                .transition()
+                .attr("width", (doc,index) => {
+                    return barWidth - barMargin
+                })
+                .attr("height", (doc,index)=>{
+                    return (index >= n_z && index < n_z + n_x) ? t_x * t_z : 0
+                })
+                .attr("x" , item => docX(item , barWidth, barMargin, groups, clusters))
+                .attr("y", (doc, index) => {
+                    return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                })
             
 
-            //here the magic begins ...
-            // if(documents[0].links != undefined && focusedDoc == ""){
-            //     d3.selectAll(".linkPath").remove()
-            //     documents.map((doc, index)=>{
-            //         if (index >= n_z && index < n_z+n_x) {
-            //             doc.links.map(linkId => {
-            //                 let index_ = documents.findIndex(item => {
-            //                     return item._id == linkId
-            //                 })
-            //                 if(index_ >= n_z && index_ < n_z+n_x){
-            //                     let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-            //                     let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
-            //                     docsContainer.append("path")
-            //                         .attr("class", "linkPath")
-            //                         .attr("stroke", doc.cluster.color)
-            //                         .attr("fill", "none")
-            //                         .attr("opacity", 1-slideHeightPorportion)
-            //                         .attr("stroke-width", t_z/8)
-            //                         .transition()
-            //                         .attr("stroke-width", t_z/3)
-            //                         .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
-            //                 }
-            //             })
-            //         }
-            //     })
-            // }
-
-            // if(documents[0].journal != undefined && focusedDoc == ""){
-
-            //     var overviewBottomRect = docsContainer.selectAll(".overviewBottomRect").data(documents)
-            //     var overviewMainRect = docsContainer.selectAll(".overviewMainRect").data(documents)
-            //     var overviewJournal = docsContainer.selectAll(".overviewJournal").data(documents)
-            //     var overviewPublishYear = docsContainer.selectAll(".overviewPublishYear").data(documents)
-
-            //     overviewBottomRect.exit().remove()
-            //     overviewMainRect.exit().remove()
-            //     overviewJournal.exit().remove()
-            //     overviewPublishYear.exit().remove()
-            //     overviewBottomRect.enter()
-            //         .append("rect")
-            //         .merge(overviewBottomRect)
-            //         .transition()
-            //         .attr("width",(doc,index) => {
-            //             return barWidth - barMargin
-            //         })
-            //         .attr("height",(doc,index) => {
-            //             return (index >= n_z && index < n_z+n_x) ? t_x*t_z / 5 : 0
-            //         })
-            //         .attr("x",(item,index)=>{
-            //             if (item.groups != undefined && item.groups != null) {
-            //                 // it has a group
-            //                 let group_index = groups.findIndex(group => {
-            //                     return group.id == item.group.id
-            //                 })
-            //                 return clusters.length * (barWidth + barMargin) + (group_index) * barWidth + (group_index + 1) * barMargin + 126
-            //             } else {
-            //                 let clusterIndex = clusters.findIndex(cluster => {
-            //                     return cluster.id == item.cluster.id
-            //                 })
-            //                 console.log(clusterIndex)
-            //                 return (clusterIndex) * barWidth + (clusterIndex + 1) * barMargin + 126
-            //             }
-            //         })
-            //         .attr("y" , (doc,index) => {
-            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + 4*t_x*t_z/5 : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-            //         })
-            //         .attr("stroke",(doc)=>{
-            //             return doc.cluster.color
-            //         })
-            //         .attr("class", "overviewBottomRect")
-
-            //     overviewMainRect.enter()
-            //         .append("rect")
-            //         .merge(overviewMainRect)
-            //         .transition()
-            //         .attr("width",(doc,index) => {
-            //             return (barWidth - barMargin) / 2
-            //         })
-            //         .attr("height",(doc,index) => {
-            //             return (index >= n_z && index < n_z+n_x) ? t_x*t_z * 4 / 5 : 0
-            //         })
-            //         .attr("x",(doc,index)=>{
-            //             return (doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 126
-            //         })
-            //         .attr("y" , (doc,index) => {
-            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-            //         })
-            //         .attr("stroke",(doc)=>{
-            //             return doc.cluster.color
-            //         })
-            //         .attr("class", "overviewMainRect")
-
-            //     let titleWrap = textwrap()
-            //         .bounds({width : barWidth-barMargin})
+            summaryRect.selectAll(".summaryRectDiv").remove()
+            summaryRect
+                .append("xhtml:div")
+                .attr("class","summaryRectDiv")
+                .attr("style","font-size:"+fontSizeCalculator(barWidth-barMargin, t_x*t_z, 204)+"px")
+                .text(doc => {
+                    return doc.abstract.substring(0,200) + " ..."
+                })
                 
-            //         overviewJournal.enter()
-            //         .append("text")
-            //         .merge(overviewJournal)
-            //         .transition()
-            //         .attr("class","overviewJournal wrap")
-            //         .attr("x",(doc,index)=>{
-            //             return (doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 126 + 5
-            //         })
-            //         .attr("y" , (doc,index) => {
-            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + 9*t_x*t_z/10 : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-            //         })
-            //         .attr("width",barWidth-barMargin)
-            //         .attr("alignment-baseline","middle")
-            //         .attr("font-size",(t_x*t_z / 5 * 0.8))
-            //         .attr("fill","white")
-            //         .text((doc,index) => {
-            //             return (index >= n_z && index < n_z+n_x) ? doc.title : ""
-            //         })
+            d3.selectAll(".summaryRectDiv")
+                .on("mouseover", (event, doc)=>{
+                    docOver(activeMainLens, doc, n_z,n_x,t_z,t_x)
+                })
                 
-
-            //     overviewPublishYear.enter()
-            //         .append("text")
-            //         .merge(overviewPublishYear)
-            //         .transition()
-            //         .attr("class","overviewPublishYear")
-            //         .attr("text-anchor","end")
-            //         .attr("x",(doc,index)=>{
-            //             return (doc.cluster.id - 1) * barWidth + (doc.cluster.id) * barMargin + 121 + (barWidth - barMargin) / 2
-            //         })
-            //         .attr("y" , (doc,index) => {
-            //             return index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) + 4*t_x*t_z/10 : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-            //         })
-            //         .attr("font-size", (t_x*t_z*4 / 5 * 0.8))
-            //         .attr("fill","white")
-            //         .attr("alignment-baseline","middle")
-            //         .text((doc,index) => {
-            //             return (index >= n_z && index < n_z+n_x) ? doc.publishYear : ""
-            //         })
-            // }
-
-            if(focusedDoc == "" && activeMainLens == "summary"){
-                let summaryRect = docsContainer.selectAll(".summaryRect").data(documents)
-                summaryRect.exit().remove()
-                summaryRect.enter()
-                    .append("rect")
-                    .merge(summaryRect)
-                    .transition()
-                    .attr("class","summaryRect")
-                    .attr("width", (doc,index) => {
-                        return barWidth - barMargin
-                    })
-                    .attr("height", (doc,index)=>{
-                        return (index >= n_z && index < n_z + n_x) ? t_x * t_z : 0
-                    })
-                    .attr("fill", "red")
-                    .attr("x" , (item,index)=>{
-                        if (index >= n_z && index < n_z + n_x) {
-                            if (item.groups != undefined && item.groups != null) {
-                                // it has a group
-                                let group_index = groups.findIndex(group => {
-                                    return group.id == item.group.id
-                                })
-                                return clusters.length * (barWidth + barMargin) + (group_index) * barWidth + (group_index + 1) * barMargin + 126
-                            } else {
-                                let clusterIndex = clusters.findIndex(cluster => {
-                                    return cluster.id == item.cluster.id
-                                })
-                                return (clusterIndex) * barWidth + (clusterIndex + 1) * barMargin + 126
-                            }
-                        } else {
-                            return 0
-                        }
-                    })
-            }
-
+        }
     }
 
     const docOver = (activeLens , doc, n_z, n_x, t_z, t_x) => {
         let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
         var docsContainer = d3.select(".docsContainer")
+        var canvasSVG = d3.select(".canvasSVG")
+        let docIndex, doc_x, doc_y, popUpWidth, popUpHeight
         switch (activeLens) {
             case "linkLens":
                 d3.selectAll(".linkPath")
@@ -509,7 +561,243 @@ const MainSection = () => {
                 })
                 break;
         
-            default:
+            case "summary":
+                docIndex = documents.findIndex(item => {
+                    return doc._id == item._id
+                })
+                doc_x = docX(doc, barWidth, barMargin, groups, clusters)
+                doc_y = docIndex < n_z ? (docIndex) * (t_z + margin) : docIndex < n_z + n_x ? n_z * (t_z + margin) + (docIndex - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (docIndex - n_z - n_x) * (t_z + margin)
+                popUpWidth = width/3
+                popUpHeight = height/3
+                let {popUpX, popUpY} = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
+                
+                d3.selectAll(".docElement")
+                    .filter(item => {
+                        return item._id != doc._id
+                    })
+                    .attr("opacity","0.3")
+                
+                canvasSVG.selectAll(".summaryBody").remove()
+
+                let summaryBody = canvasSVG.append("foreignObject")
+                    .attr("class","summaryBody")
+                summaryBody
+                    .attr("x",popUpX + popUpWidth/2)
+                    .attr("y",popUpY + popUpHeight/2)
+                    .transition()
+                    .attr("width", width/3)
+                    .attr("height", height/3)
+                    .attr("x",popUpX)
+                    .attr("y",popUpY)
+                    
+                let summaryDiv = summaryBody.append("xhtml:div")
+                    .attr("class","summaryDiv")
+                    .attr("style","border-color:"+doc.cluster.color)
+
+                summaryDiv.append("h5")
+                    .attr("class","summaryLensTitle")
+                    .text(doc.title)
+
+                summaryDiv.append("p")
+                    .attr("class", "summaryP")
+                    .attr("style","font-size:"+fontSizeCalculator(popUpWidth, popUpHeight * 0.65, doc.abstract.length)+"px")
+                    .text(doc.abstract)
+
+                break;
+            
+            case "overview":
+                docIndex = documents.findIndex(item => {
+                    return doc._id == item._id
+                })
+                doc_x = docX(doc, barWidth, barMargin, groups, clusters)
+                doc_y = docIndex < n_z ? (docIndex) * (t_z + margin) : docIndex < n_z + n_x ? n_z * (t_z + margin) + (docIndex - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (docIndex - n_z - n_x) * (t_z + margin)
+                popUpWidth = width/2.5
+                popUpHeight = popUpWidth/2
+                let popUpPosition = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
+                d3.selectAll(".docElement")
+                    .filter(item => {
+                        return item._id != doc._id
+                    })
+                    .attr("opacity","0.3")
+                // underlayer 
+                canvasSVG.selectAll(".underlayerOverviewDrill").remove()
+                let underlayerOverviewDrill = canvasSVG.append("rect")
+                    .attr("class","underlayerOverviewDrill")
+                    .transition()
+                    .attr("x",popUpPosition.popUpX)
+                    .attr("y",popUpPosition.popUpY)
+                    .attr("width",popUpWidth)
+                    .attr("height",popUpHeight)
+                    .attr("fill","#fff")
+                    .attr("opacity",0)
+                // title
+                canvasSVG.selectAll(".titleOverviewDrill").remove()
+                let titleOverviewDrill = canvasSVG.append("foreignObject")
+                    .attr("class", "titleOverviewDrill")
+                titleOverviewDrill.transition()
+                    .attr("x",popUpPosition.popUpX)
+                    .attr("y",popUpPosition.popUpY + popUpHeight*0.55)
+                    .attr("width", popUpWidth)
+                    .attr("height", popUpHeight*0.15)
+                    
+                titleOverviewDrill.selectAll(".titleOverviewDrillDiv").remove()
+                titleOverviewDrill.append("xhtml:div")
+                        .attr("class", "titleOverviewDrillDiv")
+                        .attr("style",  "font-size:"+fontSizeCalculator(popUpWidth*0.6, popUpHeight*0.15, doc.title.length)+"px; border-color:"+doc.cluster.color)
+                        .text(doc.title)
+                // authors
+                canvasSVG.selectAll(".authorsOverviewDrill").remove()
+                let authorsOverviewDrill = canvasSVG.append("foreignObject")
+                    .attr("class", "authorsOverviewDrill")
+                authorsOverviewDrill.transition()
+                    .attr("x",popUpPosition.popUpX)
+                    .attr("y",popUpPosition.popUpY + popUpHeight*0.70)
+                    .attr("width", popUpWidth)
+                    .attr("height", popUpHeight*0.15)
+                    
+                authorsOverviewDrill.selectAll(".authorsOverviewDrillDiv").remove()
+                let authors = ""
+                doc.authors.map((author, index) => {
+                    authors += index+1 == doc.authors.length ? author.name : (author.name + " - ") 
+                })
+                authorsOverviewDrill.append("xhtml:div")
+                        .attr("class", "authorsOverviewDrillDiv")
+                        .attr("style",  "font-size:"+fontSizeCalculator(popUpWidth*0.5, popUpHeight*0.15, authors.length)+"px; border-color:"+doc.cluster.color)
+                        .text(authors)
+                // journal
+                canvasSVG.selectAll(".journalOverviewDrill").remove()
+                let journalOverviewDrill = canvasSVG.append("foreignObject")
+                    .attr("class", "journalOverviewDrill")
+                journalOverviewDrill.transition()
+                    .attr("x",popUpPosition.popUpX)
+                    .attr("y",popUpPosition.popUpY + popUpHeight*0.85)
+                    .attr("width", popUpWidth)
+                    .attr("height", popUpHeight*0.15)
+                    
+                journalOverviewDrill.selectAll(".journalOverviewDrillDiv").remove()
+                journalOverviewDrill.append("xhtml:div")
+                        .attr("class", "journalOverviewDrillDiv")
+                        .attr("style",  "font-size:"+fontSizeCalculator(popUpWidth*0.5, popUpHeight*0.15, doc.journal.length)+"px; border-color:"+doc.cluster.color)
+                        .text(doc.journal)
+                // references
+                canvasSVG.selectAll(".referenceOverviewDrill").remove()
+                let referenceOverviewDrill = canvasSVG.append("foreignObject")
+                    .attr("class", "referenceOverviewDrill")
+
+                referenceOverviewDrill.transition()
+                    .attr("x",popUpPosition.popUpX)
+                    .attr("y",popUpPosition.popUpY)
+                    .attr("width", popUpWidth / 5)
+                    .attr("height", popUpHeight*0.55*0.5)
+                referenceOverviewDrill.selectAll(".referenceOverviewDrillDiv").remove()
+                referenceOverviewDrill.append("xhtml:div")
+                    .attr("class", "referenceOverviewDrillDiv")
+                    .attr("style","background-color:"+doc.cluster.color+"; border-top-left-radius:"+(100-referenceScale(doc["citing"]))+"%; font-size:"+fontSizeCalculator(popUpWidth / 8, popUpHeight*0.15, doc.citing.length+10)+ "px")
+                    .text(doc.citing + " refernces")
+                // citations
+                canvasSVG.selectAll(".citationOverviewDrill").remove()
+                let citationOverviewDrill = canvasSVG.append("foreignObject")
+                    .attr("class", "citationOverviewDrill")
+                    
+                citationOverviewDrill.transition()
+                    .attr("x",popUpPosition.popUpX)
+                    .attr("y",popUpPosition.popUpY + popUpHeight*0.55*0.5)
+                    .attr("width", popUpWidth / 5)
+                    .attr("height", popUpHeight*0.25)
+                citationOverviewDrill.selectAll(".citationOverviewDrillDiv").remove()
+                citationOverviewDrill.append("xhtml:div")
+                    .attr("class","citationOverviewDrillDiv")
+                    .attr("style","background-color:"+doc.cluster.color+"; border-bottom-left-radius:"+(100-citationScale(doc["cited"]))+"%; font-size:"+fontSizeCalculator(popUpWidth / 8, popUpHeight*0.15, doc.citing.length+10)+ "px")
+                    .text(doc.cited + " citations")
+
+                // publishDate
+                canvasSVG.selectAll(".publishDateOverviewDrill").remove()
+                let publishDateOverviewDrill = canvasSVG.append("foreignObject")
+                    .attr("class", "publishDateOverviewDrill")
+
+                publishDateOverviewDrill.transition()
+                    .attr("x",popUpPosition.popUpX + popUpWidth/5)
+                    .attr("y",popUpPosition.popUpY)
+                    .attr("width", popUpWidth / 5)
+                    .attr("height", popUpHeight*.55)
+
+                publishDateOverviewDrill.selectAll(".publishDateOverviewDrillDiv").remove()
+                let publishDateOverviewDrillDiv = publishDateOverviewDrill.append("xhtml:div")
+                    .attr("class", "publishDateOverviewDrillDiv")
+                
+                publishDateOverviewDrillDiv.selectAll(".publishDateOverviewP").remove()
+                publishDateOverviewDrillDiv.append("xhtml:p")
+                    .attr("class", "publishDateOverviewP")
+                    .attr("style","font-size:"+fontSizeCalculator(popUpWidth/5, popUpHeight*.55*.2,9)+"px")
+                    .text("1 January")
+                publishDateOverviewDrillDiv.append("xhtml:p")
+                    .attr("class", "publishDateOverviewP")
+                    .attr("style","font-size:"+fontSizeCalculator(popUpWidth/5, popUpHeight*.55*.2,doc.publishYear.length)+"px; font-weight: bold")
+                    .text(doc.publishYear)
+
+                // relevancyBars
+                let barOverviewDrill = canvasSVG.selectAll(".barOverviewDrill").data(doc.relevancies)
+                barOverviewDrill.exit().remove()
+                let barHeight = popUpHeight*15/100/(clusters.length)
+                barOverviewDrill.enter()
+                    .append("rect")
+                    .merge(barOverviewDrill)
+                    .transition()
+                    .attr("class", "barOverviewDrill")
+                    .attr("width", item => popUpWidth*3/5*relevancyScaler(item.score)/100)
+                    .attr("x", popUpPosition.popUpX + popUpWidth*2/5)
+                    .attr("y", (item,index) => index*barHeight + popUpPosition.popUpY)
+                    .attr("height" , barHeight)
+                    .attr("fill", item => item.cluster.color)
+
+                // wordcloud of most frequent words
+
+                // create a random array of 40 words with diffirent font sizes
+                let fakeKeywords = []
+                for(let i = 0; i<40;i++){ // it should be way more advanced in future
+                    let key = {}
+                    key.word = "keyWord_"+(i+1)
+                    key.size = Math.floor(Math.random() * (10 - 6) + 6)
+                    key.size = key.size * popUpWidth/20
+                    fakeKeywords.push(key)
+                }
+                var cloudLayout = cloud()
+                    .size([popUpWidth/2, popUpHeight*0.4])
+                    .words([
+                        "Hello", "world", "normally", "you", "want", "more", "words",
+                        "than", "this"].map(function(d) {
+                        return {text: d, size: 10 + Math.random() * 90, test: "haha"};
+                      }))
+                    .padding(5)
+                    .rotate(function() { return (Math.random() * 2) * 90; })
+                    .fontSize(function(d) { return d.size; })
+                    .on("end",draw)
+
+                cloudLayout.start()
+                
+                function draw(words){
+                    canvasSVG.selectAll(".keywordsGroup").remove()
+                    let keywordsGroup = canvasSVG.append("g")
+                        .attr("class","keywordsGroup")
+                    keywordsGroup.attr("transform", "translate(" + (popUpPosition.popUpX + popUpWidth*0.7) + "," + (popUpPosition.popUpY + popUpHeight*0.35) + ")")
+                    let wordcloudKeywords = keywordsGroup.selectAll(".wordcloudKeywords").data(words)
+                    wordcloudKeywords.exit().remove()
+                    wordcloudKeywords.enter()
+                        .append("text")
+                        .merge(wordcloudKeywords)
+                        .attr("class","wordcloudKeywords")
+                        .style("font-size", function(d) { return d.size; })
+                        .style("fill", doc.cluster.color)
+                        .attr("text-anchor", "middle")
+                        .style("font-family", "Impact")
+                        .attr("transform", function(d) {
+                          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                        })
+                        .text(function(d) { return d.text; });
+                }
+                break;
+            
+                default:
                 break;
         }
     }
@@ -821,7 +1109,6 @@ const MainSection = () => {
 
     const configBarMargin = (activeLens) => {
         let total = (width - 165) / clusters.length
-        console.log("total: ", total)
         if(total > 0) {
             switch (activeLens) {
                 case "linkLens":
