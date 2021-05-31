@@ -31,7 +31,7 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState("overview")
+    const [activeMainLens, setActiveMainLens] = useState("summary")
     const [focusedDoc, SetFocusedDoc] = useState("")
 
     //define your scales here ...
@@ -194,6 +194,18 @@ const MainSection = () => {
                 setSliderHeightPorportion((slideHeightPorportion * 100 + 1) / 100)
             }
         })
+
+        slideBody.on("wheel", (event) => {
+            if (activeMainLens == "linkLens") {
+                setActiveMainLens("summary")
+            } else if(activeMainLens == "summary") {
+                setActiveMainLens("overview")
+            } else if(activeMainLens == "overview") {
+                setActiveMainLens("default")
+            } else {
+                setActiveMainLens("linkLens")
+            }
+        })
     }
 
     const updateLensMenu = () => {
@@ -282,9 +294,22 @@ const MainSection = () => {
             .attr("opacity", (item, index) => {
                 return index < n_z ? 0.65 : index < n_z + n_x ? 0.95 : 0.65
             })
-            // summaryLens(n_x,n_z,t_x,t_z,barWidth)
+            // switch (activeMainLens) {
+            //     case "linkLens":
+            //         linkLense(n_x,n_z,t_x,t_z,barWidth)
+            //         break;
+            //     case "summary":
+            //         summaryLens(n_x,n_z,t_x,t_z,barWidth)
+            //         break;
+            //     case "overview":
+            //         overviewLens(n_x,n_z,t_x,t_z,barWidth)
+            //         break;
+            //     default:
+            //         break;
+            // }
+            summaryLens(n_x,n_z,t_x,t_z,barWidth)
             // linkLense(n_x,n_z,t_x,t_z,barWidth)
-            overviewLens(n_x,n_z,t_x,t_z,barWidth)
+            // overviewLens(n_x,n_z,t_x,t_z,barWidth)
     }
 
     const linkLense = (n_x, n_z, t_x, t_z, barWidth) => {
