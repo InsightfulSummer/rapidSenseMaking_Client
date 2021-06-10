@@ -296,6 +296,20 @@ const MainSection = () => {
             .attr("opacity", (item, index) => {
                 return index < n_z ? 0.65 : index < n_z + n_x ? 0.95 : 0.65
             })
+
+            let canvasProps = {
+                barWidth,
+                barMargin,
+                t_x,
+                t_z,
+                n_x,
+                n_z,
+                margin,
+                rightMargin,
+                topMargin,
+                width,
+                height
+            }
             // switch (activeMainLens) {
             //     case "linkLens":
             //         linkLense(n_x,n_z,t_x,t_z,barWidth)
@@ -309,7 +323,7 @@ const MainSection = () => {
             //     default:
             //         break;
             // }
-            summaryLens(n_x, n_z, t_x, t_z, barWidth, focusedDoc, documents, barMargin, clusters, groups, margin, activeMainLens, rightMargin, topMargin, width, height)
+            summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens)
             // linkLense(n_x,n_z,t_x,t_z,barWidth)
             // overviewLens(n_x,n_z,t_x,t_z,barWidth)
     }

@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 import {fontSizeCalculator, docX, calculatePopUpPosition} from '../helper/helper'
-
+import SummaryComponent from './components/summary'
+import ReactDOMServer from 'react-dom/server';
 /** 
  * By summary, we are refering to the abstractive summary created by t5  pretrained model.
  * This model should beild two summary for each document : 1- previewSummary, 2- actualSummary
@@ -9,8 +10,11 @@ import {fontSizeCalculator, docX, calculatePopUpPosition} from '../helper/helper
  * 
  */
 
-export const summaryLens = (n_x, n_z, t_x, t_z, barWidth, focusedDoc, documents, barMargin, clusters, groups, margin, activeMainLens ,rightMargin, topMargin, width, height) => {
-    if(focusedDoc == ""){
+export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, groups, activeMainLens ) => {
+    // if(focusedDoc == ""){
+
+        var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
+
         var docsContainer = d3.select(".docsContainer")
         let summaryRect = docsContainer.selectAll(".summaryRect").data(documents)
         summaryRect.exit().remove()
@@ -47,7 +51,7 @@ export const summaryLens = (n_x, n_z, t_x, t_z, barWidth, focusedDoc, documents,
                 summaryLensOver(activeMainLens, doc, n_z, n_x, t_z, t_x, documents, margin, barMargin, groups, clusters,  rightMargin, topMargin, width, height)
             })
             
-    }
+    // }
 }
 
 /** 
@@ -93,17 +97,22 @@ export const summaryLensOver = (activeLens , doc, n_z, n_x, t_z, t_x, documents,
         .attr("height", height/3)
         .attr("x",popUpX)
         .attr("y",popUpY)
-        
-    let summaryDiv = summaryBody.append("xhtml:div")
-        .attr("class","summaryDiv")
-        .attr("style","border-color:"+doc.cluster.color)
 
-    summaryDiv.append("h5")
-        .attr("class","summaryLensTitle")
-        .text(doc.title)
+    let sum_ = document.createElement('div')
+    sum_.innerHTML = ReactDOMServer.renderToStaticMarkup(<SummaryComponent label_={doc._id} />)
+    // console.log(sum_.innerHTML)
+    summaryBody.html(sum_.innerHTML) 
+    // summaryBody.append()    
+    // let summaryDiv = summaryBody.append("xhtml:div")
+    //     .attr("class","summaryDiv")
+    //     .attr("style","border-color:"+doc.cluster.color)
 
-    summaryDiv.append("p")
-        .attr("class", "summaryP")
-        .attr("style","font-size:"+fontSizeCalculator(popUpWidth, popUpHeight * 0.65, summary.length)+"px")
-        .text(summary)
+    // summaryDiv.append("h5")
+    //     .attr("class","summaryLensTitle")
+    //     .text(doc.title)
+
+    // summaryDiv.append("p")
+    //     .attr("class", "summaryP")
+    //     .attr("style","font-size:"+fontSizeCalculator(popUpWidth, popUpHeight * 0.65, summary.length)+"px")
+    //     .text(summary)
 }
