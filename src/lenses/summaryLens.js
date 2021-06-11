@@ -61,14 +61,14 @@ export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, g
  * In the second state it is not an already processed text, therefore an API call seems necessary
  */
 
-export const summaryLensOver = (activeLens , doc, n_z, n_x, t_z, t_x, documents, margin, barMargin, groups, clusters, rightMargin, topMargin, width, height , summary=doc.abstract) => {
+export const summaryLensOver = (activeLens, canvasProperties , doc, documents, groups, clusters , summary=doc.abstract) => {
     if (summary==doc.abstract) {
         // routine 
     } else {
         // make the api call - get the result - stop the spinner - put the result as the summary in the lens
     }
-    let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
-    var docsContainer = d3.select(".docsContainer")
+    // let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
+    var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
     var canvasSVG = d3.select(".canvasSVG")
     let docIndex = documents.findIndex(item => {
         return doc._id == item._id
@@ -99,20 +99,10 @@ export const summaryLensOver = (activeLens , doc, n_z, n_x, t_z, t_x, documents,
         .attr("y",popUpY)
 
     let sum_ = document.createElement('div')
-    sum_.innerHTML = ReactDOMServer.renderToStaticMarkup(<SummaryComponent label_={doc._id} />)
+    sum_.innerHTML = ReactDOMServer.renderToStaticMarkup(<SummaryComponent doc_={doc} />)
     // console.log(sum_.innerHTML)
     summaryBody.html(sum_.innerHTML) 
-    // summaryBody.append()    
-    // let summaryDiv = summaryBody.append("xhtml:div")
-    //     .attr("class","summaryDiv")
-    //     .attr("style","border-color:"+doc.cluster.color)
-
-    // summaryDiv.append("h5")
-    //     .attr("class","summaryLensTitle")
-    //     .text(doc.title)
-
-    // summaryDiv.append("p")
-    //     .attr("class", "summaryP")
-    //     .attr("style","font-size:"+fontSizeCalculator(popUpWidth, popUpHeight * 0.65, summary.length)+"px")
-    //     .text(summary)
+    summaryBody.select("#summaryCloseIcon").on("click",()=>{
+        canvasSVG.selectAll(".summaryBody").remove()
+    })
 }

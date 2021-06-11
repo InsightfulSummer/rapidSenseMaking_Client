@@ -262,16 +262,70 @@ p{
   text-align: justify;
   line-height: 1.1;
 }
-
+/* Summary Lens */
 .summaryDiv {
-  background: rgba(255, 255, 255, 0.90);
-  border-radius: 5px;
-  width: 100%;
-  height: 100%;
-  border: solid 5px;
-  padding: 2%;
+  background: rgba(255, 255, 255, 0.9);
+    width: 100%;
+    height: 100%;
+    border-bottom: solid 4px;
+    border-bottom-right-radius: 15px;
+    display: flex;
+    flex-direction: row;
 }
 
+.summaryConvolutionMenu{
+  flex: 1;
+  transition: all 500ms;
+  opacity: 0.6;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.summaryConvolutionMenu:hover{
+  flex: 1.35;
+  opacity: 1;
+}
+
+.summaryConvolutionIcon{
+  margin-top: 10%;
+  margin-bottom: 10%;
+  color: #444;
+  cursor: pointer;
+  transition: all 500ms;
+}
+
+.summaryBody{
+  flex: 10;
+  transition: all 500ms;
+}
+
+.summarySettings{
+  flex: 1;
+  transition: all 500ms;
+  border-bottom-right-radius: 15px;
+  opacity: 0.60;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.summarySettingsIcon{
+  margin-top: 10%;
+  margin-bottom: 10%;
+  color: #444;
+  cursor: pointer;
+  transition: all 500ms;
+}
+
+.summarySettings:hover{
+  flex: 1.35;
+  opacity: 1;
+}
+
+/* Summary Lens */
 .summaryLensTitle {
   text-align: center;
   font-weight: bold;

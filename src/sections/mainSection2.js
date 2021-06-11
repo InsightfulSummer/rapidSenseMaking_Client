@@ -70,6 +70,12 @@ const MainSection = () => {
         dispatch(SetDimensions(width - (rightMargin), height - (topMargin + bottomMargin)))
     }
 
+    const closeOpenLenses = () => {
+        var canvasSVG = d3.select(".canvasSVG")
+        canvasSVG.selectAll(".to_be_closed").remove()
+        updateDocs()
+    }
+
     const loadSVG = () => {
         d3.select("#mainCanvas_2")
             .select("svg")
@@ -323,7 +329,7 @@ const MainSection = () => {
             //     default:
             //         break;
             // }
-            summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens)
+            summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses)
             // linkLense(n_x,n_z,t_x,t_z,barWidth)
             // overviewLens(n_x,n_z,t_x,t_z,barWidth)
     }
@@ -333,6 +339,19 @@ const MainSection = () => {
         var docsContainer = d3.select(".docsContainer")
         var canvasSVG = d3.select(".canvasSVG")
         let docIndex, doc_x, doc_y, popUpWidth, popUpHeight
+        let canvasProps = {
+            barWidth,
+            barMargin,
+            t_x,
+            t_z,
+            n_x,
+            n_z,
+            margin,
+            rightMargin,
+            topMargin,
+            width,
+            height
+        }
         switch (activeLens) {
             case "linkLens":
                 d3.selectAll(".linkPath")
@@ -374,7 +393,7 @@ const MainSection = () => {
                 break;
         
             case "summary":
-                summaryLensOver(activeLens, doc, n_z, n_x, t_z, t_x, documents, margin, barMargin, groups, clusters, rightMargin, topMargin, width, height)
+                summaryLensOver(activeMainLens, canvasProps, doc, documents, groups, clusters, )
                 break;
             
             case "overview":
