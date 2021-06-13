@@ -19,8 +19,16 @@ const SummaryComponent = ({doc_}) => {
                     title="close the lense"
                     id="summaryCloseIcon"
                     ></i>
-                <i className="summarySettingsIcon fas fa-expand" title="expand the lense"></i>
-                <i className="summarySettingsIcon fas fa-compress" title="compress the lense"></i>
+                <i 
+                    className="summarySettingsIcon fas fa-expand" 
+                    title="expand the lense"
+                    id="summaryExpandIcon"
+                    ></i>
+                <i 
+                    className="summarySettingsIcon fas fa-compress"
+                    title="compress the lense"
+                    id="summaryCompressIcon"
+                    ></i>
                 <i className="summarySettingsIcon fas fa-sliders-h" title="summarize a specific range of this document"></i>
             </div>
             {/* <p>{doc_.title}</p> */}

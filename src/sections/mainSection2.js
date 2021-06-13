@@ -35,7 +35,8 @@ const MainSection = () => {
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
     const [activeMainLens, setActiveMainLens] = useState("summary")
     const [focusedDoc, SetFocusedDoc] = useState("")
-
+    const [lensFrameSize, SetLensFrameSize] = useState(3)
+    const [docOverParams, SetDocOverParams] = useState(null)
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
     const widthScale = d3.scaleLinear().domain(domain).range([0.5, 1])
@@ -74,6 +75,35 @@ const MainSection = () => {
         var canvasSVG = d3.select(".canvasSVG")
         canvasSVG.selectAll(".to_be_closed").remove()
         updateDocs()
+    }
+
+    const changeLensFrameSize = (expand=true, docOverParams) => {
+        if (expand) {
+            if(lensFrameSize == 3){
+                SetDocOverParams(docOverParams)
+                SetLensFrameSize(2)
+            } else {
+                SetDocOverParams(docOverParams)
+                SetLensFrameSize(1.5)
+            }
+        } else {
+            if(lensFrameSize == 1.5){
+                SetDocOverParams(docOverParams)
+                SetLensFrameSize(2)
+            } else {
+                SetDocOverParams(docOverParams)
+                SetLensFrameSize(3)
+            }
+        }
+    }
+
+    const resizeLens = () => {
+        // we have to run doc over here some how having all the parameters of its function ...
+        if (docOverParams != null) {
+            let {doc, n_z, n_x, t_z, t_x} = docOverParams
+            console.log(lensFrameSize)
+            docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+        }
     }
 
     const loadSVG = () => {
@@ -314,7 +344,8 @@ const MainSection = () => {
                 rightMargin,
                 topMargin,
                 width,
-                height
+                height,
+                lensFrameSize
             }
             // switch (activeMainLens) {
             //     case "linkLens":
@@ -329,7 +360,7 @@ const MainSection = () => {
             //     default:
             //         break;
             // }
-            summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses)
+            summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
             // linkLense(n_x,n_z,t_x,t_z,barWidth)
             // overviewLens(n_x,n_z,t_x,t_z,barWidth)
     }
@@ -350,7 +381,8 @@ const MainSection = () => {
             rightMargin,
             topMargin,
             width,
-            height
+            height,
+            lensFrameSize
         }
         switch (activeLens) {
             case "linkLens":
@@ -393,7 +425,7 @@ const MainSection = () => {
                 break;
         
             case "summary":
-                summaryLensOver(activeMainLens, canvasProps, doc, documents, groups, clusters, )
+                summaryLensOver(activeLens, canvasProps, doc, documents, groups, clusters, doc.abstract, closeOpenLenses, changeLensFrameSize) // doc.abstract is going to be changed into doc.fullSummary in near future ...
                 break;
             
             case "overview":
@@ -968,6 +1000,10 @@ const MainSection = () => {
     useEffect(()=>{
         configBarMargin(activeMainLens);
     },[activeMainLens,width])
+
+    useEffect(()=>{
+        resizeLens()
+    } , [lensFrameSize])
 
 
     return (

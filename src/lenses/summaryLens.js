@@ -10,7 +10,7 @@ import ReactDOMServer from 'react-dom/server';
  * 
  */
 
-export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, groups, activeMainLens ) => {
+export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, groups, activeMainLens , closeOpenLenses, changeLensFrameSize) => {
     // if(focusedDoc == ""){
 
         var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
@@ -48,7 +48,7 @@ export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, g
             
         d3.selectAll(".summaryRectDiv")
             .on("mouseover", (event, doc)=>{
-                summaryLensOver(activeMainLens, doc, n_z, n_x, t_z, t_x, documents, margin, barMargin, groups, clusters,  rightMargin, topMargin, width, height)
+                summaryLensOver(activeMainLens, canvasProperties, doc, documents, groups, clusters, doc.summary, closeOpenLenses, changeLensFrameSize)
             })
             
     // }
@@ -61,22 +61,23 @@ export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, g
  * In the second state it is not an already processed text, therefore an API call seems necessary
  */
 
-export const summaryLensOver = (activeLens, canvasProperties , doc, documents, groups, clusters , summary=doc.abstract) => {
+export const summaryLensOver = (activeLens, canvasProperties , doc, documents, groups, clusters , summary=doc.abstract, closeOpenLenses, changeLensFrameSize) => {
     if (summary==doc.abstract) {
         // routine 
     } else {
         // make the api call - get the result - stop the spinner - put the result as the summary in the lens
     }
     // let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
-    var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
+    var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height, lensFrameSize} = canvasProperties
     var canvasSVG = d3.select(".canvasSVG")
     let docIndex = documents.findIndex(item => {
         return doc._id == item._id
     })
     let doc_x = docX(doc, barWidth, barMargin, groups, clusters)
     let doc_y = docIndex < n_z ? (docIndex) * (t_z + margin) : docIndex < n_z + n_x ? n_z * (t_z + margin) + (docIndex - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (docIndex - n_z - n_x) * (t_z + margin)
-    let popUpWidth = width/3
-    let popUpHeight = height/3
+    console.log(lensFrameSize)
+    let popUpWidth = width/lensFrameSize
+    let popUpHeight = height/lensFrameSize
     let {popUpX, popUpY} = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
     
     d3.selectAll(".docElement")
@@ -88,11 +89,12 @@ export const summaryLensOver = (activeLens, canvasProperties , doc, documents, g
     canvasSVG.selectAll(".summaryBody").remove()
 
     let summaryBody = canvasSVG.append("foreignObject")
-        .attr("class","summaryBody")
+        .attr("class","summaryBody  to_be_closed to_be_resized")
     summaryBody
         .attr("x",popUpX + popUpWidth/2)
         .attr("y",popUpY + popUpHeight/2)
         .transition()
+        .duration(50)
         .attr("width", width/3)
         .attr("height", height/3)
         .attr("x",popUpX)
@@ -103,6 +105,14 @@ export const summaryLensOver = (activeLens, canvasProperties , doc, documents, g
     // console.log(sum_.innerHTML)
     summaryBody.html(sum_.innerHTML) 
     summaryBody.select("#summaryCloseIcon").on("click",()=>{
-        canvasSVG.selectAll(".summaryBody").remove()
+        closeOpenLenses()
+    })
+    summaryBody.select("#summaryExpandIcon").on("click",()=>{
+        let docOverParams = {doc, n_z, n_x, t_z, t_x}
+        changeLensFrameSize(true, docOverParams)
+    })
+    summaryBody.select("#summaryCompressIcon").on("click",()=>{
+        let docOverParams = {doc, n_z, n_x, t_z, t_x}
+        changeLensFrameSize(false, docOverParams)
     })
 }
