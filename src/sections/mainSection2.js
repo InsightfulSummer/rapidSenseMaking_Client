@@ -4,7 +4,7 @@ import * as cloud from 'd3-cloud'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { calculatePopUpPosition, docX, fontSizeCalculator, hexToRgbA, linkPathGenerator } from '../helper/helper'
-import { summaryLens, summaryLensOver, } from '../lenses/index'
+import { summaryLens, summaryLensOver, NonLinearReading} from '../lenses/index'
 
 
 const MainSection = () => {
@@ -35,8 +35,6 @@ const MainSection = () => {
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
     const [activeMainLens, setActiveMainLens] = useState("summary")
     const [focusedDoc, SetFocusedDoc] = useState("")
-    const [lensFrameSize, SetLensFrameSize] = useState(3)
-    const [docOverParams, SetDocOverParams] = useState(null)
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
     const widthScale = d3.scaleLinear().domain(domain).range([0.5, 1])
@@ -71,41 +69,6 @@ const MainSection = () => {
         dispatch(SetDimensions(width - (rightMargin), height - (topMargin + bottomMargin)))
     }
 
-    const closeOpenLenses = () => {
-        var canvasSVG = d3.select(".canvasSVG")
-        canvasSVG.selectAll(".to_be_closed").remove()
-        updateDocs()
-    }
-
-    const changeLensFrameSize = (expand=true, docOverParams) => {
-        if (expand) {
-            if(lensFrameSize == 3){
-                SetDocOverParams(docOverParams)
-                SetLensFrameSize(2)
-            } else {
-                SetDocOverParams(docOverParams)
-                SetLensFrameSize(1.5)
-            }
-        } else {
-            if(lensFrameSize == 1.5){
-                SetDocOverParams(docOverParams)
-                SetLensFrameSize(2)
-            } else {
-                SetDocOverParams(docOverParams)
-                SetLensFrameSize(3)
-            }
-        }
-    }
-
-    const resizeLens = () => {
-        // we have to run doc over here some how having all the parameters of its function ...
-        if (docOverParams != null) {
-            let {doc, n_z, n_x, t_z, t_x} = docOverParams
-            console.log(lensFrameSize)
-            docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
-        }
-    }
-
     const loadSVG = () => {
         d3.select("#mainCanvas_2")
             .select("svg")
@@ -135,7 +98,7 @@ const MainSection = () => {
     const loadData = () => {
         dispatch(sortDocuments(sortMetric, ascending))
         dispatch(CreateRandomLinks())
-        dispatch(autoCluster(3))
+        dispatch(autoCluster(4))
         dispatch(dataCompeleting())
     }
 
@@ -295,20 +258,20 @@ const MainSection = () => {
                     docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
                 }
             })
-            .on("click", (event, doc)=>{
-                if (focusedDoc != "") {
-                    if (focusedDoc == doc._id) {
-                        SetFocusedDoc("");
-                        updateDocs()
-                    } else {
-                        SetFocusedDoc(doc._id)
-                        docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
-                    }
-                } else {
-                    SetFocusedDoc(doc._id)
-                    docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
-                }
-            })
+            // .on("click", (event, doc)=>{
+            //     if (focusedDoc != "") {
+            //         if (focusedDoc == doc._id) {
+            //             SetFocusedDoc("");
+            //             updateDocs()
+            //         } else {
+            //             SetFocusedDoc(doc._id)
+            //             docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+            //         }
+            //     } else {
+            //         SetFocusedDoc(doc._id)
+            //         docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+            //     }
+            // })
             .on("mouseout", () => {
                 if (focusedDoc == "" && activeMainLens == "linkLens") {
                     updateDocs()
@@ -345,7 +308,6 @@ const MainSection = () => {
                 topMargin,
                 width,
                 height,
-                lensFrameSize
             }
             // switch (activeMainLens) {
             //     case "linkLens":
@@ -360,7 +322,8 @@ const MainSection = () => {
             //     default:
             //         break;
             // }
-            summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
+            // summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, updateDocs)
+            NonLinearReading(canvasProps, documents, clusters, groups)
             // linkLense(n_x,n_z,t_x,t_z,barWidth)
             // overviewLens(n_x,n_z,t_x,t_z,barWidth)
     }
@@ -382,7 +345,6 @@ const MainSection = () => {
             topMargin,
             width,
             height,
-            lensFrameSize
         }
         switch (activeLens) {
             case "linkLens":
@@ -425,7 +387,7 @@ const MainSection = () => {
                 break;
         
             case "summary":
-                summaryLensOver(activeLens, canvasProps, doc, documents, groups, clusters, doc.abstract, closeOpenLenses, changeLensFrameSize) // doc.abstract is going to be changed into doc.fullSummary in near future ...
+                summaryLensOver(activeLens, canvasProps, doc, documents, groups, clusters, doc.abstract, updateDocs) // doc.abstract is going to be changed into doc.fullSummary in near future ...
                 break;
             
             case "overview":
@@ -1000,10 +962,6 @@ const MainSection = () => {
     useEffect(()=>{
         configBarMargin(activeMainLens);
     },[activeMainLens,width])
-
-    useEffect(()=>{
-        resizeLens()
-    } , [lensFrameSize])
 
 
     return (

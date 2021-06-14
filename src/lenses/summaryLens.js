@@ -10,7 +10,7 @@ import ReactDOMServer from 'react-dom/server';
  * 
  */
 
-export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, groups, activeMainLens , closeOpenLenses, changeLensFrameSize) => {
+export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, groups, activeMainLens, updateDocs) => {
     // if(focusedDoc == ""){
 
         var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
@@ -48,7 +48,7 @@ export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, g
             
         d3.selectAll(".summaryRectDiv")
             .on("mouseover", (event, doc)=>{
-                summaryLensOver(activeMainLens, canvasProperties, doc, documents, groups, clusters, doc.summary, closeOpenLenses, changeLensFrameSize)
+                summaryLensOver(activeMainLens, canvasProperties, doc, documents, groups, clusters, doc.summary, updateDocs)
             })
             
     // }
@@ -61,21 +61,22 @@ export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, g
  * In the second state it is not an already processed text, therefore an API call seems necessary
  */
 
-export const summaryLensOver = (activeLens, canvasProperties , doc, documents, groups, clusters , summary=doc.abstract, closeOpenLenses, changeLensFrameSize) => {
+export const summaryLensOver = (activeLens, canvasProperties , doc, documents, groups, clusters , summary=doc.abstract, updateDocs) => {
     if (summary==doc.abstract) {
         // routine 
     } else {
         // make the api call - get the result - stop the spinner - put the result as the summary in the lens
     }
     // let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
-    var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height, lensFrameSize} = canvasProperties
+    var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
+    let lensFrameSize = 3
+    let expanded=false
     var canvasSVG = d3.select(".canvasSVG")
     let docIndex = documents.findIndex(item => {
         return doc._id == item._id
     })
     let doc_x = docX(doc, barWidth, barMargin, groups, clusters)
     let doc_y = docIndex < n_z ? (docIndex) * (t_z + margin) : docIndex < n_z + n_x ? n_z * (t_z + margin) + (docIndex - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (docIndex - n_z - n_x) * (t_z + margin)
-    console.log(lensFrameSize)
     let popUpWidth = width/lensFrameSize
     let popUpHeight = height/lensFrameSize
     let {popUpX, popUpY} = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
@@ -94,25 +95,58 @@ export const summaryLensOver = (activeLens, canvasProperties , doc, documents, g
         .attr("x",popUpX + popUpWidth/2)
         .attr("y",popUpY + popUpHeight/2)
         .transition()
-        .duration(50)
-        .attr("width", width/3)
-        .attr("height", height/3)
+        .attr("width", popUpWidth)
+        .attr("height", popUpHeight)
         .attr("x",popUpX)
         .attr("y",popUpY)
 
+    SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs)
+
+    
+}
+
+export const SummaryHTMLandEvents = (doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs) => {
+    var canvasSVG = d3.select(".canvasSVG")
+    let summaryBody = d3.select(".summaryBody")
     let sum_ = document.createElement('div')
-    sum_.innerHTML = ReactDOMServer.renderToStaticMarkup(<SummaryComponent doc_={doc} />)
+    var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
+    sum_.innerHTML = ReactDOMServer.renderToString(<SummaryComponent doc_={doc} expanded={expanded} />)
     // console.log(sum_.innerHTML)
     summaryBody.html(sum_.innerHTML) 
     summaryBody.select("#summaryCloseIcon").on("click",()=>{
-        closeOpenLenses()
+        canvasSVG.select(".to_be_closed").remove()
+        updateDocs()
+        // update the docs here ... 
+        // maybe it is required to update the document once more here ...
     })
     summaryBody.select("#summaryExpandIcon").on("click",()=>{
-        let docOverParams = {doc, n_z, n_x, t_z, t_x}
-        changeLensFrameSize(true, docOverParams)
+        if(!expanded){
+            lensFrameSize /= 2
+            expanded = true
+            let popUpHeight = height / lensFrameSize
+            let popUpWidth = width / lensFrameSize
+            let {popUpX, popUpY} = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
+            summaryBody.transition()
+                .attr("width", popUpWidth)
+                .attr("height", popUpHeight)
+                .attr("x",popUpX)
+                .attr("y",popUpY)
+            SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs)
+        }
     })
     summaryBody.select("#summaryCompressIcon").on("click",()=>{
-        let docOverParams = {doc, n_z, n_x, t_z, t_x}
-        changeLensFrameSize(false, docOverParams)
+        if(expanded){
+            lensFrameSize *= 2
+            expanded = false
+            let popUpHeight = height / lensFrameSize
+            let popUpWidth = width / lensFrameSize
+            let {popUpX, popUpY} = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
+            summaryBody.transition()
+                .attr("width", popUpWidth)
+                .attr("height", popUpHeight)
+                .attr("x",popUpX)
+                .attr("y",popUpY)
+            SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs)
+        }
     })
 }
