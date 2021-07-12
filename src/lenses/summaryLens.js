@@ -105,12 +105,19 @@ export const summaryLensOver = (activeLens, canvasProperties , doc, documents, g
     
 }
 
-export const SummaryHTMLandEvents = (doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs) => {
+export const SummaryHTMLandEvents = (doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs, showAbstract, showPDF) => {
     var canvasSVG = d3.select(".canvasSVG")
     let summaryBody = d3.select(".summaryBody")
     let sum_ = document.createElement('div')
     var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
-    sum_.innerHTML = ReactDOMServer.renderToString(<SummaryComponent doc_={doc} expanded={expanded} />)
+    sum_.innerHTML = ReactDOMServer.renderToString(<SummaryComponent 
+            doc_={doc} 
+            expanded={expanded} 
+            showAbstract={showAbstract}
+            showPDF={showPDF}
+            title={"A new approach for query expansion using Wikipedia and WordNet"}
+            abstract={"Query expansion (QE) is a well-known technique used to enhance the effectiveness of information retrieval. QE reformulates the initial query by adding similar terms that help in retrieving more relevant results. Several approaches have been proposed in literature producing quite favorable results, but they are not evenly favorable for all types of queries (individual and phrase queries). One of the main reasons for this is the use of the same kind of data sources and weighting scheme while expanding both the individual and the phrase query terms. As a result, the holistic relationship among the query terms is not well captured or scored. To address this issue, we have presented a new approach for QE using Wikipedia and WordNet as data sources. Specifically, Wikipedia gives rich expansion terms for phrase terms, while WordNet does the same for individual terms. We have also proposed novel weighting schemes for expansion terms: in-link score (for terms extracted from Wikipedia) and a tf-idf based scheme (for terms extracted from WordNet). In the proposed Wikipedia-WordNet-based QE technique (WWQE), we weigh the expansion terms twice: first, they are scored by the weighting scheme individually, and then, the weighting scheme scores the selected expansion terms concerning the entire query using correlation score. The proposed approach gains improvements of 24% on the MAP score and 48% on the GMAP score over unexpanded queries on the FIRE dataset. Experimental results achieve a significant improvement over individual expansion and other related state-of-the-art approaches. We also analyzed the effect on retrieval effectiveness of the proposed technique by varying the number of expansion terms."}
+    />)
     // console.log(sum_.innerHTML)
     summaryBody.html(sum_.innerHTML) 
     summaryBody.select("#summaryCloseIcon").on("click",()=>{
@@ -131,7 +138,7 @@ export const SummaryHTMLandEvents = (doc, expanded, lensFrameSize, canvasPropert
                 .attr("height", popUpHeight)
                 .attr("x",popUpX)
                 .attr("y",popUpY)
-            SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs)
+            SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs, showAbstract, showPDF)
         }
     })
     summaryBody.select("#summaryCompressIcon").on("click",()=>{
@@ -146,7 +153,15 @@ export const SummaryHTMLandEvents = (doc, expanded, lensFrameSize, canvasPropert
                 .attr("height", popUpHeight)
                 .attr("x",popUpX)
                 .attr("y",popUpY)
-            SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs)
+            SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs, showAbstract, showPDF)
         }
+    })
+    summaryBody.select("#toggleOriginalAbstractIcon").on("click",()=>{
+        showAbstract = !showAbstract
+        SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs, showAbstract, showPDF)
+    })
+    summaryBody.select("#pdfToggler").on("click",()=>{
+        showPDF = !showPDF
+        SummaryHTMLandEvents(doc, expanded, lensFrameSize, canvasProperties, doc_x, doc_y, updateDocs, showAbstract, showPDF)
     })
 }
