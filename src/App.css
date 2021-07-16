@@ -86,7 +86,7 @@ p{
 
 /* Scroll-indicator */
 /* width */
-::-webkit-scrollbar {
+::-webkit-scrollbar{
   width: 2.5px;
   border-radius: 50%;
 }
@@ -296,7 +296,7 @@ p{
   transition: all 500ms;
 }
 
-.summaryBody_{
+.summaryBody{
   flex: 10;
   transition: all 500ms;
 }
@@ -419,56 +419,71 @@ p{
   flex-direction: column;
 }
 
-/* nonLinearReading styles */
-.nonLinearRectDiv{
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-}
-.nonLinearIconContainer{
-  flex: 1 1;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    color: #ffffff;
-    border-right: solid 0.5px rgba(255,255,255,0.5);
-}
-.nonLinearTitleContainer{
-  flex: 8;
-  text-align: center;
-  color: #ffffff;
+.pdfContainer { 
+  width: 20%;
+  height: 500px;
+  margin: auto;
+  background-color: #000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.nonLinearCover{
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-.NonLinearComponent{
+
+
+.sliderFrame {
+  width: 50%;
+  height: 70vh;
+  padding: 1%;
+  margin: auto;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sliderContainer {
   width: 100%;
   height: 100%;
-  border-bottom-right-radius: 15px;
-  background-color: #fff;
-  border-bottom: solid 4px;
+  overflow: hidden;
+  border: solid 1px;
+  text-align: justify;
+  position: relative;
 }
-.NonLinearComponent_Settings_Convolution{
-  flex: 1;
-  transition: all 500ms;
+
+.sliderButtonContainer {
+  width: 100%;
 }
-.NonLinearComponent_Settings_Convolution:hover{
-  flex: 1.2;
+
+.sliderBTN {
+  width: 100%;
+  left: 0;
+  margin: 0;
+  margin-top: 1%;
 }
-.NonLinearComponent_PaperContainer{
-  flex: 7;
-  transition: all 500ms;
+
+.summarySlider {
+  position: absolute;
+    width: 100%;
+    padding: 1%;
+    cursor: grab;
+    height: 15%;
+    overflow: hidden;
+    font-size: 1vh;
+    z-index: 5;
+    background-color: #e6e6e6;
 }
-.NonLinearComponent_AlternativeSentences{
-  flex: 4;
-  transition: all 500ms;
-  border-bottom-right-radius: 15px;
+
+.summarySlider:active {
+  cursor: grabbing;
 }
-/* nonLinearReading styles */
+
+.sliderHeader {
+  text-align: right;
+  font-weight: bold;
+}
+
+.sliderThumbnailView {
+  font-size: 0.2vh;
+    overflow: hidden;
+    text-align: justify;
+    padding: 5%;
+}

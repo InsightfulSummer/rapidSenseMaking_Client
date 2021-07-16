@@ -18,7 +18,6 @@ const SummaryComponent = ({ doc_, title, summaryBody, showAbstract, showPDF, abs
                         <iframe
 
                             src={`${require('../../data/2.pdf').default}#view=fitH`}
-
                             height="100%"
                             width="100%"
                         />
