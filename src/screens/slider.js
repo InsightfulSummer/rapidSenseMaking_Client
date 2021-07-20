@@ -29,7 +29,7 @@ const Slider = () => {
                 const {header, element} = fetchContentByPercentage(percentage)
                 setTopHeader(header)
                 setTopContent(element)
-                setRange1(fetchContentByRange(0,topSliderPosition-1))
+                setRange1(fetchContentByRange(0,topSliderPosition))
                 setRange2(fetchContentByRange(topSliderPosition+1,bottomSliderPostion-1))
             }
         }
@@ -103,7 +103,24 @@ const Slider = () => {
         return filteredResults
     }
 
+    const generateOutput = () => {
+        let divs = fetchContentByRange(topSliderPosition, bottomSliderPostion + 5)
+        let content = ""
+        divs.map(d => {
+            d.content.map(dc => {
+               if (dc.type == "paragraph") {
+                    dc.content.map(dcp => {
+                        content += dcp.content
+                    }) 
+               }
+                    
+            })
+        })
+        return content
+    }
+
     useEffect(()=>{
+        console.log(jRes)
       let topRes = fetchContentByPercentage(0)
       let bottomRes = fetchContentByPercentage(99)
       setTopHeader(topRes.header)
@@ -126,7 +143,7 @@ const Slider = () => {
                 >
 
 
-                    <div style={{ height: topSliderPosition + "%" }} className="sliderThumbnailView">
+                    <div style={{ height: topSliderPosition + "%", top : "0%" }} className="sliderThumbnailView">
                         {range1 != null ? range1.map(div =>
                             div.content.map(item =>
                                 item.type == "paragraph" ? (<p>
@@ -180,7 +197,7 @@ const Slider = () => {
                     </div>
 
 
-                    <div style={{height : (bottomSliderPostion - topSliderPosition - 30) + "%", marginTop : "15%"}} className="sliderThumbnailView">
+                    <div style={{height : (bottomSliderPostion - topSliderPosition - 30) + "%", top : topSliderPosition + 15 + "%"}} className="sliderThumbnailView">
                         {range2 != null ? range2.map(div =>
                             div.content.map(item =>
                                 item.type == "paragraph" ? (<p>
@@ -233,7 +250,7 @@ const Slider = () => {
                     </div>
 
 
-                    <div style={{height : (100-bottomSliderPostion) + "%", marginTop : "15%"}} className="sliderThumbnailView">
+                    <div style={{height : (100-bottomSliderPostion) + "%", bottom : "0%"}} className="sliderThumbnailView">
                         {range3 != null ? range3.map(div =>
                             div.content.map(item =>
                                 item.type == "paragraph" ? (<p>
@@ -251,7 +268,7 @@ const Slider = () => {
 
                 </div>
                 <div className="sliderButtonContainer">
-                    <MDBBtn className="sliderBTN">
+                    <MDBBtn className="sliderBTN" onClick={generateOutput}>
                         Summarize
                     </MDBBtn>
                 </div>

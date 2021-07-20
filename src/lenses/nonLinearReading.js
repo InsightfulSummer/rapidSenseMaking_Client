@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 import {docX, fontSizeCalculator, calculatePopUpPosition} from '../helper/helper'
 import ReactDOMServer from 'react-dom/server';
 import NonLinearComponent from './components/nonLinear'
+import jRes from '../data/res.json'
 
 export const NonLinearReading = (canvasProperties, documents, clusters, groups) => {
     var { barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height } = canvasProperties
@@ -97,7 +98,26 @@ export const NonLinearReadingOver = (doc, canvasProperties, documents, clusters,
         .attr("x",popUpX)
         .attr("y",popUpY)
 
+    nonLinearHTMLandEvent(doc, canvasProperties)
+}
+
+export const nonLinearHTMLandEvent = (doc, canvasProperties, suggestions=[], loading=false) => {
+    var canvasSVG = d3.select(".canvasSVG")
+    let nonLinearPopUp = canvasSVG.select(".nonLinearPopUp")
     let tmpDiv = document.createElement("div")
-    tmpDiv.innerHTML = ReactDOMServer.renderToString(<NonLinearComponent doc_={doc} />)
+    var {barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height} = canvasProperties
+    tmpDiv.innerHTML = ReactDOMServer.renderToString(
+        <NonLinearComponent 
+            doc_={doc} 
+            parsedBody={jRes} 
+            loading={loading}
+            suggestions={suggestions} 
+        />
+    )
     nonLinearPopUp.html(tmpDiv.innerHTML)
+
+    // events
+    nonLinearPopUp.selectAll(".nonLinearSpanOfSentence").on("mouseover",(e)=>{
+        console.log(e.target.innerHTML)
+    })
 }

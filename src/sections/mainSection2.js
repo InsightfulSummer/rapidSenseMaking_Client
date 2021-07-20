@@ -4,7 +4,7 @@ import * as cloud from 'd3-cloud'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { calculatePopUpPosition, docX, fontSizeCalculator, hexToRgbA, linkPathGenerator } from '../helper/helper'
-import { summaryLens, summaryLensOver, } from '../lenses/index'
+import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver } from '../lenses/index'
 
 
 const MainSection = () => {
@@ -33,7 +33,7 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState("summary")
+    const [activeMainLens, setActiveMainLens] = useState("nonLinearReading")
     const [focusedDoc, SetFocusedDoc] = useState("")
     const [lensFrameSize, SetLensFrameSize] = useState(3)
     const [docOverParams, SetDocOverParams] = useState(null)
@@ -290,11 +290,11 @@ const MainSection = () => {
             .enter()
             .append("rect")
             .merge(newElements)
-            .on("mouseover",(event,doc)=>{
-                if(focusedDoc == ""){
-                    docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
-                }
-            })
+            // .on("mouseover",(event,doc)=>{
+            //     if(focusedDoc == ""){
+            //         docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
+            //     }
+            // })
             .on("click", (event, doc)=>{
                 if (focusedDoc != "") {
                     if (focusedDoc == doc._id) {
@@ -360,9 +360,10 @@ const MainSection = () => {
             //     default:
             //         break;
             // }
-            summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
+            // summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
             // linkLense(n_x,n_z,t_x,t_z,barWidth)
             // overviewLens(n_x,n_z,t_x,t_z,barWidth)
+            NonLinearReading(canvasProps, documents, clusters, groups)
     }
 
     const docOver = (activeLens , doc, n_z, n_x, t_z, t_x) => {
