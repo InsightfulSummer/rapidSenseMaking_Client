@@ -48,7 +48,7 @@ const MainSection = () => {
         .on("drag", function (d) {
             ToggleLensMenuOpen(false)
             SetFocusedDoc("")
-            d3.selectAll(".summaryBody").remove()
+            d3.selectAll(".to_be_closed").remove()
             let barHeight = parseInt(d3.select(this).attr("height"))
             if (d.y > 0 && d.y + barHeight < height) {
                 d3.select(this)
@@ -363,7 +363,7 @@ const MainSection = () => {
             // summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
             // linkLense(n_x,n_z,t_x,t_z,barWidth)
             // overviewLens(n_x,n_z,t_x,t_z,barWidth)
-            NonLinearReading(canvasProps, documents, clusters, groups)
+            NonLinearReading(canvasProps, documents, clusters, groups, closeOpenLenses)
     }
 
     const docOver = (activeLens , doc, n_z, n_x, t_z, t_x) => {

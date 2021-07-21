@@ -544,6 +544,10 @@ p{
 .nonLinearLensActionsCenter {
   flex: 0.7;
   transition: all 500ms;
+  display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .nonLinearLensActionsCenter:hover {
@@ -560,6 +564,8 @@ p{
 .nonLinearSuggestionContainer {
   flex: 4;
   border-bottom-right-radius: 15px;
+  padding: 1%;
+  overflow-y: scroll;
 }
 
 .nonLinearSpanOfSentence{
@@ -572,4 +578,21 @@ p{
   color: #fff;
   padding: .1%;
   cursor: pointer;
+}
+
+h6.suggestionHeader {
+  font-weight: 600;
+  text-align: right;
+}
+
+.suggestionP{
+  text-align: justify;
+}
+
+.nonLinearSuggestionItem {
+  border-bottom: solid 1px;
+  padding-bottom: 5%;
+  display: flex;
+  flex-direction: row;
+  position: relative;
 }
