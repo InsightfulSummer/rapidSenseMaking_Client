@@ -102,7 +102,7 @@ export const NonLinearReadingOver = (doc, canvasProperties, documents, clusters,
     nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties)
 }
 
-export const nonLinearHTMLandEvent = ( closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions = [], loading = false, expanded=false, showPDF=false) => {
+export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions = [], loading = false, expanded = false, showPDF=false, showSearch=false) => {
     var canvasSVG = d3.select(".canvasSVG")
     let nonLinearPopUp = canvasSVG.select(".nonLinearPopUp")
     let tmpDiv = document.createElement("div")
@@ -114,6 +114,7 @@ export const nonLinearHTMLandEvent = ( closeOpenLenses, doc_x, doc_y, doc, canva
             loading={loading}
             suggestions={suggestions}
             showPDF={showPDF}
+            showSearch={showSearch}
         />
     )
     nonLinearPopUp.html(tmpDiv.innerHTML)
@@ -121,7 +122,7 @@ export const nonLinearHTMLandEvent = ( closeOpenLenses, doc_x, doc_y, doc, canva
     nonLinearPopUp.selectAll(".nonLinearSpanOfSentence").on("click", (e) => {
         // let sentenceId = e.target.id
         // let sentenceContent = e.target.innerHTML
-        
+
         suggestions = [{
             'type': 'sentenceInP',
             'tag': 'span',
@@ -171,57 +172,120 @@ export const nonLinearHTMLandEvent = ( closeOpenLenses, doc_x, doc_y, doc, canva
             'position': 0.23646723646723647
         }]
         loading = false
-        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF)
+        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
     })
 
     nonLinearPopUp.selectAll(".suggestionItemClickable").on("click", (e) => {
         let id_ = e.target.attributes.positionid.value;
         var scroller = Scroll.scroller
-        scroller.scrollTo("sentence_"+id_,{
+        scroller.scrollTo("sentence_" + id_, {
             duration: 1500,
             smooth: true,
-            containerId : "nonLinearBodyOfLens",
-            offset : -50
+            containerId: "nonLinearBodyOfLens",
+            offset: -50
         })
     })
 
-    nonLinearPopUp.select("#nonLinearCloseIcon").on("click",()=>{
+    nonLinearPopUp.select("#nonLinearCloseIcon").on("click", () => {
         canvasSVG.select(".to_be_closed").remove()
         closeOpenLenses()
     })
 
-    nonLinearPopUp.select("#nonLinearExpandIcon").on("click",()=>{
-        if(!expanded){
+    nonLinearPopUp.select("#nonLinearExpandIcon").on("click", () => {
+        if (!expanded) {
             expanded = true
             let popUpHeight = height / 1.5
             let popUpWidth = width / 1.5
-            let {popUpX, popUpY} = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
+            let { popUpX, popUpY } = calculatePopUpPosition(doc_x + barWidth / 2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
             nonLinearPopUp.transition()
                 .attr("width", popUpWidth)
                 .attr("height", popUpHeight)
-                .attr("x",popUpX)
-                .attr("y",popUpY)
-            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF)
+                .attr("x", popUpX)
+                .attr("y", popUpY)
+            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
         }
     })
 
-    nonLinearPopUp.select("#nonLinearCompressIcon").on("click",()=>{
-        if(expanded){
+    nonLinearPopUp.select("#nonLinearCompressIcon").on("click", () => {
+        if (expanded) {
             expanded = false
             let popUpHeight = height / 2
             let popUpWidth = width / 2
-            let {popUpX, popUpY} = calculatePopUpPosition(doc_x + barWidth/2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
+            let { popUpX, popUpY } = calculatePopUpPosition(doc_x + barWidth / 2, doc_y, popUpWidth, popUpHeight, width, rightMargin, topMargin, 105, height)
             nonLinearPopUp.transition()
                 .attr("width", popUpWidth)
                 .attr("height", popUpHeight)
-                .attr("x",popUpX)
-                .attr("y",popUpY)
-            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF)
+                .attr("x", popUpX)
+                .attr("y", popUpY)
+            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
         }
     })
 
-    nonLinearPopUp.select("#pdfToggler").on("click",()=>{
+    nonLinearPopUp.select("#pdfToggler").on("click", () => {
         showPDF = !showPDF
-        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF)
+        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+    })
+
+    nonLinearPopUp.select("#nonLinearSearchFuncIcon").on("click", (e) => {
+        // get the value of the search input
+        let inputValue = document.getElementById("nonLinearSearchInput").value
+        // valide the input : 1- if it is not empty  2- if it is more than a word ...
+        if (inputValue != "") {
+            suggestions = [{
+                'type': 'sentenceInP',
+                'tag': 'span',
+                'content': "The Web is the largest information source available on the planet and it's growing day by day [32] .",
+                'divId': 0,
+                'sentenceId': 0,
+                'position': 0.0
+            },
+            {
+                'type': 'sentenceInP',
+                'tag': 'span',
+                'content': 'References [5,10] provide comprehensive surveys on data sources used for QE.',
+                'divId': 0,
+                'sentenceId': 13,
+                'position': 0.037037037037037035
+            },
+            {
+                'type': 'sentenceInP',
+                'tag': 'span',
+                'content': 'Wikipedia is freely available and is the largest multilingual online encyclopedia on the web, where articles are regularly updated and new articles are added by a large number of web users.',
+                'divId': 5,
+                'sentenceId': 114,
+                'position': 0.3247863247863248
+            },
+            {
+                'type': 'sentenceInP',
+                'tag': 'span',
+                'content': 'WordNet is a large lexicon database of words in the English language.',
+                'divId': 0,
+                'sentenceId': 31,
+                'position': 0.08831908831908832
+            },
+            {
+                'type': 'sentenceInP',
+                'tag': 'span',
+                'content': 'The usefulness of these terms is determined by considering multiple sources of information.',
+                'divId': 4,
+                'sentenceId': 103,
+                'position': 0.2934472934472934
+            },
+            {
+                'type': 'sentenceInP',
+                'tag': 'span',
+                'content': 'These two sources are described next.',
+                'divId': 3,
+                'sentenceId': 83,
+                'position': 0.23646723646723647
+            }]
+            loading = false
+            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+        }
+    })
+
+    nonLinearPopUp.select("#nonLinearSearchIcon").on("click",(e)=>{
+        showSearch = !showSearch
+        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
     })
 }

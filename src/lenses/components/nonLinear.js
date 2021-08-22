@@ -3,8 +3,9 @@ import { hexToRgbA } from '../../helper/helper'
 import {
     Element
 } from 'react-scroll'
+import { MDBBtn } from 'mdbreact'
 
-const NonLinearComponent = ({ doc_, parsedBody, loading, suggestions, showPDF }) => {
+const NonLinearComponent = ({ doc_, parsedBody, loading, suggestions, showPDF, showSearch }) => {
 
 
     let color_ = doc_.cluster.color
@@ -21,6 +22,9 @@ const NonLinearComponent = ({ doc_, parsedBody, loading, suggestions, showPDF })
         })
         return header
     }
+
+    // add a search input
+    // global similar sentence findings ...
     return (
         <div className="NonLinearComponent" style={{ borderColor: color_ }}>
             <div className="nonLinearLensActionsCenter" style={{ backgroundImage: 'linear-gradient(45deg, ' + color_ + ', #ffffff)' }}>
@@ -39,6 +43,11 @@ const NonLinearComponent = ({ doc_, parsedBody, loading, suggestions, showPDF })
                     title="compress the lense"
                     id="nonLinearCompressIcon"
                 />
+                <i 
+                    class={showSearch ? "summarySettingsIcon fas fa-search activeSummarySettingsIcon" : "summarySettingsIcon fas fa-search" }
+                    title="search and find relevant sentences ..."
+                    id="nonLinearSearchIcon"
+                />
                 <i class={showPDF ? "summarySettingsIcon fas fa-file-pdf activeSummarySettingsIcon" : "summarySettingsIcon fas fa-file-pdf"} title="show the original pdf file of the document" id="pdfToggler"></i>
             </div>
             {
@@ -54,6 +63,25 @@ const NonLinearComponent = ({ doc_, parsedBody, loading, suggestions, showPDF })
                 ) : (
                     <div style={{ flex: 10, display: "flex", flexDirection: "row" }}>
                         <div className="nonLinearBodyOfLens" id="nonLinearBodyOfLens">
+                            {
+                                showSearch ? (
+                                    <div className="nonLinearSearchContainer">
+                                        <div style={{flex:10,display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                            <div className="form-group" style={{marginBottom: 0, width: "100%"}}>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="nonLinearSearchInput"
+                                                    placeholder="search and find relevant sentences ..."
+                                                />
+                                            </div>
+                                        </div>
+                                        <MDBBtn style={{flex:1, display: "flex", justifyContent: "center", alignItems: "center", width: "100%", padding: "2%", backgroundColor: color_+" !important", cursor: "pointer", borderRadius: "5px"}} id="nonLinearSearchFuncIcon">
+                                            <i class="fas fa-search"></i>
+                                        </MDBBtn>
+                                    </div>
+                                ) : null
+                            }
                             {
                                 parsedBody.map(div => (
                                     <div>

@@ -596,3 +596,14 @@ h6.suggestionHeader {
   flex-direction: row;
   position: relative;
 }
+
+.nonLinearSearchContainer {
+  display: flex;
+  flex-direction: row;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+.md-form {
+  margin-top: 0;
+}
