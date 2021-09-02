@@ -4,7 +4,7 @@ import * as cloud from 'd3-cloud'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { calculatePopUpPosition, docX, fontSizeCalculator, hexToRgbA, linkPathGenerator } from '../helper/helper'
-import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver, skimmingLens } from '../lenses/index'
+import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver, skimmingLens, biblioLens } from '../lenses/index'
 
 
 const MainSection = () => {
@@ -33,7 +33,7 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState("nonLinearReading")
+    const [activeMainLens, setActiveMainLens] = useState("biblio")
     const [focusedDoc, SetFocusedDoc] = useState("")
     const [lensFrameSize, SetLensFrameSize] = useState(3)
     const [docOverParams, SetDocOverParams] = useState(null)
@@ -192,6 +192,7 @@ const MainSection = () => {
             .attr("x", 105)
             .attr("fill", "url('#slideBodyGradient')")
             .attr("class", "slideBody")
+            .attr("id", "slideBody_")
             .merge(slideBody)
             .attr("y", z * height)
             .attr("height", height * slideHeightPorportion)
@@ -234,14 +235,13 @@ const MainSection = () => {
         })
 
         slideBody.on("wheel", (event) => {
-            if (activeMainLens == "linkLens") {
+            // here we should switch the active lens
+            // for now we just test with the biblio lens
+            console.log(activeMainLens)
+            if (activeMainLens == "biblio") {
                 setActiveMainLens("summary")
-            } else if(activeMainLens == "summary") {
-                setActiveMainLens("overview")
-            } else if(activeMainLens == "overview") {
-                setActiveMainLens("default")
             } else {
-                setActiveMainLens("linkLens")
+                setActiveMainLens("biblio")
             }
         })
     }
@@ -309,11 +309,6 @@ const MainSection = () => {
                     docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
                 }
             })
-            .on("mouseout", () => {
-                if (focusedDoc == "" && activeMainLens == "linkLens") {
-                    updateDocs()
-                }
-            })
             .transition()
             .attr("x", item => docX(item, barWidth, barMargin, groups, clusters))
             .attr("y", (item, index) => {
@@ -349,7 +344,7 @@ const MainSection = () => {
             }
             // switch (activeMainLens) {
             //     case "linkLens":
-            //         linkLense(n_x,n_z,t_x,t_z,barWidth)
+            //         biblioLens(n_x,n_z,t_x,t_z,barWidth)
             //         break;
             //     case "summary":
             //         summaryLens(n_x,n_z,t_x,t_z,barWidth)
@@ -361,10 +356,10 @@ const MainSection = () => {
             //         break;
             // }
             // summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
-            // linkLense(n_x,n_z,t_x,t_z,barWidth)
+            biblioLens(canvasProps, documents, clusters, groups)
             // overviewLens(n_x,n_z,t_x,t_z,barWidth)
             // NonLinearReading(canvasProps, documents, clusters, groups, closeOpenLenses)
-            skimmingLens(canvasProps, documents, clusters, groups, closeOpenLenses)
+            // skimmingLens(canvasProps, documents, clusters, groups, closeOpenLenses)
     }
 
     const docOver = (activeLens , doc, n_z, n_x, t_z, t_x) => {
@@ -388,42 +383,7 @@ const MainSection = () => {
         }
         switch (activeLens) {
             case "linkLens":
-                d3.selectAll(".linkPath")
-                    .transition()
-                    .attr("opacity", "0.05")
-                    .attr("stroke-width", t_z/5)
-
-                d3.selectAll(".docElement")
-                    .attr("opacity", "0.3")
-                d3.selectAll(".docElement")
-                    .filter(item => {
-                        return item._id == doc._id
-                    })
-                    .attr("opacity","1")
-
-                let index = documents.findIndex(item => {
-                    return doc._id == item._id
-                })
-                let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-                doc.links.map(linkId => {
-                    let index_ = documents.findIndex(item => {
-                        return item._id == linkId
-                    })
-                    d3.selectAll(".docElement")
-                        .filter(item => {
-                            return item._id == documents[index_]._id
-                        })
-                        .attr("opacity","0.80")
-                    let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
-                    docsContainer.append("path")
-                        .attr("class", "linkPath")
-                        .attr("stroke", doc.cluster.color)
-                        .attr("fill", "none")
-                        .attr("stroke-width", t_z/5)
-                        .transition()
-                        .attr("stroke-width", t_z/2)
-                        .attr("d", linkPathGenerator(doc, documents[index_],barMargin, barWidth, y1+t_z/2, y2+t_z/2, height))
-                })
+                
                 break;
         
             case "summary":
@@ -875,16 +835,16 @@ const MainSection = () => {
             .append("text")
             .attr("y", topMargin / 3)
             .attr("alignment-baseline", "middle")
-            .on("mouseover", function (event, data) {
-                d3.selectAll(".docElement")
-                    .transition()
-                    .attr("opacity", (item) => {
-                        return item.cluster.id == data.id ? "0.9" : "0.3"
-                    })
-            })
-            .on("mouseout", function () {
-                updateDocs()
-            })
+            // .on("mouseover", function (event, data) {
+            //     d3.selectAll(".docElement")
+            //         .transition()
+            //         .attr("opacity", (item) => {
+            //             return item.cluster.id == data.id ? "0.9" : "0.3"
+            //         })
+            // })
+            // .on("mouseout", function () {
+            //     updateDocs()
+            // })
             .merge(clusterElements)
             .transition()
             .attr("text-anchor", "middle")
@@ -907,9 +867,9 @@ const MainSection = () => {
             .attr("y", 25)
             .attr("fill", "#3a3a3a")
             .text("\uf067")
-            .on("click", function () {
-                dispatch(addOneCluster())
-            })
+            // .on("click", function () {
+            //     dispatch(addOneCluster())
+            // })
 
         // clusterController.append("text")
         //     .attr("class", "fa addClusterIcon")
@@ -936,17 +896,14 @@ const MainSection = () => {
         let total = (width - 165) / clusters.length
         if(total > 0) {
             switch (activeLens) {
-                case "linkLens":
-                    setBarMargin(Math.abs(total*0.7 / 2))
+                case "biblio":
+                    setBarMargin(Math.abs(total*0.4 / 2))
                     break;
             
                 default:
                     setBarMargin(Math.abs(total*0.2 / 2))
                     break;
             }
-            setTimeout(()=>{
-                updateDocs();
-            }, 300)
         }
     }
 
@@ -1000,8 +957,12 @@ const MainSection = () => {
     },[focusedDoc])
 
     useEffect(()=>{
+        updateSlider()
         configBarMargin(activeMainLens);
-    },[activeMainLens,width])
+        setTimeout(() => {
+            updateDocs()
+        }, 300);
+    },[activeMainLens,width, barMargin])
 
     useEffect(()=>{
         resizeLens()

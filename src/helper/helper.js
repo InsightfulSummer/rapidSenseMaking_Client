@@ -25,19 +25,21 @@ export const linkPathGenerator = (doc1, doc2, barMargin, barWidth, y1, y2, heigh
     if (doc1.cluster.id == doc2.cluster.id) {
        let x1 = (doc1.cluster.id - 1) * barWidth + (doc1.cluster.id) * barMargin + 126
        let curveX = x1 - barMargin - p
-       return "M "+x1+" "+y1+" C "+curveX+" "+y1+" "+curveX+" "+y2+" "+x1+" "+y2
+       return "M "+x1+" "+y1+" C "+curveX+" "+y1+" "+curveX+" "+y2+" "+x1+" "+y2+" L "+ (x1-4.5) + " " + (y2+4.5) + " L "+ (x1-4.5) + " " + (y2-4.5) + " L " +x1+" "+y2
     } else {
-        let x1, x2, xp;
+        let x1, x2, xp, arrow;
         if (doc1.cluster.id < doc2.cluster.id) {
             x1 = (doc1.cluster.id) * barWidth + (doc1.cluster.id - 1) * barMargin + 126
             x2 = (doc2.cluster.id - 1) * barWidth + (doc2.cluster.id) * barMargin + 126
             xp = x2 - barMargin - p
+            arrow = " L "+ (x2-4.5) + " " + (y2+4.5) + " L "+ (x2-4.5) + " " + (y2-4.5) + " L " +x2+" "+y2
         } else {
             x1 = (doc1.cluster.id - 1) * barWidth + (doc1.cluster.id) * barMargin + 126
             x2 = (doc2.cluster.id) * barWidth + (doc2.cluster.id - 1) * barMargin + 126
             xp = x2 + barMargin + p
+            arrow = " L "+ (x2+4.5) + " " + (y2+4.5) + " L "+ (x2+4.5) + " " + (y2-4.5) + " L " +x2+" "+y2
         }
-        return "M "+ x1+" "+y1+" H "+xp+ " C "+x2+" "+y1+" "+xp+" "+y2+" "+x2+" "+y2
+        return "M "+ x1+" "+y1+" H "+xp+ " C "+x2+" "+y1+" "+xp+" "+y2+" "+x2+" "+y2+arrow
     }
 }
 
@@ -85,4 +87,37 @@ export const calculatePopUpPosition = (doc_x, doc_y, popUpWidth, popUpHeight, ca
     }
     // console.log(popUpX, popUpY)
     return {popUpX, popUpY}
+}
+
+export const outlinkCalculator = (doc, documents) => {
+    let outlinks = []
+    doc.references.map(ref => {
+        let linkedDoc = documents.find(doc_ => {
+            return doc_.title.toLowerCase() == ref.toLowerCase()
+        })
+        if(linkedDoc){
+            outlinks.push({
+                id_ : linkedDoc._id
+            })
+        }
+    })
+    return outlinks
+}
+
+export const inlinkCalculator = (doc, documents) => {
+    let inlinks = []
+    let docTitle = doc.title.toLowerCase()
+
+    documents.map(doc_ => {
+        let ref__ = doc_.references.find(ref => {
+            return ref.toLowerCase() == docTitle
+        })
+        if(ref__){
+            inlinks.push({
+                id_ : doc_._id,
+                clusterColor : doc_.cluster.color
+            })
+        }
+    })
+    return inlinks
 }
