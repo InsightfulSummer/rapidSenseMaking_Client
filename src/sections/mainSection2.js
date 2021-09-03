@@ -21,6 +21,7 @@ const MainSection = () => {
     }))
 
     const [z, setZ] = useState(0)
+    const [windowSize, setWindowSize] = useState([window.innerWidth, window.innerHeight])
     const [slideHeightPorportion, setSliderHeightPorportion] = useState(1 / 2)
     const [margin, setMargin] = useState(5)
     const [steps, setSteps] = useState([])
@@ -63,12 +64,15 @@ const MainSection = () => {
 
     const dispatch = useDispatch()
 
-    const getDimensions = () => {
+    const updateDimensions = () => {
         let mainCanvas = document.getElementById("mainCanvas_2")
         let { width, height } = getComputedStyle(mainCanvas)
         width = width.slice(0, -2)
         height = height.slice(0, -2)
         dispatch(SetDimensions(width - (rightMargin), height - (topMargin + bottomMargin)))
+        window.addEventListener('resize',(event) => {
+            setWindowSize([window.innerWidth, window.innerHeight])
+        })
     }
 
     const closeOpenLenses = () => {
@@ -382,9 +386,6 @@ const MainSection = () => {
             lensFrameSize
         }
         switch (activeLens) {
-            case "linkLens":
-                
-                break;
         
             case "summary":
                 summaryLensOver(activeLens, canvasProps, doc, documents, groups, clusters, doc.abstract, closeOpenLenses, changeLensFrameSize) // doc.abstract is going to be changed into doc.fullSummary in near future ...
@@ -914,8 +915,13 @@ const MainSection = () => {
         updateClusterController();
     }, [JSON.stringify(documents), JSON.stringify(clusters)])
 
+    useEffect(()=>{
+        updateDimensions();
+    } , [JSON.stringify(windowSize)])
+
     useEffect(() => {
-        getDimensions();
+
+        updateDimensions();
         loadData();
         setTimeout(() => {
             loadSVG();

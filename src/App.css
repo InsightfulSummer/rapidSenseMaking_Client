@@ -20,6 +20,13 @@ p{
   padding: 5px;
 }
 
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+  background: #ffffff !important;
+  border-bottom: solid 2px #441f74;
+}
 /* ListView styles */
 .listContainer {
   width: 100%;
@@ -743,4 +750,114 @@ h6.suggestionHeader {
 
 .activeBiblioLensActionBtn {
   background: rgba(255,255,255,0.35);
+}
+
+/* upload screen */
+.uploadScreen {
+  width: 100%;
+  height: 100vh;
+  background: rgba(79, 38, 131, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-direction: column;
+}
+
+.uploadForm{
+  flex: 1 1;
+  height: 50vh;
+  background: #fff;
+  border-radius: 1%;
+  box-shadow: 2px 2px 6px 2px #a6a6a6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  transition: all 500ms;
+  padding: 2%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.uploadForm:hover {
+  box-shadow: 2px 2px 13px 4px #8a8a8a;
+}
+
+.dragNDropupload {
+  width: 100%;
+  flex: 19;
+  border: dashed 2px #4f2683;
+  border-radius: 2%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  transition: all 500ms;
+}
+
+.uploadingBtnContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 1%;
+  width: 100%;
+}
+
+.uploadBTN {
+    flex: 1 1;
+    margin: 1%;
+    width: 50%;
+    background: #4f2683 !important;
+    font-size: 1em;
+    font-weight: bold;
+    height: 100%;
+    padding: 1%;
+    color: white;
+    border-radius: 5px;
+}
+
+.btn-default:not([disabled]):not(.disabled):active, .btn-default:not([disabled]):not(.disabled).active, .show>.btn-default.dropdown-toggle {
+  background: #441f74 !important;
+}
+
+.currentDocumentsContainer { 
+  flex: 19;
+  width: 51%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 1%;
+  padding-top: 0%;
+}
+
+.uploadDocumentItem {
+  width: 100%;
+  border-radius: 5px;
+  background: #c5c5c5;
+  margin-top: 2%;
+  padding: 2%;
+  transition: all 500ms;
+  box-shadow: 2px 2px 3px #a1a1a1;
+  color: black;
+  display: flex;
+  flex-direction: row;
+}
+
+.uploadDocumentItem:hover {
+  color: white;
+  background: #441f74;
+  box-shadow: 3px 3px 5px #868686;
+}
+
+.uploadBTN_ {
+  background-color: rgb(202, 202, 202) !important;
+  border: solid 3px #441f74;
+  color: #441f74;
+}
+
+.uploadingSpinner {
+  color: #441f74;
+  margin: 5%;
 }
