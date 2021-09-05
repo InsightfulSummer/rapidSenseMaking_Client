@@ -861,3 +861,33 @@ h6.suggestionHeader {
   color: #441f74;
   margin: 5%;
 }
+
+/* overview lens */
+.overviewRectDiv {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: 0.5%;
+}
+
+.overviewRectDivIconContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: solid 1px #fff;
+}
+
+.overviewRectDivMainContainer {
+  flex: 8;
+  display: flex;
+  flex-direction: column;
+}
+
+.overviewRectDivDateContainer {
+  flex: 3;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}

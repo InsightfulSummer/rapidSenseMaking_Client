@@ -36,12 +36,7 @@ export const skimmingLens = (canvasProperties, documents, clusters, groups, clos
     let skimmingRectDiv = skimmingRect
         .append("xhtml:div")
         .attr("class", "skimmingRectDiv")
-    // .attr("style", doc => {
-    //     return "font-size:" + fontSizeCalculator(barWidth - barMargin, t_x * t_z, 54) + "px"
-    // })
-    // .text(doc => {
-    //     return doc.title.substring(0,50)+" ..."
-    // })
+
     skimmingRectDiv.append("div")
         .attr("class", "skimmingIconContainer")
         .append("i")

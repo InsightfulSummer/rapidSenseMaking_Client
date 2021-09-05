@@ -4,7 +4,7 @@ import * as cloud from 'd3-cloud'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { calculatePopUpPosition, docX, fontSizeCalculator, hexToRgbA, linkPathGenerator } from '../helper/helper'
-import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver, skimmingLens, biblioLens } from '../lenses/index'
+import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver, skimmingLens, biblioLens, overviewLens } from '../lenses/index'
 
 
 const MainSection = () => {
@@ -360,8 +360,8 @@ const MainSection = () => {
             //         break;
             // }
             // summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
-            biblioLens(canvasProps, documents, clusters, groups)
-            // overviewLens(n_x,n_z,t_x,t_z,barWidth)
+            // biblioLens(canvasProps, documents, clusters, groups)
+            overviewLens(canvasProps, documents, clusters, groups)
             // NonLinearReading(canvasProps, documents, clusters, groups, closeOpenLenses)
             // skimmingLens(canvasProps, documents, clusters, groups, closeOpenLenses)
     }
