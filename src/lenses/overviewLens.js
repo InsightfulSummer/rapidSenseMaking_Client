@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import ReactDOMServer from 'react-dom/server'
 import {
-    docX
+    docX, fontSizeCalculator
 } from '../helper/helper'
 
 export const overviewLens = (canvasProperties, documents, clusters, groups) => {
@@ -43,10 +43,31 @@ export const overviewLens = (canvasProperties, documents, clusters, groups) => {
 
     overviewRectDivMainContainer.append("div")
         .attr("class", "overviewRectTitleContainer")
+        .text(doc => {
+            if (doc.title.length > 40) {
+                return doc.title.substring(0, 40) + " ..." 
+            } else {
+                return doc.title.substring(0, 40)
+            }
+        })
+        .attr("style", "font-size:" + fontSizeCalculator((barWidth-barMargin)*2/3, t_x*t_z*3/5,44 )+"px")
 
     overviewRectDivMainContainer.append("div")
         .attr("class", "overviewRectJournalContainer")
+        .text(doc => doc.publisher)
+        .attr("style", doc => "font-size:" + fontSizeCalculator((barWidth-barMargin)*1.2/3, t_x*t_z*2/5,doc.publisher.length )+"px")
 
-    overviewRectDiv.append("div")
+    let overviewRectDivDateContainer = overviewRectDiv.append("div")
         .attr("class", "overviewRectDivDateContainer")
+    // publication date needs more attention ... it should more systematic and uniformed ...    
+    overviewRectDivDateContainer.append("span")
+        .text(doc => doc.publishYear.substring(0,2))
+        .attr("class","overviewRectDivDateFirstSpan")
+        .attr("style", "font-size:" + fontSizeCalculator((barWidth-barMargin)*1.5/8, t_x*t_z, 2 )/2+"px")
+
+    overviewRectDivDateContainer.append("span")
+        .text(doc => doc.publishYear.substring(2,4))
+        .attr("style", "font-size:" + fontSizeCalculator((barWidth-barMargin)*1.5/8, t_x*t_z, 2 )+"px")
+
+    overviewRectDiv.append("div").attr("class","overviewCover")
 }
