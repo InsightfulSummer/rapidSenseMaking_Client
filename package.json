@@ -16,8 +16,10 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-scroll": "^1.8.2",
+    "react-wordcloud": "^1.2.7",
     "redux": "^4.0.5",
-    "web-vitals": "^1.1.1"
+    "web-vitals": "^1.1.1",
+    "wordcloud": "^1.2.2"
   },
   "scripts": {
     "start": "react-scripts start",

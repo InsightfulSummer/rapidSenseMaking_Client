@@ -13,6 +13,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <BrowserRouter>
+        <Route path="/test" exact component={Slider} />
         <Route path="/" exact component={UploadScreen} />
         <Route path="/main" exact component={MainScreen} />
       </BrowserRouter>

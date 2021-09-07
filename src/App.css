@@ -929,3 +929,187 @@ h6.suggestionHeader {
     position: absolute;
     cursor: pointer;
 }
+
+.overviewComponent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.overviewComponent_publisherContainer{
+  flex: 1;
+  border: solid 3px;
+  border-right: 0;
+  border-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.overviewComponent_closeIconContainer {
+  text-align: center;
+  width: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.overviewComponent_publisher {
+  width: 100%;
+  flex: 1;
+  writing-mode: vertical-rl;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  transform: rotate( 180deg );
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.overviewComponent_mainBody {
+  flex: 12;
+  display: flex;
+  flex-direction: column;
+}
+
+.overviewComponent_firstRow {
+  display: flex;
+  flex-direction: row;
+  background: #fff;
+  border-top-right-radius: 100%;
+  border-bottom-right-radius: 100%;
+}
+
+.overviewComponent_titleContainer{
+  color: #555555;
+  flex: 6 1;
+  background: white;
+  padding: 2%;
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: solid 3px black;
+  font-size: 1.1em;
+}
+
+.overviewComponent_refContainer {
+  flex: 1;
+  position: relative;
+}
+
+.overviewComponent_refBack{
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #736980;
+  position: inherit;
+}
+
+.overviewComponent_refIndicator {
+  width: 50%;
+  aspect-ratio: 1/1;
+  border-radius: 100%;
+  background-color: rgb(255, 255, 255);
+  border: solid 2px black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.3em;
+}
+
+.overviewComponent_refFix {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  background: #ffffff;
+  border-top: solid 3px black;
+}
+
+.overviewComponent_publishDate {
+  width: 93.5%;
+  display: flex;
+  flex-direction: row;
+}
+
+.overviewComponent_publishDateBegin{
+  flex: 1 1;
+  writing-mode: vertical-rl;
+  -webkit-text-orientation: mixed;
+  text-orientation: mixed;
+  padding: 1%;
+  font-weight: bold;
+  transform: rotate(180deg);
+}
+
+.overviewComponent_publishDateIndicator{
+  flex: 15;
+}
+
+.overviewComponent_publishDateEnd{
+  flex: 1 1;
+  writing-mode: vertical-rl;
+  -webkit-text-orientation: mixed;
+  text-orientation: mixed;
+  padding: 1%;
+  font-weight: bold;
+}
+
+div#publishDateBaseShape {
+  width: 8%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+div#publishDateBaseShape1 {
+  flex: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: #fff;
+}
+
+div#publishDateBaseShape2 {
+  flex: 1;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.overviewComponent_authorsContainer {
+  width: 93.5%;
+  background: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 1%;
+}
+
+.overviewComponent_authors{
+  padding-right: 1%;
+  padding-left: 1%;
+  font-weight: bold;
+  width: 100%;
+  text-align: center; 
+}
+
+.overviewComponent_wordCloudContainer {
+  width: 93.5%;
+  background: #ffffff;
+  border: solid 2px black;
+  flex: 1;
+  border-left: 0;
+  border-bottom-right-radius: 15px;
+  border-right: 0;
+}

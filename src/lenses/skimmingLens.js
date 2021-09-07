@@ -99,7 +99,6 @@ export const skimmingLensOver = (doc, canvasProperties, documents, clusters, gro
         .attr("x", popUpX)
         .attr("y", popUpY)
 
-    console.log(jRes)
     skimmingHTMLandEvent(closeOpenLenses, doc,  doc_x, doc_y, canvasProperties)
 }
 
