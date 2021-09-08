@@ -4,7 +4,7 @@ import * as cloud from 'd3-cloud'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { calculatePopUpPosition, docX, fontSizeCalculator, hexToRgbA, linkPathGenerator } from '../helper/helper'
-import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver, skimmingLens, biblioLens, overviewLens } from '../lenses/index'
+import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver, skimmingLens, biblioLens, overviewLens, lenses } from '../lenses/index'
 
 
 const MainSection = () => {
@@ -34,7 +34,7 @@ const MainSection = () => {
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState("biblio")
+    const [activeMainLens, setActiveMainLens] = useState(lenses[lenses.length-1].name)
     const [focusedDoc, SetFocusedDoc] = useState("")
     const [lensFrameSize, SetLensFrameSize] = useState(3)
     const [docOverParams, SetDocOverParams] = useState(null)
@@ -239,32 +239,82 @@ const MainSection = () => {
         })
 
         slideBody.on("wheel", (event) => {
-            // here we should switch the active lens
-            // for now we just test with the biblio lens
-            console.log(activeMainLens)
-            if (activeMainLens == "biblio") {
-                setActiveMainLens("summary")
-            } else {
-                setActiveMainLens("biblio")
+            let index_ = lenses.findIndex(item => {
+                return item.name == activeMainLens
+            })
+            let newIndex;
+            if (event.deltaY < 0) {
+                newIndex = 0
+                if (index_ == newIndex) {
+                    newIndex = lenses.length - 1
+                } else {
+                    newIndex = index_ - 1
+                } 
+            } else if (event.deltaY > 0) {
+                newIndex = lenses.length - 1
+                if (index_ == newIndex) {
+                    newIndex = 0
+                } else {
+                    newIndex = index_ + 1
+                } 
             }
+            d3.selectAll(".to_be_switched").remove()
+            setActiveMainLens(lenses[newIndex].name)
         })
     }
 
     const updateLensMenu = () => {
+        d3.selectAll(".to_be_closed").remove()
         var mainContainer = d3.select(".mainContainer")
         mainContainer.selectAll(".lensMenuContainer").remove()
         if (isLensMenuOpen) {
             d3.selectAll(".docElement")
                 .attr("opacity", "0.1")
-            mainContainer.append("rect")
-                .attr("height", slideHeightPorportion*height)
+            let lensMenuContainer = mainContainer.append("g")
                 .attr("class", "lensMenuContainer")
                 .attr("id", "lensMenuContainer_")
+            lensMenuContainer    
                 .attr("x", 60)
                 .attr("y", z * height)
+                .attr("height", slideHeightPorportion*height)
                 .transition()
-                .attr("width", width + rightMargin - 60)
+                .attr("width", width - 60)
                 .attr("fill", "rgba(230,230,230,0.85)")
+
+            let lensMenuItem = lensMenuContainer.selectAll(".lensMenuItem").data(lenses)
+            lensMenuItem.exit().remove()
+            lensMenuItem = lensMenuItem.enter()
+                .append("foreignObject")
+                .merge(lensMenuItem)
+                .attr("class", "lensMenuItem")
+
+            lensMenuItem
+                .attr("y", z * height)
+                .attr("height" , slideHeightPorportion*height)
+                .transition()
+                .attr("x", (item , index) => {
+                    return (width - 60)/lenses.length * index + 60
+                })
+                .attr("width", (width - 60)/lenses.length)
+
+            lensMenuItem.selectAll(".lensMenuItemDiv").remove()
+            let lensMenuItemDiv = lensMenuItem.append("xhtml:div")
+                .attr("class",item => item.name == activeMainLens ? "activeLensMenuItemDiv" : "lensMenuItemDiv")
+            
+            lensMenuItemDiv.append("div")
+                .attr("class", "lensMenuItemDivIcon")
+                .append("i").attr("class", item => "lensMenuItemDiv_Icon "+ item.icon)
+
+            lensMenuItemDiv.append("div")
+                .attr("class", "lensMenuItemDivName")
+                .text(item => item.name)
+
+            lensMenuItemDiv.on("click", (e, item)=>{
+                if (item.name != activeMainLens) {
+                    d3.selectAll(".to_be_switched").remove()
+                    setActiveMainLens(item.name)
+                }
+            })
         } else {
             updateDocs()
         }
@@ -313,38 +363,28 @@ const MainSection = () => {
                 return index < n_z ? 0.65 : index < n_z + n_x ? 0.95 : 0.65
             })
 
-            let canvasProps = {
-                barWidth,
-                barMargin,
-                t_x,
-                t_z,
-                n_x,
-                n_z,
-                margin,
-                rightMargin,
-                topMargin,
-                width,
-                height,
-                lensFrameSize
+            let canvasProps = {barWidth,barMargin,t_x,t_z,n_x,n_z,margin,rightMargin,topMargin,width,height,lensFrameSize}
+
+            switch (activeMainLens) {
+                case lenses[0].name:
+                    summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, updateDocs)
+                    break;
+                case lenses[1].name:
+                    NonLinearReading(canvasProps, documents, clusters, groups, closeOpenLenses)
+                    break;
+                case lenses[2].name:
+                    skimmingLens(canvasProps, documents, clusters, groups, closeOpenLenses)
+                    break;
+                case lenses[3].name:
+                    biblioLens(canvasProps, documents, clusters, groups)
+                    break;
+                case lenses[4].name:
+                    overviewLens(canvasProps, documents, clusters, groups, closeOpenLenses)
+                    break;
+            
+                default:
+                    break;
             }
-            // switch (activeMainLens) {
-            //     case "linkLens":
-            //         biblioLens(n_x,n_z,t_x,t_z,barWidth)
-            //         break;
-            //     case "summary":
-            //         summaryLens(n_x,n_z,t_x,t_z,barWidth)
-            //         break;
-            //     case "overview":
-            //         overviewLens(n_x,n_z,t_x,t_z,barWidth)
-            //         break;
-            //     default:
-            //         break;
-            // }
-            // summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, closeOpenLenses, changeLensFrameSize)
-            // biblioLens(canvasProps, documents, clusters, groups)
-            overviewLens(canvasProps, documents, clusters, groups, closeOpenLenses)
-            // NonLinearReading(canvasProps, documents, clusters, groups, closeOpenLenses)
-            // skimmingLens(canvasProps, documents, clusters, groups, closeOpenLenses)
     }
 
     const loadAxis = (cardinality) => {
@@ -723,6 +763,7 @@ const MainSection = () => {
 
     useEffect(()=>{
         updateSlider()
+        updateLensMenu()
         configBarMargin(activeMainLens);
         setTimeout(() => {
             updateDocs()

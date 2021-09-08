@@ -15,7 +15,7 @@ export const overviewLens = (canvasProperties, documents, clusters, groups, clos
     overviewRect = overviewRect.enter()
         .append("foreignObject")
         .merge(overviewRect)
-        .attr("class", "overviewRect")
+        .attr("class", "overviewRect to_be_switched")
 
     overviewRect
         .transition()

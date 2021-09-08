@@ -13,7 +13,7 @@ export const NonLinearReading = (canvasProperties, documents, clusters, groups, 
     nonLinearRect = nonLinearRect.enter()
         .append("foreignObject")
         .merge(nonLinearRect)
-        .attr("class", "nonLinearRect")
+        .attr("class", "nonLinearRect to_be_switched")
 
     nonLinearRect
         .transition()

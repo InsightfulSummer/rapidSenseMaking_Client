@@ -19,7 +19,7 @@ export const biblioLens = (canvasProperties, documents, clusters, groups) => {
     biblioRect = biblioRect.enter()
         .append("foreignObject")
         .merge(biblioRect)
-        .attr("class", "biblioRect")
+        .attr("class", "biblioRect to_be_switched")
 
     biblioRect
         .transition()
@@ -72,7 +72,7 @@ export const biblioLens = (canvasProperties, documents, clusters, groups) => {
                     let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
                     let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
                     docsContainer.append("path")
-                        .attr("class", "linkPath")
+                        .attr("class", "linkPath to_be_switched")
                         .attr("stroke", hexToRgbA(doc.cluster.color, 0.9))
                         .attr("fill", "none")
                         // .attr("opacity", 1 - slideHeightPorportion)
@@ -152,7 +152,7 @@ export const biblioLensEvents = (canvasProperties, doc, documents , clusters , g
                 .attr("height" , t_x * t_z)
                 .attr("x", docX(documents[index_], barWidth, barMargin, groups, clusters))
                 .attr("y", y2)
-                .attr("font-size", fontSizeCalculator((barWidth - barMargin)/1.5, t_x*t_z, (documents[index_].authors[0].name.length + 6)))
+                .attr("font-size", fontSizeCalculator((barWidth - barMargin)/2.5, t_x*t_z, (documents[index_].authors[0].name.length + 6)))
                 .attr("font-weight", "bold")
                 .attr("class", "to_be_closed identifyingLinkedDocs")
                 .text((documents[index_].authors.length > 1) ? documents[index_].authors[0].name + " et al." : documents[index_].authors[0].name)

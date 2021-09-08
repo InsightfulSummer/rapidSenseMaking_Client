@@ -21,7 +21,7 @@ export const summaryLens = (canvasProperties, focusedDoc, documents, clusters, g
         summaryRect = summaryRect.enter()
             .append("foreignObject")
             .merge(summaryRect)
-            .attr("class","summaryRect")
+            .attr("class","summaryRect to_be_switched")
             
         summaryRect
             .transition()

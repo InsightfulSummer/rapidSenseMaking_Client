@@ -17,7 +17,7 @@ export const skimmingLens = (canvasProperties, documents, clusters, groups, clos
     skimmingRect = skimmingRect.enter()
         .append("foreignObject")
         .merge(skimmingRect)
-        .attr("class", "skimmingRect")
+        .attr("class", "skimmingRect to_be_switched")
 
     skimmingRect
         .transition()
