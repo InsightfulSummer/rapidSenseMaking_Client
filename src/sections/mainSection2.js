@@ -3,8 +3,8 @@ import * as d3 from 'd3'
 import * as cloud from 'd3-cloud'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
-import { calculatePopUpPosition, docX, fontSizeCalculator, hexToRgbA, linkPathGenerator } from '../helper/helper'
-import { summaryLens, summaryLensOver, NonLinearReading, NonLinearReadingOver, skimmingLens, biblioLens, overviewLens, lenses } from '../lenses/index'
+import { docX, hexToRgbA } from '../helper/helper'
+import { summaryLens, NonLinearReading, skimmingLens, biblioLens, overviewLens, compareLens, lenses } from '../lenses/index'
 
 
 const MainSection = () => {
@@ -28,22 +28,24 @@ const MainSection = () => {
     const [barMargin, setBarMargin] = useState(10)
     const [topMargin, setTopMargin] = useState(80)
     const [bottomMargin, setBottomMargin] = useState(20)
-    const [rightMargin, setRightMargin] = useState(80)
+    const [rightMargin, setRightMargin] = useState(0)
     const [cardinality, setCardinality] = useState(10)
     const [sortingInCanvas, ToggleSortingInCanvas] = useState(false)
     const [slideBarMinimum, setSlideBarMinimum] = useState(9) // this maximum and minimum values can be changed based on the lense used in the application
     const [slideBarMaximum, setSlideBarMaximum] = useState(80)// this maximum and minimum values can be changed based on the lense used in the application
     const [isLensMenuOpen, ToggleLensMenuOpen] = useState(false)
-    const [activeMainLens, setActiveMainLens] = useState(lenses[lenses.length-1].name)
+    const [activeMainLens, setActiveMainLens] = useState(lenses[lenses.length-2].name)
     const [focusedDoc, SetFocusedDoc] = useState("")
     const [lensFrameSize, SetLensFrameSize] = useState(3)
     const [docOverParams, SetDocOverParams] = useState(null)
+    const [compareLensOpen, ToggleCompareLens] = useState(false)
+    const [slideControllerWidth, setSldieControllerWidth] = useState(55)
+    const [lensMenuMargin, setLensMenuMargin] = useState(5)
+    const [axisTextX, setAxisTextX] = useState(25)
+    const [axisLineX, setAxisLineX] = useState(20)
+    const [windows, setWindows] = useState([{document:null},{document:null}])
     //define your scales here ...
     let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
-    const widthScale = d3.scaleLinear().domain(domain).range([0.5, 1])
-    const referenceScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["citing"])))).range([0,100])
-    const citationScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["cited"])))).range([0,100])
-    const relevancyScaler = d3.scaleLinear().domain([0,10]).range([20,100])
 
     const sliderDragHandler = d3.drag()
         .on("drag", function (d) {
@@ -193,7 +195,7 @@ const MainSection = () => {
 
         slideBody = slider.append("rect")
             .attr("width", width-(rightMargin))
-            .attr("x", 105)
+            .attr("x", (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX))
             .attr("fill", "url('#slideBodyGradient')")
             .attr("class", "slideBody")
             .attr("id", "slideBody_")
@@ -202,7 +204,7 @@ const MainSection = () => {
             .attr("height", height * slideHeightPorportion)
 
         slideController = slider.append("rect")
-            .attr("width", 55)
+            .attr("width", slideControllerWidth)
             .attr("x", 0)
             .attr("fill", "#737373")
             .attr("class", "slideController")
@@ -212,14 +214,14 @@ const MainSection = () => {
 
         slideControllerText = slider.append("text")
             .attr("class", "slideControllerText")
-            .attr("x", 55 / 2)
+            .attr("x", slideControllerWidth / 2)
             .attr("y", (z * height) + (height * slideHeightPorportion / 2))
             .text(Math.ceil(Math.pow(slideHeightPorportion, 2) * 100) + "%")
 
         slider.append("text")
             .attr("class" , "fa slideControllerText")
             .attr("id", "lensMenuIcon_")
-            .attr("x", 55 / 2)
+            .attr("x", slideControllerWidth / 2)
             .attr("y", (z * height) + (height * slideHeightPorportion) - (height * slideHeightPorportion / 9))
             .attr("cursor", "pointer")
             .text("\uf0c9")
@@ -274,11 +276,11 @@ const MainSection = () => {
                 .attr("class", "lensMenuContainer")
                 .attr("id", "lensMenuContainer_")
             lensMenuContainer    
-                .attr("x", 60)
+                .attr("x", (slideControllerWidth + lensMenuMargin))
                 .attr("y", z * height)
                 .attr("height", slideHeightPorportion*height)
                 .transition()
-                .attr("width", width - 60)
+                .attr("width", width - (slideControllerWidth + lensMenuMargin) - rightMargin)
                 .attr("fill", "rgba(230,230,230,0.85)")
 
             let lensMenuItem = lensMenuContainer.selectAll(".lensMenuItem").data(lenses)
@@ -293,9 +295,9 @@ const MainSection = () => {
                 .attr("height" , slideHeightPorportion*height)
                 .transition()
                 .attr("x", (item , index) => {
-                    return (width - 60)/lenses.length * index + 60
+                    return (width - (slideControllerWidth + lensMenuMargin) - rightMargin)/lenses.length * index + (slideControllerWidth + lensMenuMargin)
                 })
-                .attr("width", (width - 60)/lenses.length)
+                .attr("width", (width - (slideControllerWidth + lensMenuMargin) - rightMargin)/lenses.length)
 
             lensMenuItem.selectAll(".lensMenuItemDiv").remove()
             let lensMenuItemDiv = lensMenuItem.append("xhtml:div")
@@ -339,7 +341,7 @@ const MainSection = () => {
             .data(documents)
 
         newElements.exit().remove()
-        let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
+        let barWidth = (width - (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX) - (clusters.length * barMargin) - rightMargin) / clusters.length
         newElements
             .enter()
             .append("rect")
@@ -381,6 +383,8 @@ const MainSection = () => {
                 case lenses[4].name:
                     overviewLens(canvasProps, documents, clusters, groups, closeOpenLenses)
                     break;
+                case lenses[5].name:
+                    compareLens({lensWidth: rightMargin, lensHeight: height + (topMargin * 1 / 3)+bottomMargin, lensX:width-rightMargin, lensY:topMargin*2/3}, canvasProps, documents, clusters, groups, compareLensOpen ,windows, setWindows)
             
                 default:
                     break;
@@ -409,7 +413,7 @@ const MainSection = () => {
         sortingContainer.selectAll(".sortingIcon_").remove()
         sortingContainer
             .append("text")
-            .attr("x", 85)
+            .attr("x", (slideControllerWidth + lensMenuMargin + axisTextX))
             .attr("y", 25)
             .attr("class", "fa sortingIcon_")
             .attr("id", "sortingIconInCanvas")
@@ -537,7 +541,7 @@ const MainSection = () => {
         axisLines
             .enter()
             .append("line")
-            .attr("x1", 105)
+            .attr("x1", (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX))
             .attr("x2", width)
             .merge(axisLines)
             .attr("class", "axisLines")
@@ -559,7 +563,7 @@ const MainSection = () => {
         axisText
             .enter()
             .append("text")
-            .attr("x", 85)
+            .attr("x", (slideControllerWidth + lensMenuMargin + axisTextX))
             .attr("text-anchor", "middle")
             .merge(axisText)
             .text(step => step.label)
@@ -619,11 +623,11 @@ const MainSection = () => {
             .attr("offset","100%")
             .attr("stop-color","#e6e6e6")
 
-        let barWidth = (width - 125 - (clusters.length * barMargin)) / clusters.length
+            let barWidth = (width - (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX) - (clusters.length * barMargin) - rightMargin) / clusters.length
 
         clusterController.append("rect")
             .attr("fill", "url('#clustersGradient')")
-            .attr("x", 105)
+            .attr("x", (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX))
             .attr("y", 0)
             .attr("width", width - rightMargin)
             .attr("height", topMargin * 2 / 3)
@@ -635,16 +639,6 @@ const MainSection = () => {
             .append("text")
             .attr("y", topMargin / 3)
             .attr("alignment-baseline", "middle")
-            // .on("mouseover", function (event, data) {
-            //     d3.selectAll(".docElement")
-            //         .transition()
-            //         .attr("opacity", (item) => {
-            //             return item.cluster.id == data.id ? "0.9" : "0.3"
-            //         })
-            // })
-            // .on("mouseout", function () {
-            //     updateDocs()
-            // })
             .merge(clusterElements)
             .transition()
             .attr("text-anchor", "middle")
@@ -656,31 +650,6 @@ const MainSection = () => {
             .text(item => {
                 return item.name
             })
-
-        clusterController.selectAll(".addClusterIcon").remove()
-
-        clusterController.append("text")
-            .attr("class", "fa addClusterIcon")
-            .attr("text-anchor", "middle")
-            .attr("alignment-baseline", "middle")
-            .attr("x", width + rightMargin - 25)
-            .attr("y", 25)
-            .attr("fill", "#3a3a3a")
-            .text("\uf067")
-            // .on("click", function () {
-            //     dispatch(addOneCluster())
-            // })
-
-        // clusterController.append("text")
-        //     .attr("class", "fa addClusterIcon")
-        //     .attr("alignment-baseline", "middle")
-        //     .attr("x", width + rightMargin - 60)
-        //     .attr("y", 25)
-        //     .attr("fill", "#3a3a3a")
-        //     .text("\uf58e")
-        //     .on("click", function () {
-        //         dispatch(autoCluster(3))
-        //     })
     }
 
     const loadGeneralEvents = () => {
@@ -719,7 +688,6 @@ const MainSection = () => {
     } , [JSON.stringify(windowSize)])
 
     useEffect(() => {
-
         updateDimensions();
         loadData();
         setTimeout(() => {
@@ -762,17 +730,33 @@ const MainSection = () => {
     },[focusedDoc])
 
     useEffect(()=>{
+        if (activeMainLens == lenses[lenses.length-1].name) {
+            ToggleCompareLens(true)
+            setRightMargin(240)
+        } else {
+            ToggleCompareLens(false)
+            setRightMargin(0)
+        }
         updateSlider()
         updateLensMenu()
         configBarMargin(activeMainLens);
         setTimeout(() => {
             updateDocs()
-        }, 300);
+        }, 240);
     },[activeMainLens,width, barMargin])
 
     useEffect(()=>{
         resizeLens()
     } , [lensFrameSize])
+
+    useEffect(()=>{
+        updateClusterController();
+        updateSlider();
+        updateLensMenu();
+        setTimeout(()=>{
+            updateDocs();
+        } , 240)
+    } , [compareLensOpen, rightMargin, activeMainLens])
 
 
     return (

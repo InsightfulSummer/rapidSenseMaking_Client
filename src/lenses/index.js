@@ -3,6 +3,7 @@ export * from './nonLinearReading'
 export * from './skimmingLens'
 export * from './biblioLens'
 export * from './overviewLens'
+export * from './comparisonLens'
 export const lenses = [
     {
         "name" : "summarization lens",
@@ -23,5 +24,9 @@ export const lenses = [
     {
         "name" : "overview of documents lens",
         "icon" : "fas fa-info"
+    },
+    {
+        "name" : "comparison",
+        "icon" : "fas fa-columns"
     }
 ]

@@ -1155,3 +1155,138 @@ div#publishDateBaseShape2 {
   color: #444444;
   font-size: 1.3em;
 }
+
+/* compare lens */
+.compareIconDiv {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: all 500ms;
+}
+
+.compareIconDiv:hover {
+  font-size: 1.3em;
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.compareBody_1 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.compareActionCenter_1 {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  background: linear-gradient(to bottom, #acacac, #cfcfcf, rgb(243, 243, 243));
+}
+
+.compareWindowsContainer_1 {
+  flex: 24;
+  display: flex;
+  flex-direction: column;
+  border-left: solid 1px #737373;
+  padding: 1%;
+}
+
+.compareWindow_1 {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1%;
+  border-bottom: solid 2px #737373;
+}
+
+.noDocP {
+  font-size: 1em;
+  text-align: center;
+  font-weight: bold;
+  color: #441f74;
+}
+
+.compareActionButton_1 {
+  flex: 1 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.3em;
+  color: #441f74;
+  font-family: none;
+  cursor: pointer;
+}
+
+.activeCompareBtn {
+  border: solid 2px #441f74;
+    border-bottom-right-radius: 10px;
+    cursor: default;
+}
+
+.compareRectDiv {
+  display: flex;
+  flex-direction: row;
+  padding: 0.5%;
+  height: 100%;
+  transition: all 500ms;
+}
+
+.compareRectIconContainer {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  border-right: solid 1px #fff;
+}
+
+.compareRectTitleContainer {
+  flex: 13;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: 100%;
+  padding: 0.5%;
+}
+
+.compareRectCover {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  cursor: pointer;
+}
+
+.compareRectDiv:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.compareWindowDocumentContainer_1 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-weight: bold;
+  justify-content: center;
+  color: #441f74;
+  flex-direction: column;
+  position: relative;
+}
+
+.closeCompareWindowDocument {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5%;
+  color: #441f74;
+  font-size: 1.3em;
+  cursor: pointer;
+}
