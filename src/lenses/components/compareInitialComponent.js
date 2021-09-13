@@ -16,9 +16,9 @@ const CompareInitialComponent = ({windows}) => {
     return (
         <div className="compareBody_1">
             <div className="compareActionCenter_1">
-                <div className={windows.length == 2 ? "compareActionButton_1 activeCompareBtn" : "compareActionButton_1"} title={windows.length == 2 ? "" : "compare only two documents"} id="compareTwoDocs">II</div>
-                <div className={windows.length == 3 ? "compareActionButton_1 activeCompareBtn" : "compareActionButton_1"} title={windows.length == 3 ? "" : "compare only three documents"} id="compareThreeDocs">III</div>
-                <div className="compareActionButton_1" style={checkReady() ? {cursor: "pointer", background: "#441f74", borderBottomRightRadius: "10px", color: "#FFF"} : {cursor:"default", color: "#848484"}} title={checkReady() ? "start comparing selected documents" : "select documents to start comparing"}>
+                {/* <div className={windows.length == 2 ? "compareActionButton_1 activeCompareBtn" : "compareActionButton_1"} title={windows.length == 2 ? "" : "compare only two documents"} id="compareTwoDocs">II</div>
+                <div className={windows.length == 3 ? "compareActionButton_1 activeCompareBtn" : "compareActionButton_1"} title={windows.length == 3 ? "" : "compare only three documents"} id="compareThreeDocs">III</div> */}
+                <div className={checkReady() ? "compareActionButton_1 readyToCompare" : "compareActionButton_1"} style={checkReady() ? {cursor: "pointer", background: "#441f74", borderBottomRightRadius: "10px", color: "#FFF"} : {cursor:"default", color: "#848484"}} title={checkReady() ? "start comparing selected documents" : "select documents to start comparing"}>
                     <i class="fas fa-greater-than"></i>
                 </div>
             </div>

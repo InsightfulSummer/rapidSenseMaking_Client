@@ -117,7 +117,6 @@ const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, comp
                 showPDF ? (
                     <div style={{ flex: 10 }}>
                         <iframe
-
                             src={`${require('../../data/2.pdf').default}#view=fitH`}
                             height="100%"
                             width="100%"
