@@ -305,7 +305,8 @@ const MainSection = () => {
             
             lensMenuItemDiv.append("div")
                 .attr("class", "lensMenuItemDivIcon")
-                .append("i").attr("class", item => "lensMenuItemDiv_Icon "+ item.icon)
+                .append("div").attr("class", "lensMenuItemDiv_Icon")
+                .attr("style",icon => "background-image :"+ `url(${require("../images/lensIcons/"+icon.img).default})`)
 
             lensMenuItemDiv.append("div")
                 .attr("class", "lensMenuItemDivName")

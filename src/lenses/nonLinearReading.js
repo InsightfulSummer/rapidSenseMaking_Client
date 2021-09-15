@@ -40,8 +40,9 @@ export const NonLinearReading = (canvasProperties, documents, clusters, groups, 
     // })
     nonLinearRectDiv.append("div")
         .attr("class", "nonLinearIconContainer")
-        .append("i")
-        .attr("class", "nonLinearIcon fas fa-exchange-alt")
+        .append("div")
+        .attr("class", "nonLinearIcon")
+        .attr("style","background-image :"+ `url(${require("../images/lensIcons/HyperSimilarity.png").default})`)
 
     nonLinearRectDiv.append("div")
         .attr("class", "nonLinearTitleContainer")

@@ -39,8 +39,9 @@ export const skimmingLens = (canvasProperties, documents, clusters, groups, clos
 
     skimmingRectDiv.append("div")
         .attr("class", "skimmingIconContainer")
-        .append("i")
-        .attr("class", "skimmingIcon fas fa-book-open")
+        .append("div")
+        .attr("class", "skimmingIcon")
+        .attr("style","background-image :"+ `url(${require("../images/lensIcons/Skimming.png").default})`)
 
     skimmingRectDiv.append("div")
         .attr("class", "skimmingTitleContainer")

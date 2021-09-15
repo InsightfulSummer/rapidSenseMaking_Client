@@ -41,8 +41,9 @@ export const biblioLens = (canvasProperties, documents, clusters, groups) => {
 
     biblioRectDiv.append("div")
         .attr("class", "biblioIconContainer")
-        .append("i")
-        .attr("class", "biblioIcon fab fa-connectdevelop")
+        .append("div")
+        .attr("class", "biblioIcon")
+        .attr("style","background-image :"+ `url(${require("../images/lensIcons/BibliographicInformation.png").default})`)
 
     biblioRectDiv.append("div")
         .attr("class", "biblioTitleContainer")

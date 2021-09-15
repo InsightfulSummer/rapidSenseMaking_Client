@@ -37,8 +37,9 @@ export const overviewLens = (canvasProperties, documents, clusters, groups, clos
 
     overviewRectDiv.append("div")
         .attr("class", "overviewRectDivIconContainer")
-        .append("i")
-        .attr("class", "overviewIcon fas fa-info")
+        .append("div")
+        .attr("class", "overviewIcon")
+        .attr("style","background-image :"+ `url(${require("../images/lensIcons/Map.png").default})`)
 
     let overviewRectDivMainContainer = overviewRectDiv.append("div")
         .attr("class", "overviewRectDivMainContainer")

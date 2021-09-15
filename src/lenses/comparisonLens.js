@@ -52,8 +52,9 @@ export const compareLens = (visualProps, canvasProperties, documents, clusters, 
 
         compareRectDiv.append("div")
             .attr("class", "compareRectIconContainer")
-            .append("i")
-            .attr("class", "compareRectIcon fas fa-columns")
+            .append("div")
+            .attr("class", "compareRectIcon")
+            .attr("style","background-image :"+ `url(${require("../images/lensIcons/Comparison.png").default})`)
     
         compareRectDiv.append("div")
             .attr("class", "compareRectTitleContainer")

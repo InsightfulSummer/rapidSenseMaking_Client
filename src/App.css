@@ -522,6 +522,13 @@ p{
   border-right: solid 1px #fff;
 }
 
+.nonLinearIcon {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 .nonLinearTitleContainer {
   flex: 13;
   display: flex;
@@ -631,6 +638,13 @@ h6.suggestionHeader {
   border-right: solid 1px #fff;
 }
 
+.skimmingIcon {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 .skimmingTitleContainer {
   flex: 13;
   display: flex;
@@ -710,6 +724,10 @@ h6.suggestionHeader {
 .biblioIcon{
   font-weight: bold;
   font-size: 1.5em;
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .biblioCover {
@@ -876,6 +894,13 @@ h6.suggestionHeader {
   align-items: center;
   justify-content: center;
   border-right: solid 1px #fff;
+}
+
+.overviewIcon {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .overviewRectDivMainContainer {
@@ -1145,9 +1170,18 @@ div#publishDateBaseShape2 {
   transform: scale(1.1);
 }
 
+.lensMenuItemDivIcon {
+  aspect-ratio: 1/1;
+  padding: 20%;
+}
+
 .lensMenuItemDiv_Icon {
   font-size: 9em;
   color: #441f74;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .lensMenuItemDivName {
@@ -1245,6 +1279,13 @@ div#publishDateBaseShape2 {
   align-items: center;
   display: flex;
   border-right: solid 1px #fff;
+}
+
+.compareRectIcon{
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .compareRectTitleContainer {

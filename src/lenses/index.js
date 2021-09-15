@@ -6,27 +6,33 @@ export * from './overviewLens'
 export * from './comparisonLens'
 export const lenses = [
     {
-        "name" : "summarization lens",
-        "icon" : "fas fa-list-alt"
+        "name" : "Summary",
+        "icon" : "fas fa-list-alt",
+        "img" : "Summary.png"
     },
     {
-        "name" : "non-linear reading lens",
+        "name" : "Hyper Similarity",
         "icon" : "fas fa-exchange-alt",
+        "img" : "HyperSimilarity.png"
     },
     {
-        "name" : "skimming document lens",
-        "icon" : "fas fa-book-open"
+        "name" : "Skimming",
+        "icon" : "fas fa-book-open",
+        "img" : "Skimming.png"
     },
     {
-        "name" : "bibliographic information lens",
-        "icon" : "fab fa-connectdevelop"
+        "name" : "Bibliographic Information",
+        "icon" : "fab fa-connectdevelop",
+        "img":"BibliographicInformation.png"
     },
     {
-        "name" : "overview of documents lens",
-        "icon" : "fas fa-info"
+        "name" : "Map",
+        "icon" : "fas fa-info",
+        "img" : "Map.png"
     },
     {
-        "name" : "comparison",
-        "icon" : "fas fa-columns"
+        "name" : "Comparison",
+        "icon" : "fas fa-columns",
+        "img" : "Comparison.png"
     }
 ]
