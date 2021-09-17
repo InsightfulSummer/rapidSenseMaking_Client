@@ -880,6 +880,14 @@ h6.suggestionHeader {
   margin: 5%;
 }
 
+.progress-bar {
+  background: #441f74 !important;
+}
+
+.progress.my-2{
+  width: 60%;
+}
+
 /* overview lens */
 .overviewRectDiv {
   width: 100%;
@@ -1341,9 +1349,11 @@ div#publishDateBaseShape2 {
 
 .compareMainComponentPane {
   flex: 1;
-  background-color: rgba(255, 255, 255, 0.90);
+  background-color: rgba(255, 255, 255, 0.98);
   border-right: solid 5px;
   padding: 1%;
+  overflow-y: scroll;
+  text-align: justify;
 }
 
 .compareMainComponentActionCenter {
@@ -1358,6 +1368,9 @@ div#publishDateBaseShape2 {
   display: flex;
   flex: 1;
   flex-direction: row;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .compareMainComponentActionBtn {
@@ -1408,4 +1421,27 @@ div#publishDateBaseShape2 {
   justify-content: center;
   align-items: center;
   background: rgba(255,255,255,.9);
+}
+
+.paneContentContainer {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  height: 100%;
+}
+
+.paneContentBody {
+  flex: 7;
+  padding: .3%;
+  overflow-y: scroll;
+}
+
+.paneSuggestion {
+  flex: 3;
+  height: 80vh;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

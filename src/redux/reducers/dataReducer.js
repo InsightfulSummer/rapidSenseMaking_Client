@@ -6,6 +6,7 @@ const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
 const initialState = {
     documents : SampleData,
+    requestId : null,
     clusters : [{
         name : "mainCluster",
         id : 1,
@@ -171,6 +172,9 @@ const reducer = (state = initialState, actions) => {
                 return item.id == actions.payload.group_id
             })
             _tmp_Documents[documentIndex].group = groupItem
+
+        case types.SetRequestId : 
+            return {...state, requestId: actions.payload.requestId}
         default:
             return state;
     }

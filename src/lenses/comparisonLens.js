@@ -114,7 +114,7 @@ export const compareLensHTMLandEvent = (visualProps, windows, setWindows) => {
     })
 }
 
-export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=false, search=false, showPDF=false) => {
+export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=false, search=false, showPDF=false, similarEncoding=false) => {
     var canvasSVG = d3.select(".canvasSVG")
     canvasSVG.selectAll(".mainCompare").remove();
     let mainCompare = canvasSVG.append("foreignObject")
@@ -131,6 +131,7 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
             generalInfo={generalInfo} 
             search={search}
             showPDF={showPDF}
+            similarEncoding={similarEncoding}
         />
     )
     mainCompare.html(tmpDiv.innerHTML)
@@ -145,6 +146,10 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
         })
         mainCompareHTMLandEvents(windows, false)
     }
+
+    windows.map(window => {
+        window.suggestion = null
+    })
 
     // load wordclouds if needed
     if (generalInfo) {
@@ -192,10 +197,14 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
     })
 
     mainCompare.selectAll("#comparisonSearch").on("click", ()=>{
-        mainCompareHTMLandEvents(windows, loading, false, !search)
+        mainCompareHTMLandEvents(windows, loading, false, !search, false, similarEncoding)
     })
 
     mainCompare.selectAll("#comparisonPDFToggle").on("click", () => {
         mainCompareHTMLandEvents(windows, loading, false, false, !showPDF)
+    })
+
+    mainCompare.selectAll("#comparisonSimilarEncodingToggle").on("click", () => {
+        mainCompareHTMLandEvents(windows, loading, false, false, false, !similarEncoding)
     })
 }

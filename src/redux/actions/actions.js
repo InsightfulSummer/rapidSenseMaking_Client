@@ -26,6 +26,15 @@ export const sortDocuments = (sortMetric, ascending=true) => {
     }
 }
 
+export const SetRequestId = (requestId) => {
+    return {
+        type : types.SetRequestId,
+        payload : {
+            requestId
+        }
+    }
+}
+
 export const CreateRandomLinks = () => {
     return {
         type : types.CreateRandomLinks

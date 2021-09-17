@@ -1,8 +1,9 @@
 import React from 'react'
 import { MDBBtn } from 'mdbreact'
 import * as d3 from 'd3'
+import { hexToRgbA } from '../../helper/helper'
 
-const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, similarEncoding, sentenceSelection }) => {
+const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, similarEncoding}) => {
 
     const calculateEncodingRange = () => {
         let min = 0; let max = 5;
@@ -85,18 +86,18 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
                             <div className="compareMainComponentActionBtn" style={search ? { background: "#fff", color: "#441f74" } : {}} title="search and find semantically close sentences to a search query" id="comparisonSearch">
                                 <i class="fas fa-search"></i>
                             </div>
-                            <div className="compareMainComponentActionBtn">
-                                <p style={{ fontSize: "0.6em" }}>Similarity Score: <span style={{ fontSize: "1.6em", fontWeight: "bold" }}>0.98</span></p>
-                            </div>
                             <div className="compareMainComponentActionBtn" style={showPDF ? { background: "#fff", color: "#441f74" } : {}} title={showPDF ? "hide pdf files of the documents" : "show pdf files of the documents"} id="comparisonPDFToggle">
                                 <i class="fas fa-file-pdf"></i>
                             </div>
-                            <div className="compareMainComponentActionBtn" title={similarEncoding ? "highlight similar sentences in both documents" : ""} id="comparisonSimilarEncodingToggle">
-                                <i class={similarEncoding ? "fas fa-not-equal" : "fas fa-equals"}></i>
+                            <div className="compareMainComponentActionBtn" style={similarEncoding ? { background: "#fff", color: "#441f74" } : {}} title={similarEncoding ? "highlight similar sentences in both documents" : ""} id="comparisonSimilarEncodingToggle">
+                                <i class="fas fa-equals"></i>
                             </div>
-                            <div className="compareMainComponentActionBtn" title={"find similar sentences to a selected sentence"} id="compareSentenceSelectionMode">
+                            <div className="compareMainComponentActionBtn">
+                                <p style={{ fontSize: "0.6em" }}>Similarity Score: <span style={{ fontSize: "1.6em", fontWeight: "bold" }}>0.98</span></p>
+                            </div>
+                            {/* <div className="compareMainComponentActionBtn" title={"find similar sentences to a selected sentence"} id="compareSentenceSelectionMode">
                                 <i class="fas fa-align-left"></i>
-                            </div>
+                            </div> */}
                         </div>
                         {
                             search ? (
@@ -152,9 +153,11 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
                                                                                     <h3>{divContent.content}</h3>
                                                                                 ) : divContent.type == "paragraph" ? (<p>
                                                                                     {
-                                                                                        divContent.content.map(pContent =>
-                                                                                            identifyKeywords(pContent, window.document.keywords, window.document.cluster.color_)
-                                                                                        )
+                                                                                        similarEncoding ? divContent.content.map(pContent =>
+                                                                                            identifyKeywords(pContent, window.document.keywords, window.document.cluster.color)
+                                                                                        ) : divContent.content.map(pContent => (
+                                                                                            <span>{pContent.content}</span>
+                                                                                        ))
                                                                                     }
                                                                                 </p>
                                                                                 ) : divContent.type == "formula" ? (
@@ -174,7 +177,19 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
                                                                     ))
                                                                 }
                                                     </div>
-                                                    <div className="paneSuggestion"></div>
+                                                    {
+                                                        search ? (
+                                                            <div className="paneSuggestion" style={{background: hexToRgbA(window.document.cluster.color, .65)}}>
+                                                                {
+                                                                    window.suggestion == null ? (
+                                                                        <p style={{color: "#fff", textAlign: "center", fontWeight : "bold", padding: "1%"}}>search and find semantically close sentences to your search query</p>
+                                                                    ) : (
+                                                                        <div></div>
+                                                                    )
+                                                                }
+                                                            </div>
+                                                        ) : null
+                                                    }
                                                 </div>
                                             )
                                         }

@@ -1,12 +1,20 @@
-import { MDBBtn, MDBContainer } from 'mdbreact';
+import axios from 'axios';
+import { MDBBtn, MDBContainer, MDBProgress } from 'mdbreact';
 import React, { useState } from 'react';
 import MainScreenHeader from '../components/mainScreenHeader';
+import {API_ADDRESS} from '../helper/generalInfo'
+import {useDispatch} from 'react-redux'
+import {SetRequestId} from '../redux/actions/actions'
 
 const UploadScreen = ({history}) => {
+
+    const dispatch = useDispatch()
+
     const [documents, setDocuments] = useState([])
     const [dragOver, toggleDragOver] = useState(false)
     const [uploading, toggleUploading] = useState(true)
     const [loading, toggleLoading] = useState(false)
+    const [loadingPercentage, setLoadingPercentage] = useState(0)
     
 
     const dropHandler = (event) => {
@@ -70,11 +78,38 @@ const UploadScreen = ({history}) => {
         setDocuments(tmpDocs)
     }
 
-    const processDocuments = () => {
-        toggleLoading(true)
-        setTimeout(()=>{
-            history.push("/main")
-        } , 500)
+    const processDocuments = async () => {
+        // api calls
+        if (documents.length > 0) {
+            toggleLoading(true)
+            // create a random request id here and store it in the redux store
+            // generating random request id
+            let reqID = new Date().getTime()+"__"+(Math.floor((Math.random() * 100000) + 1))
+            dispatch(SetRequestId(reqID))
+            // uploading documents
+            await Promise.all(documents.map( async (document, index) => {
+                let formData = new FormData()
+                formData.append('reqID', reqID)
+                formData.append('iterationNum', index+1)
+                formData.append('pdfFile', document)
+                await axios.post(API_ADDRESS + "/pdfUploading", formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(data => {
+                    console.log(data.data)
+                })
+                .catch(err => console.log(err))
+                setLoadingPercentage(index+1)
+            }))
+            // clustering documents 
+
+            // navigating to the main screen
+            setTimeout(()=>{
+                history.push("/main")
+            } , 500)
+        }
     }
 
     return (
@@ -86,8 +121,9 @@ const UploadScreen = ({history}) => {
                             <div className="spinner-border uploadingSpinner" role="status" >
                                 <span className="sr-only">Loading...</span>
                             </div>
-                            <p>Processing documents ...</p>
+                            <p>{loadingPercentage < documents.length ? "Processing documents ..." : "clustering documents ..."}</p>
                             <p>Please wait.</p>
+                            <MDBProgress value={(loadingPercentage/documents.length)*100} className="my-2" />
                         </div>
                     ) : uploading ? (
                         <form encType="multipart/form-data" className="uploadForm">
