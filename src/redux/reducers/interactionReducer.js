@@ -3,36 +3,36 @@ import types from "../actions/types";
 
 const initialState = {
     activeDocumentId: null,
-    sortMetric: "publishYear",
+    sortMetric: "publishingDate",
     sortingMetrics : [
         {
             label : "Publishing Date (Ascending)",
-            metric : "publishYear",
+            metric : "publishingDate",
             ascending : true
         },
         {
             label : "Publishing Date (Descending)",
-            metric : "publishYear",
+            metric : "publishingDate",
             ascending : false
         },
         {
-            label : "Reletivity",
-            metric : "relevancy",
+            label : "Number of Outlinks (Ascending)",
+            metric : "outlinks",
+            ascending : true
+        },
+        {
+            label : "Number of Outlinks (Descending)",
+            metric : "outlinks",
             ascending : false
         },
         {
-            label : "Reletivity To a Custom Document",
-            metric : "relevancy", // change it later
-            ascending : false
+            label : "Alphabetical (Ascending)",
+            metric : "title",
+            ascending : true
         },
         {
-            label : "Most Cited Documents",
-            metric : "cited",
-            ascending : false
-        },
-        {
-            label : "Most Citing Documents",
-            metric : "citing",
+            label : "Alphabetical (Descending)",
+            metric : "title",
             ascending : false
         }
     ],

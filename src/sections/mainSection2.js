@@ -45,7 +45,8 @@ const MainSection = () => {
     const [axisLineX, setAxisLineX] = useState(20)
     const [windows, setWindows] = useState([{document:null},{document:null}])
     //define your scales here ...
-    let domain = ascending ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) }).reverse() : d3.extent(documents, doc => { return parseFloat(doc[sortMetric]) })
+    let domain = sortMetric == "publishingDate" ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric].substring(0,4)) }) : sortMetric == "outlinks" ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric].length) }) : d3.extent(documents, doc => { return doc[sortMetric].replace(/[^a-zA-Z ]/g, "").substring(0, 1).toUpperCase() })
+    domain = ascending ? domain.reverse() : domain
 
     const sliderDragHandler = d3.drag()
         .on("drag", function (d) {
@@ -136,13 +137,6 @@ const MainSection = () => {
         // define your linear gradient here ...
         var defs = d3.select(".mainContainer")
             .append("defs")
-    }
-
-    const loadData = () => {
-        dispatch(sortDocuments(sortMetric, ascending))
-        dispatch(CreateRandomLinks())
-        dispatch(autoCluster(3))
-        dispatch(dataCompeleting())
     }
 
     const loadSlider = () => {
@@ -324,6 +318,7 @@ const MainSection = () => {
     }
 
     const loadDocs = () => {
+        setMargin((height / documents.length) /5)
         d3.select(".mainContainer")
             .append("g")
             .attr("class", "docsContainer")
@@ -460,7 +455,7 @@ const MainSection = () => {
                 .attr("width", 350)
                 .attr("height", 25 * sortingMetrics.length + 15)
                 .attr("fill", "#737373")
-                .attr("class", "sortingMenu_")
+                .attr("class", "sortingMenu_ to_be_closed")
                 .attr("id", "sortingMenuInCanvas")
 
             var sortingText = sortingContainer.selectAll(".sortingText")
@@ -470,7 +465,7 @@ const MainSection = () => {
 
             sortingText.enter()
                 .append("text")
-                .attr("class", "sortingText")
+                .attr("class", "sortingText to_be_closed")
                 .text(item => {
                     return item.label
                 })
@@ -478,6 +473,7 @@ const MainSection = () => {
                 .on("click", (event, metric)=>{
                     dispatch(ChangeSortMetric(metric.metric, metric.ascending));
                     dispatch(sortDocuments(metric.metric, metric.ascending));
+                    ToggleSortingInCanvas(false)
                 })
                 .attr("font-weight", item => {
                     return (ascending == item.ascending && sortMetric == item.metric) ? "bold" : "normal"
@@ -497,28 +493,57 @@ const MainSection = () => {
     }
 
     const updateSteps = (cardinality) => {
-        let steps_ = []
-        let stepMagnitude = (domain[0] - domain[1]) / (cardinality - 1)
-        for (let index = 0; index < cardinality; index++) {
-            steps_.push({
-                label: parseInt(domain[1] + stepMagnitude * index)
+        if (sortMetric != "title") {
+            let steps_ = []
+            let stepMagnitude = (domain[0] - domain[1]) / (cardinality - 1)
+            for (let index = 0; index < cardinality; index++) {
+                steps_.push({
+                    label: parseInt(domain[1] + stepMagnitude * index)
+                })
+            }
+            steps_[0].n = 0
+            steps_[0].label = ascending ? steps_[0].label - 1 : steps_[0].label + 1
+            steps_.slice(1).map((step, index) => {
+                step.n = documents.filter(item => {
+                    let itemValue = sortMetric == "publishingDate" ? parseInt(item[sortMetric].substring(0,4)) : parseInt(item[sortMetric].length)
+                    return ascending ? itemValue > steps_[index].label && itemValue <= step.label : itemValue < steps_[index].label && itemValue >= step.label
+                }).length
+                step.n += steps_[index].n
             })
+            steps_ = steps_.filter((item, index) => {
+                return steps_.findIndex(step => {
+                    return step.n == item.n
+                }) == index
+            })
+            steps_[0].label = ascending ? steps_[0].label + 1 : steps_[0].label - 1
+            
+            setSteps(steps_)
+        } else {
+            let steps_ = []
+            let alphabets = ["A", "F", "K", "P", "U", "Z"]
+            alphabets = ascending ? alphabets : alphabets.reverse()
+            alphabets.map(alpha => {
+                steps_.push({
+                    label : alpha
+                })
+            })
+            steps_[0].n = 0
+            steps_.slice(1).map((step, index) => {
+                step.n = documents.filter(item => {
+                    let itemValue = item[sortMetric].replace(/[^a-zA-Z ]/g, "").toUpperCase()
+                    return ascending ? itemValue > steps_[index].label && itemValue <= step.label : itemValue < steps_[index].label && itemValue >= step.label
+                }).length
+                step.n += steps_[index].n
+            })
+            // console.log(steps_)
+            steps_ = steps_.filter((item, index) => {
+                return steps_.findIndex(step => {
+                    return step.n == item.n
+                }) == index
+            })
+            console.log(steps_)
+            setSteps(steps_)
         }
-        steps_[0].n = 0
-        steps_[0].label = ascending ? steps_[0].label - 1 : steps_[0].label + 1
-        steps_.slice(1).map((step, index) => {
-            step.n = documents.filter(item => {
-                return ascending ? item[sortMetric] > steps_[index].label && item[sortMetric] <= step.label : item[sortMetric] < steps_[index].label && item[sortMetric] >= step.label
-            }).length
-            step.n += steps_[index].n
-        })
-        steps_ = steps_.filter((item, index) => {
-            return steps_.findIndex(step => {
-                return step.n == item.n
-            }) == index
-        })
-        steps_[0].label = ascending ? steps_[0].label + 1 : steps_[0].label - 1
-        setSteps(steps_)
     }
 
     const updateAxis = () => {
@@ -690,7 +715,6 @@ const MainSection = () => {
 
     useEffect(() => {
         updateDimensions();
-        loadData();
         setTimeout(() => {
             loadSVG();
             loadSlider();

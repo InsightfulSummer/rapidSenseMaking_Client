@@ -12,7 +12,7 @@ const OverviewComponent = ({doc, publishYearRange, refR, publishYearMargin}) => 
                 <div className="overviewComponent_closeIconContainer" title="close overview lens">
                     <i class="fas fa-times"></i>
                 </div>
-                <div className="overviewComponent_publisher" title="publisher of this article"><i class="fas fa-book" style={{margin: "2%"}}></i> Elsevier BV</div>
+                <div className="overviewComponent_publisher" title="publisher of this article" ><i class="fas fa-book" style={{margin: "2%"}}></i> Elsevier BV</div>
             </div>
             <div className="overviewComponent_mainBody">
                 <div className="overviewComponent_firstRow">
@@ -21,7 +21,7 @@ const OverviewComponent = ({doc, publishYearRange, refR, publishYearMargin}) => 
                         <div className="overviewComponent_refFix" style={{borderColor: color_}}></div>
                         <div className="overviewComponent_refBack" style={{background: "radial-gradient(#fff, "+color_+");"}}>
                             <div className="overviewComponent_refIndicator" style={{borderColor: color_, width:refR+"%"}}>
-                                {doc.references.length} <span style={{fontSize: ".5em", fontWeight:"100"}}>Refs.</span>
+                                {doc.outlinks.length} <span style={{fontSize: ".5em", fontWeight:"100"}}>Refs.</span>
                             </div>
                         </div>
                     </div>
@@ -30,7 +30,7 @@ const OverviewComponent = ({doc, publishYearRange, refR, publishYearMargin}) => 
                     <div className="overviewComponent_publishDateBegin">{publishYearRange[0]}</div>
                     <div className="overviewComponent_publishDateIndicator">
                         <div id="publishDateBaseShape" style={{marginLeft: publishYearMargin+"%"}}>
-                            <div id="publishDateBaseShape1" style={{background: publishYearMargin > 60 ? "#fff" : color_, color: publishYearMargin > 60 ? color_ : "#fff"}}>{doc.publishYear}</div>
+                            <div id="publishDateBaseShape1" style={{background: publishYearMargin > 60 ? "#fff" : color_, color: publishYearMargin > 60 ? color_ : "#fff"}}>{doc.publishingDate}</div>
                             <div id="publishDateBaseShape2" style={{background: publishYearMargin > 60 ? "#fff" : color_}}></div>
                         </div>
                     </div>

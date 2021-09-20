@@ -25,5 +25,7 @@ export default {
     RemoveOneGroup : "RemoveOneGroup",
     ChangeGroupOfDocument : "ChangeGroupOfDocument",
     RenameGroup : "RenameGroup",
-    SetRequestId : "SetRequestId"
+    SetRequestId : "SetRequestId",
+    SetDocuments : "SetDocuments",
+    ExtractClusters : "ExtractClusters"
 }

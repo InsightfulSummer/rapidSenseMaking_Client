@@ -64,17 +64,17 @@ export const overviewLens = (canvasProperties, documents, clusters, groups, clos
         .attr("class", "overviewRectDivDateContainer")
     // publication date needs more attention ... it should more systematic and uniformed ...    
     overviewRectDivDateContainer.append("span")
-        .text(doc => doc.publishYear.substring(0,2))
+        .text(doc => doc.publishingDate.substring(0,2))
         .attr("class","overviewRectDivDateFirstSpan")
         .attr("style", "font-size:" + fontSizeCalculator((barWidth-barMargin)*1.5/8, t_x*t_z, 2 )/2+"px")
 
     overviewRectDivDateContainer.append("span")
-        .text(doc => doc.publishYear.substring(2,4))
+        .text(doc => doc.publishingDate.substring(2,4))
         .attr("style", "font-size:" + fontSizeCalculator((barWidth-barMargin)*1.5/8, t_x*t_z, 2 )+"px")
 
     overviewRectDiv.append("div").attr("class","overviewCover")
 
-    d3.selectAll(".overviewCover").on("mouseover", (event, doc)=>{
+    d3.selectAll(".overviewCover").on("click", (event, doc)=>{
         overviewOver(doc, canvasProperties, documents, clusters, groups, closeOpenLenses)
     })
 }
@@ -123,15 +123,15 @@ export const overviewHTMLandEvent = (doc, canvasProperties, documents, clusters,
     var { barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height } = canvasProperties
 
     // scales 
-    const referenceScale = d3.scaleLinear().domain(d3.extent(documents, doc => doc.references.length)).range([60,100])
-    const publishYearScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["publishYear"])))).range([0,92])
+    const referenceScale = d3.scaleLinear().domain(d3.extent(documents, doc => doc.outlinks.length)).range([60,100])
+    const publishYearScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["publishingDate"])))).range([0,92])
 
     tmpDiv.innerHTML = ReactDOMServer.renderToString(
         <OverviewComponent 
             doc={doc}
-            publishYearRange={d3.extent(documents, doc => (parseInt(doc["publishYear"])))}
-            refR={referenceScale(doc.references.length)}
-            publishYearMargin={publishYearScale(doc.publishYear)}
+            publishYearRange={d3.extent(documents, doc => (parseInt(doc["publishingDate"])))}
+            refR={referenceScale(doc.outlinks.length)}
+            publishYearMargin={publishYearScale(doc.publishingDate)}
         />
     )
     overviewPopup.html(tmpDiv.innerHTML)

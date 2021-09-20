@@ -3,12 +3,17 @@ import { MDBBtn, MDBContainer, MDBProgress } from 'mdbreact';
 import React, { useState } from 'react';
 import MainScreenHeader from '../components/mainScreenHeader';
 import {API_ADDRESS} from '../helper/generalInfo'
-import {useDispatch} from 'react-redux'
-import {SetRequestId} from '../redux/actions/actions'
+import {useDispatch, useSelector} from 'react-redux'
+import {SetRequestId, SetDocuments, ExtractClusters, sortDocuments} from '../redux/actions/actions'
 
 const UploadScreen = ({history}) => {
 
     const dispatch = useDispatch()
+
+    const {sortMetric, ascending} = useSelector(state => ({
+        ascending: state.interactionReducer.ascending,
+        sortMetric: state.interactionReducer.sortMetric
+    }))
 
     const [documents, setDocuments] = useState([])
     const [dragOver, toggleDragOver] = useState(false)
@@ -80,35 +85,55 @@ const UploadScreen = ({history}) => {
 
     const processDocuments = async () => {
         // api calls
-        if (documents.length > 0) {
+        if (documents.length > 4) {
             toggleLoading(true)
             // create a random request id here and store it in the redux store
             // generating random request id
-            let reqID = new Date().getTime()+"__"+(Math.floor((Math.random() * 100000) + 1))
-            dispatch(SetRequestId(reqID))
+            // let reqID = new Date().getTime()+"__"+(Math.floor((Math.random() * 100000) + 1))
+            // dispatch(SetRequestId(reqID))
+            let reqID = "1632103970822__26009"
             // uploading documents
-            await Promise.all(documents.map( async (document, index) => {
-                let formData = new FormData()
-                formData.append('reqID', reqID)
-                formData.append('iterationNum', index+1)
-                formData.append('pdfFile', document)
-                await axios.post(API_ADDRESS + "/pdfUploading", formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
-                .then(data => {
-                    console.log(data.data)
-                })
-                .catch(err => console.log(err))
-                setLoadingPercentage(index+1)
-            }))
+            // await Promise.all(documents.map( async (document, index) => {
+            //     let formData = new FormData()
+            //     formData.append('reqID', reqID)
+            //     formData.append('iterationNum', index+1)
+            //     formData.append('pdfFile', document)
+            //     await axios.post(API_ADDRESS + "/pdfUploading", formData, {
+            //         headers: {
+            //             'Content-Type': 'multipart/form-data'
+            //         }
+            //     })
+            //     .then(data => {
+            //         console.log(data.data)
+            //     })
+            //     .catch(err => {
+            //         console.log(err)
+            //         alert("some error happened. Please try again later ...")
+            //         return false;
+            //     })
+            //     setLoadingPercentage(index+1)
+            // }))
+            // setLoadingPercentage(documents.length)
             // clustering documents 
-
+            let formData = new FormData()
+            formData.append('reqID', reqID)
+            await axios.post(API_ADDRESS + "/clusterDocuments", formData , {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(data => {
+                dispatch(SetDocuments(data.data))
+            }).catch(err => {
+                console.log(err)
+            })
+            dispatch(ExtractClusters())
+            dispatch(sortDocuments(sortMetric, ascending))
             // navigating to the main screen
             setTimeout(()=>{
                 history.push("/main")
             } , 500)
+        } else {
+            alert("you need to upload at least 5 pdf documents")
         }
     }
 

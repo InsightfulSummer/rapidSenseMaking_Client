@@ -16,6 +16,21 @@ export const fetchDocuments = () => {
     }
 }
 
+export const SetDocuments = (documents) => {
+    return {
+        type : types.SetDocuments,
+        payload : {
+            documents
+        }
+    }
+}
+
+export const ExtractClusters = () => {
+    return {
+        type : types.ExtractClusters
+    }
+}
+
 export const sortDocuments = (sortMetric, ascending=true) => {
     return {
         type : types.SortDocuments,
