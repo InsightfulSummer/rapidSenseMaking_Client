@@ -29,6 +29,12 @@ const reducer = (state = initialState, actions) => {
                     return cluster.id == document.cluster_id
                 })
                 if (newCluster == undefined){
+                    let sameLabel = tmpClusters.find(cluster => {
+                        return cluster.name == clusterObject.name
+                    })
+                    if (sameLabel != undefined) {
+                        clusterObject.name = clusterObject.wordCloud[1]
+                    }
                     tmpClusters.push(clusterObject)
                 }
                 document.cluster = clusterObject

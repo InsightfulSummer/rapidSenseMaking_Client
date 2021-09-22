@@ -89,31 +89,33 @@ const UploadScreen = ({history}) => {
             toggleLoading(true)
             // create a random request id here and store it in the redux store
             // generating random request id
-            // let reqID = new Date().getTime()+"__"+(Math.floor((Math.random() * 100000) + 1))
-            // dispatch(SetRequestId(reqID))
-            let reqID = "1632103970822__26009"
+            let reqID = new Date().getTime()+"__"+(Math.floor((Math.random() * 100000) + 1))
+            dispatch(SetRequestId(reqID))
+            // let reqID = "1632103970822__26009"
             // uploading documents
-            // await Promise.all(documents.map( async (document, index) => {
-            //     let formData = new FormData()
-            //     formData.append('reqID', reqID)
-            //     formData.append('iterationNum', index+1)
-            //     formData.append('pdfFile', document)
-            //     await axios.post(API_ADDRESS + "/pdfUploading", formData, {
-            //         headers: {
-            //             'Content-Type': 'multipart/form-data'
-            //         }
-            //     })
-            //     .then(data => {
-            //         console.log(data.data)
-            //     })
-            //     .catch(err => {
-            //         console.log(err)
-            //         alert("some error happened. Please try again later ...")
-            //         return false;
-            //     })
-            //     setLoadingPercentage(index+1)
-            // }))
-            // setLoadingPercentage(documents.length)
+            await Promise.all(documents.map( async (document, index) => {
+                let formData = new FormData()
+                formData.append('reqID', reqID)
+                formData.append('iterationNum', index+1)
+                formData.append('pdfFile', document)
+                await axios.post(API_ADDRESS + "/pdfUploading", formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(data => {
+                    // console.log(data.data)
+                })
+                .catch(err => {
+                    console.log(err)
+                    alert("some error happened. Please try again later ...")
+                    return false;
+                })
+                if (index+1 > loadingPercentage) {
+                    setLoadingPercentage(index+1)
+                }
+            }))
+            setLoadingPercentage(documents.length)
             // clustering documents 
             let formData = new FormData()
             formData.append('reqID', reqID)

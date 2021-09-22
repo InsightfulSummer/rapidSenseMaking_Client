@@ -3,9 +3,8 @@ import { useEffect } from 'react'
 import WordCloud from 'wordcloud'
 
 
-const OverviewComponent = ({doc, publishYearRange, refR, publishYearMargin}) => {
+const OverviewComponent = ({doc, publishYearRange, refR, publishYearMargin, authorsExpanded}) => {
     let color_ = doc.cluster.color
-    console.log(publishYearRange, refR, publishYearMargin)
     return (
         <div className="overviewComponent">
             <div className="overviewComponent_publisherContainer" style={{background: "linear-gradient(to top,"+color_+" , #fff)", borderColor: color_}}>
@@ -30,25 +29,47 @@ const OverviewComponent = ({doc, publishYearRange, refR, publishYearMargin}) => 
                     <div className="overviewComponent_publishDateBegin">{publishYearRange[0]}</div>
                     <div className="overviewComponent_publishDateIndicator">
                         <div id="publishDateBaseShape" style={{marginLeft: publishYearMargin+"%"}}>
-                            <div id="publishDateBaseShape1" style={{background: publishYearMargin > 60 ? "#fff" : color_, color: publishYearMargin > 60 ? color_ : "#fff"}}>{doc.publishingDate}</div>
+                            <div id="publishDateBaseShape1" style={{background: publishYearMargin > 60 ? "#fff" : color_, color: publishYearMargin > 60 ? color_ : "#fff"}}>{doc.publishingDate.substring(0,4)}</div>
                             <div id="publishDateBaseShape2" style={{background: publishYearMargin > 60 ? "#fff" : color_}}></div>
                         </div>
                     </div>
                     <div className="overviewComponent_publishDateEnd">{publishYearRange[1]}</div>
                 </div>
-                <div className="overviewComponent_authorsContainer" title="list of authors">
-                    <i class="fas fa-pen-nib"></i>
-                    {
-                        doc.authors.length > 1 ? (
-                            doc.authors.map((author, index) => (
-                                <div className="overviewComponent_authors" style={index == doc.authors.length -1 ? {} : {borderRight : "solid 1px "+color_}}>{author.name}</div>
-                            ))
-                        ) : (
-                            <div className="overviewComponent_authors">{doc.authors[0].name}</div>
-                        )
-                    }
-                </div>
-                <div className="overviewComponent_wordCloudContainer" style={{borderColor: color_}} id="overviewComponent_wordCloudContainer"></div>
+                {
+                    authorsExpanded ? (
+                        <div className="overviewComponent_expandedAuthorsContainer" title="list of authors">
+                            <div className="overviewComponent_expandedAuthors" style={{borderColor: color_}}><i class="fas fa-pen-nib"></i> | <i class="fas fa-chevron-up" style={{fontWeight: "bold", cursor: "pointer"}} id="expandAuthors"></i></div>
+                            {
+                                doc.authors.map(author => (
+                                    <div className="overviewComponent_expandedAuthors" style={{borderColor: color_}}>{author.name}</div>
+                                ))
+                            }
+                        </div>
+                    ) : (
+                        <div className="overviewComponent_authorsContainer" title="list of authors">
+                            <i class="fas fa-pen-nib"></i>
+                            {
+                                doc.authors.length > 1 ? (
+                                    doc.authors.slice(0,2).map((author, index) => (
+                                        <div className="overviewComponent_authors" style={index == doc.authors.length - 1 ? {} : { borderRight: "solid 1px " + color_ }}>{author.name}</div>
+                                    ))
+                                ) : (
+                                    <div className="overviewComponent_authors">{doc.authors[0].name}</div>
+                                )
+                            }
+                            {
+                                doc.authors.length > 2 ? (
+                                    <i class="fas fa-chevron-down" style={{fontWeight: "bold", cursor: "pointer", marginRight: "2%", marginLeft: "2%"}} title="show all authors" id="expandAuthors"></i>
+                                ) : null
+                            }
+                        </div>
+                    )
+                }
+                {
+                    authorsExpanded ? null : (
+                        <div className="overviewComponent_wordCloudContainer" style={{borderColor: color_}} id="overviewComponent_wordCloudContainer"></div>
+                    )
+                }
             </div>
         </div>
     )

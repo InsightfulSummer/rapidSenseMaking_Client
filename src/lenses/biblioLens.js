@@ -67,7 +67,7 @@ export const biblioLens = (canvasProperties, documents, clusters, groups) => {
             let outlinks_ = outlinkCalculator(doc, documents)
             outlinks_.map(ol => {
                 let index_ = documents.findIndex(item => {
-                    return item._id == ol.id_
+                    return item.id == ol.id
                 })
                 if (index_ >= n_z && index_ < n_z + n_x) {
                     let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
@@ -110,12 +110,12 @@ export const biblioLensEvents = (canvasProperties, doc, documents , clusters , g
         .attr("opacity", "0.3")
     d3.selectAll(".docElement")
         .filter(item => {
-            return item._id == doc._id
+            return item.id == doc.id
         })
         .attr("opacity", "1")
 
     let index = documents.findIndex(item => {
-        return doc._id == item._id
+        return doc.id == item.id
     })
     var docsContainer = d3.select(".docsContainer")
     // 3- visualize hovered document links
@@ -127,7 +127,7 @@ export const biblioLensEvents = (canvasProperties, doc, documents , clusters , g
     }
     links.map(ol => {
         let index_ = documents.findIndex(item => {
-            return item._id == ol.id_
+            return item.id == ol.id
         })
         let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
         let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
@@ -145,7 +145,7 @@ export const biblioLensEvents = (canvasProperties, doc, documents , clusters , g
         if (fixed && (index_ < n_z || index_ >= n_z + n_x)) {
             docsContainer.selectAll(".docElement")
                 .filter(item => {
-                    return item._id == ol.id_
+                    return item.id == ol.id
                 }).attr("opacity", "1")
 
             docsContainer.append("text")
@@ -164,7 +164,7 @@ export const biblioLensEvents = (canvasProperties, doc, documents , clusters , g
     // 4- visualize the controlling buttons of hovered document ...
     d3.selectAll(".biblioRect")
         .filter(item => {
-            return item._id == doc._id
+            return item.id == doc.id
         })
         .remove()
 

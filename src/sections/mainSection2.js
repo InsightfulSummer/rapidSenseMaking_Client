@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import * as d3 from 'd3'
-import * as cloud from 'd3-cloud'
+import ReactDOMServer from 'react-dom/server'
 import { useSelector, useDispatch } from 'react-redux'
 import { SetDimensions, sortDocuments, autoCluster, addOneCluster, fetchDocuments, ChangeSortMetric, CreateRandomLinks, dataCompeleting } from '../redux/actions/actions'
 import { docX, hexToRgbA } from '../helper/helper'
 import { summaryLens, NonLinearReading, skimmingLens, biblioLens, overviewLens, compareLens, lenses } from '../lenses/index'
-
+import ClusterWC from '../helper/clusterWC'
+import WordCloud from 'wordcloud'
 
 const MainSection = () => {
 
@@ -44,6 +45,7 @@ const MainSection = () => {
     const [axisTextX, setAxisTextX] = useState(25)
     const [axisLineX, setAxisLineX] = useState(20)
     const [windows, setWindows] = useState([{document:null},{document:null}])
+    const [showClusterWordClouds, toggleClusterWordClouds] = useState(false)
     //define your scales here ...
     let domain = sortMetric == "publishingDate" ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric].substring(0,4)) }) : sortMetric == "outlinks" ? d3.extent(documents, doc => { return parseFloat(doc[sortMetric].length) }) : d3.extent(documents, doc => { return doc[sortMetric].replace(/[^a-zA-Z ]/g, "").substring(0, 1).toUpperCase() })
     domain = ascending ? domain.reverse() : domain
@@ -108,7 +110,6 @@ const MainSection = () => {
         // we have to run doc over here some how having all the parameters of its function ...
         if (docOverParams != null) {
             let {doc, n_z, n_x, t_z, t_x} = docOverParams
-            console.log(lensFrameSize)
             // docOver(activeMainLens, doc, n_z, n_x, t_z, t_x)
         }
     }
@@ -541,7 +542,6 @@ const MainSection = () => {
                     return step.n == item.n
                 }) == index
             })
-            console.log(steps_)
             setSteps(steps_)
         }
     }
@@ -657,6 +657,7 @@ const MainSection = () => {
             .attr("y", 0)
             .attr("width", width - rightMargin)
             .attr("height", topMargin * 2 / 3)
+            .attr("cursor", "pointer")
             .attr("class", "clusterContainerRect")
 
 
@@ -669,13 +670,68 @@ const MainSection = () => {
             .transition()
             .attr("text-anchor", "middle")
             .attr("x", item => {
-                return ((item.id - 1)*barWidth + (item.id)*barMargin + 126) + (barWidth - barMargin) / 2 
+                return ((item.id)*(barWidth) + (item.id)*barMargin + (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX)) + (barWidth+barMargin) / 2 
             })
             .attr("class", "clusterElement")
             .attr("fill", "#3a3a3a")
             .text(item => {
                 return item.name
             })
+
+        d3.select(".clusterContainerRect").on("click", ()=> {
+            console.log("in here",showClusterWordClouds)
+            if (showClusterWordClouds) {
+                toggleClusterWordClouds(false)
+                let canvasSVG = d3.select(".canvasSVG")
+                canvasSVG.selectAll(".clusterWordCloudContainer").remove()
+            } else {
+                toggleClusterWordClouds(true)
+                let canvasSVG = d3.select(".canvasSVG")
+                canvasSVG.selectAll(".clusterWordCloudContainer").remove()
+                let clusterWordCloudContainer = canvasSVG.append("foreignObject")
+                    .attr("width",width - (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX))
+                    .attr("height", height)
+                    .attr("x", (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX))
+                    .attr("y", topMargin)
+                    .attr("class", "clusterWordCloudContainer to_be_closed")
+
+                let tmp_ = document.createElement("div")
+                tmp_.innerHTML = ReactDOMServer.renderToString(
+                    <ClusterWC clusters={clusters} />
+                )
+                clusterWordCloudContainer.html(tmp_.innerHTML)
+
+                clusters.map((cluster, index) => {
+                    let keywordsList = []
+                    let length_ = cluster.wordCloud.length
+                    let maxFont = 25; let minFont = 10;
+                    cluster.wordCloud.map((kw,index) => {
+                        keywordsList.push([kw, Math.ceil(((length_-index)/length_)*(maxFont - minFont) + minFont)])
+                    })
+                    WordCloud(document.getElementById("clusterWCContainer_"+index), {
+                        list : keywordsList,
+                        minRotation: -45,
+                        maxRotation : 45,
+                        rotationSteps: 2,
+                        color: (w,i)=>{
+                            switch (i%3) {
+                                case 0:
+                                    return cluster.color;
+                                case 1:
+                                    return "#252525"
+                                case 2:
+                                    return "#441f74"
+                                default:
+                                    return cluster.color;
+                            }
+                        },
+                        shrinkToFit : true,
+                        gridSize:(maxFont+minFont)/2,
+                        backgroundColor: hexToRgbA("#fff", 0.85)
+                    })
+                })
+            }
+        })
     }
 
     const loadGeneralEvents = () => {
@@ -782,6 +838,12 @@ const MainSection = () => {
             updateDocs();
         } , 240)
     } , [compareLensOpen, rightMargin, activeMainLens])
+
+    useEffect(()=>{
+        setTimeout(()=> {
+            updateClusterController()
+        }, 300)
+    } , [showClusterWordClouds])
 
 
     return (

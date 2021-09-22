@@ -23,19 +23,19 @@ export const hexToRgbA = (hex, a) => {
 export const linkPathGenerator = (doc1, doc2, barMargin, barWidth, y1, y2, height) => {
     let p = Math.abs(y2-y1) / height * barMargin
     if (doc1.cluster.id == doc2.cluster.id) {
-       let x1 = (doc1.cluster.id - 1) * barWidth + (doc1.cluster.id) * barMargin + 126
+       let x1 = (doc1.cluster.id) * barWidth + (doc1.cluster.id+1) * barMargin + 126
        let curveX = x1 - barMargin - p
        return "M "+x1+" "+y1+" C "+curveX+" "+y1+" "+curveX+" "+y2+" "+x1+" "+y2+" L "+ (x1-4.5) + " " + (y2+4.5) + " L "+ (x1-4.5) + " " + (y2-4.5) + " L " +x1+" "+y2
     } else {
         let x1, x2, xp, arrow;
         if (doc1.cluster.id < doc2.cluster.id) {
-            x1 = (doc1.cluster.id) * barWidth + (doc1.cluster.id - 1) * barMargin + 126
-            x2 = (doc2.cluster.id - 1) * barWidth + (doc2.cluster.id) * barMargin + 126
+            x1 = (doc1.cluster.id+1) * barWidth + (doc1.cluster.id ) * barMargin + 126
+            x2 = (doc2.cluster.id ) * barWidth + (doc2.cluster.id+1) * barMargin + 126
             xp = x2 - barMargin - p
             arrow = " L "+ (x2-4.5) + " " + (y2+4.5) + " L "+ (x2-4.5) + " " + (y2-4.5) + " L " +x2+" "+y2
         } else {
-            x1 = (doc1.cluster.id - 1) * barWidth + (doc1.cluster.id) * barMargin + 126
-            x2 = (doc2.cluster.id) * barWidth + (doc2.cluster.id - 1) * barMargin + 126
+            x1 = (doc1.cluster.id ) * barWidth + (doc1.cluster.id+1) * barMargin + 126
+            x2 = (doc2.cluster.id+1) * barWidth + (doc2.cluster.id ) * barMargin + 126
             xp = x2 + barMargin + p
             arrow = " L "+ (x2+4.5) + " " + (y2+4.5) + " L "+ (x2+4.5) + " " + (y2-4.5) + " L " +x2+" "+y2
         }
@@ -76,13 +76,13 @@ export const calculatePopUpPosition = (doc_x, doc_y, popUpWidth, popUpHeight, ca
     if (popUpX < leftMargin) {
         popUpX = leftMargin 
     }
-    if(doc_x + popUpWidth/2 > canvasWidth - rightMargin) {
+    if(popUpX + popUpWidth > canvasWidth - rightMargin) {
         popUpX = canvasWidth - popUpWidth 
     }
     if(popUpY < topMargin) {
         popUpY = topMargin 
     }
-    if(doc_y + popUpHeight/2 > canvasHeight) {
+    if(popUpY + popUpHeight > canvasHeight) {
         popUpY = canvasHeight - popUpHeight 
     }
     // console.log(popUpX, popUpY)
@@ -91,13 +91,13 @@ export const calculatePopUpPosition = (doc_x, doc_y, popUpWidth, popUpHeight, ca
 
 export const outlinkCalculator = (doc, documents) => {
     let outlinks = []
-    doc.references.map(ref => {
+    doc.outlinks.map(ref => {
         let linkedDoc = documents.find(doc_ => {
             return doc_.title.toLowerCase() == ref.toLowerCase()
         })
         if(linkedDoc){
             outlinks.push({
-                id_ : linkedDoc._id
+                id : linkedDoc.id
             })
         }
     })
@@ -109,12 +109,12 @@ export const inlinkCalculator = (doc, documents) => {
     let docTitle = doc.title.toLowerCase()
 
     documents.map(doc_ => {
-        let ref__ = doc_.references.find(ref => {
+        let ref__ = doc_.outlinks.find(ref => {
             return ref.toLowerCase() == docTitle
         })
         if(ref__){
             inlinks.push({
-                id_ : doc_._id,
+                id : doc_.id,
                 clusterColor : doc_.cluster.color
             })
         }

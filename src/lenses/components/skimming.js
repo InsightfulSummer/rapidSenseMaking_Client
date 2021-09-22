@@ -6,9 +6,12 @@ import {
 import { MDBBtn } from 'mdbreact'
 import * as Scroll from 'react-scroll'
 import * as d3 from 'd3'
+import {API_ADDRESS} from '../../helper/generalInfo'
+import Store from '../../redux/store'
 
 const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, compressDocumentRate, showKeywords, showHeaders }) => {
     let color_ = doc_.cluster.color
+    const reqID = Store.getState().dataReducer.requestId
     
     const calculateEncodingRange = () => {
         let min = 10; let max = 0;
@@ -117,7 +120,8 @@ const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, comp
                 showPDF ? (
                     <div style={{ flex: 10 }}>
                         <iframe
-                            src={`${require('../../data/2.pdf').default}#view=fitH`}
+                            // src={`${require('../../data/2.pdf').default}#view=fitH`}
+                            src={API_ADDRESS+"PDF?directory="+reqID+"&pdfID="+doc_.id+"#view=fitH"}
                             height="100%"
                             width="100%"
                         />

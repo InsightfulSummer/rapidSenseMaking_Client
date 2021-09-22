@@ -60,7 +60,7 @@ export const skimmingLens = (canvasProperties, documents, clusters, groups, clos
 
 
     d3.selectAll(".skimmingCover")
-        .on("mouseover", (event, doc) => {
+        .on("click", (event, doc) => {
             skimmingLensOver(doc, canvasProperties, documents, clusters, groups, closeOpenLenses)
         })
 }
@@ -71,7 +71,7 @@ export const skimmingLensOver = (doc, canvasProperties, documents, clusters, gro
     let lensFrameSize = 2
     var canvasSVG = d3.select(".canvasSVG")
     let docIndex = documents.findIndex(item => {
-        return doc._id == item._id
+        return doc.id == item.id
     })
     let doc_x = docX(doc, barWidth, barMargin, groups, clusters)
     let doc_y = docIndex < n_z ? (docIndex) * (t_z + margin) : docIndex < n_z + n_x ? n_z * (t_z + margin) + (docIndex - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (docIndex - n_z - n_x) * (t_z + margin)
@@ -82,7 +82,7 @@ export const skimmingLensOver = (doc, canvasProperties, documents, clusters, gro
 
     d3.selectAll(".docElement")
         .filter(item => {
-            return item._id != doc._id
+            return item.id != doc.id
         })
         .attr("opacity", "0.3")
 
@@ -129,7 +129,7 @@ export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasP
             duration: scrollingDuration,
             smooth: 'linear',
             containerId: "skimmingBody",
-            offset: -50
+            offset: -51
         })
     })
 

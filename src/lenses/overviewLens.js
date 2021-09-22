@@ -83,7 +83,7 @@ export const overviewOver = (doc, canvasProperties, documents, clusters, groups,
     var { barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height } = canvasProperties
     var canvasSVG = d3.select(".canvasSVG")
     let docIndex = documents.findIndex(item => {
-        return doc._id == item._id
+        return doc.id == item.id
     })
     let lensFrameSize = 2.5
     let doc_x = docX(doc, barWidth, barMargin, groups, clusters)
@@ -97,7 +97,7 @@ export const overviewOver = (doc, canvasProperties, documents, clusters, groups,
         .filter(item => {
             return item._id != doc._id
         })
-        .attr("opacity", "0.3")
+        .attr("opacity", "0.29")
 
     canvasSVG.selectAll(".overviewPopup").remove()
 
@@ -116,7 +116,7 @@ export const overviewOver = (doc, canvasProperties, documents, clusters, groups,
     overviewHTMLandEvent(doc, canvasProperties, documents, clusters, groups, closeOpenLenses)
 }
 
-export const overviewHTMLandEvent = (doc, canvasProperties, documents, clusters, groups, closeOpenLenses) => {
+export const overviewHTMLandEvent = (doc, canvasProperties, documents, clusters, groups, closeOpenLenses, authorsExpanded=false) => {
     var canvasSVG = d3.select(".canvasSVG")
     let overviewPopup = canvasSVG.select(".overviewPopup")
     let tmpDiv = document.createElement("div")
@@ -124,14 +124,15 @@ export const overviewHTMLandEvent = (doc, canvasProperties, documents, clusters,
 
     // scales 
     const referenceScale = d3.scaleLinear().domain(d3.extent(documents, doc => doc.outlinks.length)).range([60,100])
-    const publishYearScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["publishingDate"])))).range([0,92])
+    const publishYearScale = d3.scaleLinear().domain(d3.extent(documents, doc => (parseInt(doc["publishingDate"].substring(0,4))))).range([0,92])
 
     tmpDiv.innerHTML = ReactDOMServer.renderToString(
         <OverviewComponent 
             doc={doc}
-            publishYearRange={d3.extent(documents, doc => (parseInt(doc["publishingDate"])))}
+            publishYearRange={d3.extent(documents, doc => (parseInt(doc["publishingDate"].substring(0,4))))}
             refR={referenceScale(doc.outlinks.length)}
-            publishYearMargin={publishYearScale(doc.publishingDate)}
+            publishYearMargin={publishYearScale(doc["publishingDate"].substring(0,4))}
+            authorsExpanded={authorsExpanded}
         />
     )
     overviewPopup.html(tmpDiv.innerHTML)
@@ -140,37 +141,44 @@ export const overviewHTMLandEvent = (doc, canvasProperties, documents, clusters,
         // prepare keywords
         let keywordsList = []
         let length_ = doc.keywords.length
-        let maxFont = 30; let minFont = 15;
+        let maxFont = 25; let minFont = 10;
         doc.keywords.map((kw,index) => {
             keywordsList.push([kw, Math.ceil(((length_-index)/length_)*(maxFont - minFont) + minFont)])
         })
-        setTimeout(()=>{
-            WordCloud(document.getElementById("overviewComponent_wordCloudContainer"), {
-                list : keywordsList,
-                minRotation: -45,
-                maxRotation : 45,
-                rotationSteps: 2,
-                color: (w,i)=>{
-                    switch (i%3) {
-                        case 0:
-                            return doc.cluster.color;
-                        case 1:
-                            return "#252525"
-                        case 2:
-                            return "#441f74"
-                        default:
-                            return doc.cluster.color;
-                    }
-                },
-                shrinkToFit : true,
-                gridSize:(maxFont+minFont)/2,
-                backgroundColor: hexToRgbA("#fff", 0.85)
-            })
-        } , 350)
+        if (!authorsExpanded) {
+            setTimeout(()=>{
+                WordCloud(document.getElementById("overviewComponent_wordCloudContainer"), {
+                    list : keywordsList,
+                    minRotation: -45,
+                    maxRotation : 45,
+                    rotationSteps: 2,
+                    color: (w,i)=>{
+                        switch (i%3) {
+                            case 0:
+                                return doc.cluster.color;
+                            case 1:
+                                return "#252525"
+                            case 2:
+                                return "#441f74"
+                            default:
+                                return doc.cluster.color;
+                        }
+                    },
+                    shrinkToFit : true,
+                    gridSize:(maxFont+minFont)/2,
+                    backgroundColor: hexToRgbA("#fff", 0.85)
+                })
+            } , 350)
+        }
     })
+
 
     overviewPopup.selectAll(".overviewComponent_closeIconContainer").on("click", () => {
         canvasSVG.select(".to_be_closed").remove()
         closeOpenLenses();
+    })
+
+    overviewPopup.selectAll("#expandAuthors").on("click", ()=>{
+        overviewHTMLandEvent(doc, canvasProperties, documents, clusters, groups, closeOpenLenses, !authorsExpanded)
     })
 }
