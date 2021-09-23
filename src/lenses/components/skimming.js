@@ -9,7 +9,7 @@ import * as d3 from 'd3'
 import {API_ADDRESS} from '../../helper/generalInfo'
 import Store from '../../redux/store'
 
-const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, compressDocumentRate, showKeywords, showHeaders }) => {
+const Skimming = ({ doc_, parsedBody, showPDF, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, loading }) => {
     let color_ = doc_.cluster.color
     const reqID = Store.getState().dataReducer.requestId
     
@@ -38,7 +38,7 @@ const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, comp
         return {fontSizeScale, fontWeightScale}
     }
 
-    var {fontSizeScale, fontWeightScale} = calculateEncodingRange()
+    var {fontSizeScale, fontWeightScale} = parsedBody ? calculateEncodingRange() : {fontSizeScale: null, fontWeightScale: null}
 
     const identifyKeywords = (sent, keywords_) => {
         let hasKeywords = false
@@ -70,7 +70,13 @@ const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, comp
         }
     }
 
-    return (
+    return (loading) ? (
+        <div className="skimmingComponent" style={{ borderColor: color_, justifyContent: "center", alignItems: "center" }}>
+            <div className="spinner-border" style={{color: color_}} role="status" >
+                <span className="sr-only">Loading...</span>
+            </div>
+        </div>
+    ) : (
         <div className="skimmingComponent" style={{ borderColor: color_ }}>
             <div className="skimmingActionCenter" style={{ backgroundImage: 'linear-gradient(45deg, ' + color_ + ', #ffffff)' }}>
                 <i
@@ -128,6 +134,8 @@ const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, comp
                     </div>
                 ) : (
                     <div className="skimmingContent" id="skimmingBody">
+                        <h3>Abstract</h3>
+                        <p>{showHeaders ? null : doc_.abstract}</p>
                         {
                             parsedBody.map(div => (
                                 <div>
@@ -137,7 +145,7 @@ const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, comp
                                         ) : divContent.type == "paragraph" && !showHeaders ? (<p>
                                             {
                                                 divContent.content.map(pContent => 
-                                                    identifyKeywords(pContent, keywords)
+                                                    identifyKeywords(pContent, doc_.keywords)
                                                 )
                                             }
                                         </p>
@@ -161,8 +169,6 @@ const Skimming = ({ doc_, parsedBody, keywords, showPDF, scrollingDuration, comp
                     </div>
                 )
             }
-
-        
         </div>
     )
 }

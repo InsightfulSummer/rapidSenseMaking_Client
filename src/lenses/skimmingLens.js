@@ -8,6 +8,9 @@ import ReactDOMServer from 'react-dom/server'
 import jRes from '../data/res.json'
 import SkimmingComponent from './components/skimming'
 import * as Scroll from 'react-scroll'
+import axios from 'axios'
+import { API_ADDRESS } from '../helper/generalInfo'
+import Store from '../redux/store'
 
 export const skimmingLens = (canvasProperties, documents, clusters, groups, closeOpenLenses) => {
     var { barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height } = canvasProperties
@@ -103,7 +106,7 @@ export const skimmingLensOver = (doc, canvasProperties, documents, clusters, gro
     skimmingHTMLandEvent(closeOpenLenses, doc,  doc_x, doc_y, canvasProperties)
 }
 
-export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration = 60000 , compressDocumentRate=2, showKeywords = true, showHeaders = false, expanded = false, showPDF = false) => {
+export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration = 60000 , compressDocumentRate=2, showKeywords = true, showHeaders = false, expanded = false, showPDF = false, loading=true, parsedBody=null) => {
     var canvasSVG = d3.select(".canvasSVG")
     let skimmingPopUp = canvasSVG.select(".skimmingPopUp")
     let tmpDiv = document.createElement("div")
@@ -111,18 +114,32 @@ export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasP
     tmpDiv.innerHTML = ReactDOMServer.renderToString(
         <SkimmingComponent
             doc_={doc}
-            parsedBody={jRes}
-            keywords={['query expansion','information retrieval','wordnet','wikipedia','terms','query','expansion','term','qe','proposed']}
+            parsedBody={parsedBody}
             scrollingDuration={scrollingDuration/1000}
             compressDocumentRate={compressDocumentRate}
             showKeywords={showKeywords}
             showHeaders={showHeaders}
             showPDF={showPDF}
+            loading={loading}
         />
     )
     skimmingPopUp.html(tmpDiv.innerHTML)
+    
     // events
-
+    if (loading) {
+        var formData = new FormData()
+        const reqID = Store.getState().dataReducer.requestId
+        formData.append('reqID', reqID)
+        formData.append('docID', doc.id)
+        axios.post(API_ADDRESS+"skimmingDocument", formData)
+        .then(data => {
+            skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded, showPDF, false, data.data.parsedBody)
+        })
+        .catch(err => {
+            console.log(err);
+            alert("some error happended! please try again later.")
+        })
+    }
     skimmingPopUp.select("#skimmingAutoScrollIcon").on("click",()=>{ // not all devices have scroll button to do this auto scrolling systematically (e.g., laptop track pads, tablets, ...)
         var scroller = Scroll.scroller
         scroller.scrollTo("autoScrollingTarget" , {
@@ -144,7 +161,7 @@ export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasP
         } else if (d == 180000) {
             d= 30000
         }
-        skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, d , compressDocumentRate, showKeywords, showHeaders, expanded)
+        skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, d , compressDocumentRate, showKeywords, showHeaders, expanded, showPDF, loading, parsedBody)
     })
 
     skimmingPopUp.select("#skimmingCompressDocumentIcon").on("click", () => {
@@ -157,17 +174,17 @@ export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasP
         } else if (c == 3) {
             c = 1.5
         }
-        skimmingHTMLandEvent(closeOpenLenses, doc , doc_x, doc_y, canvasProperties, scrollingDuration, c, showKeywords, showHeaders, expanded)
+        skimmingHTMLandEvent(closeOpenLenses, doc , doc_x, doc_y, canvasProperties, scrollingDuration, c, showKeywords, showHeaders, expanded, showPDF, loading, parsedBody)
     })
 
     skimmingPopUp.select("#skimmingHighlightIcon").on("click" , () => {
         let sk = !showKeywords
-        skimmingHTMLandEvent(closeOpenLenses, doc , doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate , sk, showHeaders, expanded)
+        skimmingHTMLandEvent(closeOpenLenses, doc , doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate , sk, showHeaders, expanded, showPDF, loading, parsedBody)
     })
 
     skimmingPopUp.select("#skimmingShowHeadersIcon").on("click", () => {
         let sh = !showHeaders
-        skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, sh, expanded)
+        skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, sh, expanded, showPDF, loading, parsedBody)
     })
 
     skimmingPopUp.select("#skimmingCloseIcon").on("click", () => {
@@ -186,7 +203,7 @@ export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasP
                 .attr("height", popUpHeight)
                 .attr("x", popUpX)
                 .attr("y", popUpY)
-            skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded)
+            skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded, showPDF, loading, parsedBody)
         }
     })
 
@@ -201,12 +218,12 @@ export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasP
                 .attr("height", popUpHeight)
                 .attr("x", popUpX)
                 .attr("y", popUpY)
-            skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded)
+            skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded, showPDF, loading, parsedBody)
         }
     })
 
     skimmingPopUp.select("#pdfToggler").on("click", () => {
         showPDF = !showPDF
-        skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded, showPDF)
+        skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded, showPDF, loading, parsedBody)
     })
 }

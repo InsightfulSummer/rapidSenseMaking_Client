@@ -727,7 +727,7 @@ const MainSection = () => {
                         },
                         shrinkToFit : true,
                         gridSize:(maxFont+minFont)/2,
-                        backgroundColor: hexToRgbA("#fff", 0.85)
+                        backgroundColor: hexToRgbA("#fff", 0.84)
                     })
                 })
             }
@@ -744,7 +744,7 @@ const MainSection = () => {
     }
 
     const configBarMargin = (activeLens) => {
-        let total = (width - 165) / clusters.length
+        let total = (width - (slideControllerWidth + lensMenuMargin + axisTextX + axisLineX)) / clusters.length
         if(total > 0) {
             switch (activeLens) {
                 case "biblio":
@@ -831,10 +831,10 @@ const MainSection = () => {
     } , [lensFrameSize])
 
     useEffect(()=>{
-        updateClusterController();
         updateSlider();
         updateLensMenu();
         setTimeout(()=>{
+            updateClusterController();
             updateDocs();
         } , 240)
     } , [compareLensOpen, rightMargin, activeMainLens])
@@ -842,7 +842,7 @@ const MainSection = () => {
     useEffect(()=>{
         setTimeout(()=> {
             updateClusterController()
-        }, 300)
+        }, 240)
     } , [showClusterWordClouds])
 
 

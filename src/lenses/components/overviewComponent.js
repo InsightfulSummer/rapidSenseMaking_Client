@@ -11,7 +11,7 @@ const OverviewComponent = ({doc, publishYearRange, refR, publishYearMargin, auth
                 <div className="overviewComponent_closeIconContainer" title="close overview lens">
                     <i class="fas fa-times"></i>
                 </div>
-                <div className="overviewComponent_publisher" title="publisher of this article" ><i class="fas fa-book" style={{margin: "2%"}}></i> Elsevier BV</div>
+                <div className="overviewComponent_publisher" title="publisher of this article" ><i class="fas fa-book" style={{margin: "2%"}}></i>{doc.publisher}</div>
             </div>
             <div className="overviewComponent_mainBody">
                 <div className="overviewComponent_firstRow">

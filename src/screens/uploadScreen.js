@@ -111,9 +111,7 @@ const UploadScreen = ({history}) => {
                     alert("some error happened. Please try again later ...")
                     return false;
                 })
-                if (index+1 > loadingPercentage) {
-                    setLoadingPercentage(index+1)
-                }
+                setLoadingPercentage(index+1)
             }))
             setLoadingPercentage(documents.length)
             // clustering documents 

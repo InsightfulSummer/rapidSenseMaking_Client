@@ -141,7 +141,7 @@ export const overviewHTMLandEvent = (doc, canvasProperties, documents, clusters,
         // prepare keywords
         let keywordsList = []
         let length_ = doc.keywords.length
-        let maxFont = 25; let minFont = 10;
+        let maxFont = 26; let minFont = 10;
         doc.keywords.map((kw,index) => {
             keywordsList.push([kw, Math.ceil(((length_-index)/length_)*(maxFont - minFont) + minFont)])
         })
