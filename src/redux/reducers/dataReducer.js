@@ -39,6 +39,7 @@ const reducer = (state = initialState, actions) => {
                 }
                 document.cluster = clusterObject
             })
+            tmpClusters.sort((a,b)=>{return parseInt(a.id) - parseInt(b.id)})
             return {...state, clusters: tmpClusters, documents: tmpDocuments_}
 
         case types.SortDocuments : 

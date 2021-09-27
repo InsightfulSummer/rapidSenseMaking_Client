@@ -261,13 +261,46 @@ p{
 }
 
 .summaryRectDiv {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.summaryIconContainer {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  border-right: solid 1px #fff;
+}
+
+.summaryIcon {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.summaryTitleContainer {
+  flex: 13;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: 100%;
+  padding: 0.5%;
+}
+
+.summaryCover {
   width: 100%;
   height: 100%;
+  position: absolute;
   transition: all 500ms;
-  padding: 1%;
-  color: white;
-  text-align: justify;
-  line-height: 1.1;
+  cursor: pointer;
+}
+
+.summaryCover:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 /* Summary Lens */
 .summaryDiv {
@@ -280,47 +313,26 @@ p{
     flex-direction: row;
 }
 
-.summaryConvolutionMenu{
-  flex: 1;
+.summarySettings{
+  flex: .7;
   transition: all 500ms;
-  opacity: 0.6;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.summaryConvolutionMenu:hover{
-  flex: 1.35;
-  opacity: 1;
+.summarySettings:hover {
+  flex: .85;
 }
 
-.summaryConvolutionIcon{
-  margin-top: 10%;
-  margin-bottom: 10%;
-  color: #444;
-  cursor: pointer;
-  transition: all 500ms;
-}
-
-.summaryBody{
+.summaryBody__{
   flex: 10;
-  transition: all 500ms;
   text-align: justify;
   padding: 1%;
-  overflow: hidden;
+  overflow-y: scroll;
 }
 
-.summarySettings{
-  flex: 1;
-  transition: all 500ms;
-  border-bottom-right-radius: 15px;
-  opacity: 0.60;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
 
 .summarySettingsIcon{
   margin-top: 10%;
@@ -335,9 +347,23 @@ p{
   transform: scale(1.5);
 }
 
-.summarySettings:hover{
-  flex: 1.35;
-  opacity: 1;
+.summaryLensDevider {
+  width: 50%;
+  border-bottom: solid 1px #444444;
+}
+
+.summaryLensSizeIcon {
+  padding: 5%;
+  font-size: 1.2em;
+  font-weight: 400;
+  color: #444444;
+  cursor: pointer;
+}
+
+.summaryLensSizeIconActive {
+  font-weight: 700;
+  color: black;
+  cursor: default;
 }
 
 /* Summary Lens */

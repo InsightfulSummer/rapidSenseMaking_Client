@@ -366,7 +366,7 @@ const MainSection = () => {
 
             switch (activeMainLens) {
                 case lenses[0].name:
-                    summaryLens(canvasProps, focusedDoc, documents, clusters, groups, activeMainLens, updateDocs)
+                    summaryLens(canvasProps, documents, clusters, groups, closeOpenLenses)
                     break;
                 case lenses[1].name:
                     NonLinearReading(canvasProps, documents, clusters, groups, closeOpenLenses)
