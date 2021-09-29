@@ -85,7 +85,7 @@ export const overviewOver = (doc, canvasProperties, documents, clusters, groups,
     let docIndex = documents.findIndex(item => {
         return doc.id == item.id
     })
-    let lensFrameSize = 2.5
+    let lensFrameSize = 2
     let doc_x = docX(doc, barWidth, barMargin, groups, clusters)
     let doc_y = docIndex < n_z ? (docIndex) * (t_z + margin) : docIndex < n_z + n_x ? n_z * (t_z + margin) + (docIndex - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (docIndex - n_z - n_x) * (t_z + margin)
     let popUpWidth = width / lensFrameSize

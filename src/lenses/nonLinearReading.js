@@ -4,6 +4,9 @@ import ReactDOMServer from 'react-dom/server';
 import NonLinearComponent from './components/nonLinear'
 import jRes from '../data/res.json'
 import * as Scroll from 'react-scroll'
+import axios from 'axios'
+import { API_ADDRESS } from '../helper/generalInfo'
+import Store from '../redux/store'
 
 export const NonLinearReading = (canvasProperties, documents, clusters, groups, closeOpenLenses) => {
     var { barWidth, barMargin, t_x, t_z, n_x, n_z, margin, rightMargin, topMargin, width, height } = canvasProperties
@@ -32,12 +35,6 @@ export const NonLinearReading = (canvasProperties, documents, clusters, groups, 
     let nonLinearRectDiv = nonLinearRect
         .append("xhtml:div")
         .attr("class", "nonLinearRectDiv")
-    // .attr("style", doc => {
-    //     return "font-size:" + fontSizeCalculator(barWidth - barMargin, t_x * t_z, 54) + "px"
-    // })
-    // .text(doc => {
-    //     return doc.title.substring(0,50)+" ..."
-    // })
     nonLinearRectDiv.append("div")
         .attr("class", "nonLinearIconContainer")
         .append("div")
@@ -60,7 +57,7 @@ export const NonLinearReading = (canvasProperties, documents, clusters, groups, 
 
 
     d3.selectAll(".nonLinearCover")
-        .on("mouseover", (event, doc) => {
+        .on("click", (event, doc) => {
             NonLinearReadingOver(doc, canvasProperties, documents, clusters, groups, closeOpenLenses)
         })
 }
@@ -71,7 +68,7 @@ export const NonLinearReadingOver = (doc, canvasProperties, documents, clusters,
     let lensFrameSize = 2
     var canvasSVG = d3.select(".canvasSVG")
     let docIndex = documents.findIndex(item => {
-        return doc._id == item._id
+        return doc.id == item.id
     })
     let doc_x = docX(doc, barWidth, barMargin, groups, clusters)
     let doc_y = docIndex < n_z ? (docIndex) * (t_z + margin) : docIndex < n_z + n_x ? n_z * (t_z + margin) + (docIndex - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (docIndex - n_z - n_x) * (t_z + margin)
@@ -82,7 +79,7 @@ export const NonLinearReadingOver = (doc, canvasProperties, documents, clusters,
 
     d3.selectAll(".docElement")
         .filter(item => {
-            return item._id != doc._id
+            return item.id != doc.id
         })
         .attr("opacity", "0.3")
 
@@ -103,7 +100,7 @@ export const NonLinearReadingOver = (doc, canvasProperties, documents, clusters,
     nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties)
 }
 
-export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions = [], loading = false, expanded = false, showPDF=false, showSearch=false) => {
+export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions = [], loading = false, expanded = false, showPDF=false, showSearch=false, mainLoading=true, parsedBody=null, activeSentence=null, showSimilarDocs = false, similarDocs=[]) => {
     var canvasSVG = d3.select(".canvasSVG")
     let nonLinearPopUp = canvasSVG.select(".nonLinearPopUp")
     let tmpDiv = document.createElement("div")
@@ -111,69 +108,85 @@ export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvas
     tmpDiv.innerHTML = ReactDOMServer.renderToString(
         <NonLinearComponent
             doc_={doc}
-            parsedBody={jRes}
+            parsedBody={parsedBody}
             loading={loading}
             suggestions={suggestions}
             showPDF={showPDF}
             showSearch={showSearch}
+            mainLoading={mainLoading}
+            showSimilarDocs={showSimilarDocs}
+            similarDocs={similarDocs}
+            activeSentence={activeSentence}
         />
     )
     nonLinearPopUp.html(tmpDiv.innerHTML)
     // events
-    nonLinearPopUp.selectAll(".nonLinearSpanOfSentence").on("click", (e) => {
-        // let sentenceId = e.target.id
-        // let sentenceContent = e.target.innerHTML
 
-        suggestions = [{
-            'type': 'sentenceInP',
-            'tag': 'span',
-            'content': "The Web is the largest information source available on the planet and it's growing day by day [32] .",
-            'divId': 0,
-            'sentenceId': 0,
-            'position': 0.0
-        },
-        {
-            'type': 'sentenceInP',
-            'tag': 'span',
-            'content': 'References [5,10] provide comprehensive surveys on data sources used for QE.',
-            'divId': 0,
-            'sentenceId': 13,
-            'position': 0.037037037037037035
-        },
-        {
-            'type': 'sentenceInP',
-            'tag': 'span',
-            'content': 'Wikipedia is freely available and is the largest multilingual online encyclopedia on the web, where articles are regularly updated and new articles are added by a large number of web users.',
-            'divId': 5,
-            'sentenceId': 114,
-            'position': 0.3247863247863248
-        },
-        {
-            'type': 'sentenceInP',
-            'tag': 'span',
-            'content': 'WordNet is a large lexicon database of words in the English language.',
-            'divId': 0,
-            'sentenceId': 31,
-            'position': 0.08831908831908832
-        },
-        {
-            'type': 'sentenceInP',
-            'tag': 'span',
-            'content': 'The usefulness of these terms is determined by considering multiple sources of information.',
-            'divId': 4,
-            'sentenceId': 103,
-            'position': 0.2934472934472934
-        },
-        {
-            'type': 'sentenceInP',
-            'tag': 'span',
-            'content': 'These two sources are described next.',
-            'divId': 3,
-            'sentenceId': 83,
-            'position': 0.23646723646723647
-        }]
-        loading = false
-        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+    // 1 - get parsed body of the document
+    if (mainLoading) {
+        var formData = new FormData()
+        const reqID = Store.getState().dataReducer.requestId
+        formData.append('reqID', reqID)
+        formData.append('docID', doc.id)
+        axios.post(API_ADDRESS+"skimmingDocument", formData)
+        .then(data => {
+            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch, false, data.data.parsedBody, activeSentence, showSimilarDocs, similarDocs)
+        })
+        .catch(err => {
+            console.log(err);
+            alert("some error happended! please try again later.")
+        })
+    }
+    // 2 - find similar sentences or similar documents
+    if (loading){
+        // make api request here and 
+        let sentence = activeSentence.sentence;
+        var formData = new FormData()
+        const reqID = Store.getState().dataReducer.requestId
+        let topN = showSimilarDocs ? 5 : 10
+        formData.append('reqID', reqID)
+        formData.append('docID', doc.id)
+        formData.append('sentence', sentence)
+        formData.append('topN', topN)
+        if (showSimilarDocs) {
+            axios.post(API_ADDRESS+"hyperSimilarity/findDocs", formData)
+            .then(data => {
+                console.log(data.data)
+                nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, false, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, showSimilarDocs, data.data.similarDocuments)
+            })
+            .catch(err => {
+                console.log(err);
+                alert("some error happended! please try again later.")
+            })
+        } else {
+            axios.post(API_ADDRESS+"hyperSimilarity/findSents", formData)
+            .then(data => {
+                nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, data.data.similarSentences, false, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, showSimilarDocs, similarDocs)
+            })
+            .catch(err => {
+                console.log(err);
+                alert("some error happended! please try again later.")
+            })
+        }
+    }
+
+    if(activeSentence != null && activeSentence.type == "sentence clicked"){
+        var scroller = Scroll.scroller
+        scroller.scrollTo("sentence_" + activeSentence.sentenceId, {
+            duration: 500,
+            smooth: true,
+            containerId: "nonLinearBodyOfLens",
+            offset: -21
+        })
+    }
+    nonLinearPopUp.selectAll(".nonLinearSpanOfSentence").on("click", (e) => {
+        let activeSentenceId = e.target.attributes.id.value;
+        let activeSentence_ = {
+            "type" : "sentence clicked",
+            "sentenceId" : activeSentenceId,
+            "sentence" : e.target.innerHTML
+        }
+        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, true, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence_, showSimilarDocs, similarDocs)
     })
 
     nonLinearPopUp.selectAll(".suggestionItemClickable").on("click", (e) => {
@@ -203,7 +216,7 @@ export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvas
                 .attr("height", popUpHeight)
                 .attr("x", popUpX)
                 .attr("y", popUpY)
-            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, showSimilarDocs, similarDocs)
         }
     })
 
@@ -218,13 +231,13 @@ export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvas
                 .attr("height", popUpHeight)
                 .attr("x", popUpX)
                 .attr("y", popUpY)
-            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, showSimilarDocs, similarDocs)
         }
     })
 
     nonLinearPopUp.select("#pdfToggler").on("click", () => {
         showPDF = !showPDF
-        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, showSimilarDocs, similarDocs)
     })
 
     nonLinearPopUp.select("#nonLinearSearchFuncIcon").on("click", (e) => {
@@ -232,61 +245,31 @@ export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvas
         let inputValue = document.getElementById("nonLinearSearchInput").value
         // valide the input : 1- if it is not empty  2- if it is more than a word ...
         if (inputValue != "") {
-            suggestions = [{
-                'type': 'sentenceInP',
-                'tag': 'span',
-                'content': "The Web is the largest information source available on the planet and it's growing day by day [32] .",
-                'divId': 0,
-                'sentenceId': 0,
-                'position': 0.0
-            },
-            {
-                'type': 'sentenceInP',
-                'tag': 'span',
-                'content': 'References [5,10] provide comprehensive surveys on data sources used for QE.',
-                'divId': 0,
-                'sentenceId': 13,
-                'position': 0.037037037037037035
-            },
-            {
-                'type': 'sentenceInP',
-                'tag': 'span',
-                'content': 'Wikipedia is freely available and is the largest multilingual online encyclopedia on the web, where articles are regularly updated and new articles are added by a large number of web users.',
-                'divId': 5,
-                'sentenceId': 114,
-                'position': 0.3247863247863248
-            },
-            {
-                'type': 'sentenceInP',
-                'tag': 'span',
-                'content': 'WordNet is a large lexicon database of words in the English language.',
-                'divId': 0,
-                'sentenceId': 31,
-                'position': 0.08831908831908832
-            },
-            {
-                'type': 'sentenceInP',
-                'tag': 'span',
-                'content': 'The usefulness of these terms is determined by considering multiple sources of information.',
-                'divId': 4,
-                'sentenceId': 103,
-                'position': 0.2934472934472934
-            },
-            {
-                'type': 'sentenceInP',
-                'tag': 'span',
-                'content': 'These two sources are described next.',
-                'divId': 3,
-                'sentenceId': 83,
-                'position': 0.23646723646723647
-            }]
-            loading = false
-            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+            let activeSentence_ = {
+                "type" : "term searched",
+                "sentence" : inputValue
+            }
+            nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, true, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence_, showSimilarDocs, similarDocs)
         }
     })
 
     nonLinearPopUp.select("#nonLinearSearchIcon").on("click",(e)=>{
         showSearch = !showSearch
-        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch)
+        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch, mainLoading, parsedBody, null, showSimilarDocs, similarDocs)
+    })
+
+    nonLinearPopUp.select("#nonLinearFindDocsIcon").on("click", ()=>{
+        nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, !showSimilarDocs, similarDocs)
+    })
+
+    nonLinearPopUp.selectAll(".similarDocItem").on("click", (e)=>{
+        let docID = e.target.attributes.id.value;
+        var documents = Store.getState().dataReducer.documents
+        var clusters = Store.getState().dataReducer.clusters
+        var groups = Store.getState().dataReducer.groups
+        var doc = documents.find(doc => {
+            return doc.id == docID
+        })
+        NonLinearReadingOver(doc, canvasProperties, documents, clusters, groups, closeOpenLenses)
     })
 }
