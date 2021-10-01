@@ -2,8 +2,13 @@ import React from 'react'
 import { MDBBtn } from 'mdbreact'
 import * as d3 from 'd3'
 import { hexToRgbA } from '../../helper/helper'
+import { API_ADDRESS } from '../../helper/generalInfo'
+import Store from '../../redux/store'
+import { Element } from 'react-scroll'
 
-const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, similarEncoding}) => {
+const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, similarEncoding, similarityScore, searchLoading }) => {
+
+    const reqID = Store.getState().dataReducer.requestId
 
     const calculateEncodingRange = () => {
         let min = 0; let max = 5;
@@ -11,13 +16,13 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
             min = 10; max = 0;
             windows[0].parsedBody.map(div => {
                 div.content.map(content => {
-                    if(content.type == "paragraph"){
+                    if (content.type == "paragraph") {
                         content.content.map(pContent => {
-                            if(pContent.type == "sentenceInP"){
-                                if(pContent.sentScore > max){
+                            if (pContent.type == "sentenceInP") {
+                                if (pContent.sentScore > max) {
                                     max = pContent.sentScore
                                 }
-                                if(pContent.sentScore < min) {
+                                if (pContent.sentScore < min) {
                                     min = pContent.sentScore
                                 }
                             }
@@ -26,49 +31,66 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
                 })
             })
         }
-        let fontWeightRange = [3,6]
-        let fontSizeRange = [12,24]
-        let fontWeightScale = d3.scaleLinear().domain([min,max]).range(fontWeightRange)
+        let fontWeightRange = [3, 6]
+        let fontSizeRange = [12, 24]
+        let fontWeightScale = d3.scaleLinear().domain([min, max]).range(fontWeightRange)
         let fontSizeScale = d3.scaleLinear().domain([min, max]).range(fontSizeRange)
-        return {fontSizeScale, fontWeightScale}
+        return { fontSizeScale, fontWeightScale }
     }
 
-    var {fontSizeScale, fontWeightScale} = calculateEncodingRange()
+    var { fontSizeScale, fontWeightScale } = calculateEncodingRange()
 
     const identifyKeywords = (sent, keywords_, color_) => {
         let hasKeywords = false
         let str_arr = sent.content.split(" ")
-        for(let i=0; i<keywords_.length; i++){
-            if(str_arr.includes(keywords_[i])){
+        for (let i = 0; i < keywords_.length; i++) {
+            if (str_arr.includes(keywords_[i])) {
                 hasKeywords = true
                 break;
             }
         }
-        if(hasKeywords){
-            return(
-                <span style={{
-                    fontWeight : Math.floor(fontWeightScale(sent.sentScore))*100,
-                    fontSize : Math.floor(fontSizeScale(sent.sentScore)) + "px"
-                }}>{
-                    str_arr.map(w => {
-                        return keywords_.includes(w) ? <span style={{color : color_}}>{w+ " "}</span> : w + " "
-                    })
-                }</span>
-            )  
+        if (hasKeywords) {
+            return (
+                <Element name={"sentence_" + sent.sentenceId} style={{ display: "inline" }}>
+                    <span style={{
+                        fontWeight: Math.floor(fontWeightScale(sent.sentScore)) * 100,
+                        fontSize: Math.floor(fontSizeScale(sent.sentScore)) + "px"
+                    }}>{
+                            str_arr.map(w => {
+                                return keywords_.includes(w) ? <span style={{ color: color_ }}>{w + " "}</span> : w + " "
+                            })
+                        }</span>
+                </Element>
+            )
         } else {
             return (
-                <span style={{
-                    fontWeight : Math.floor(fontWeightScale(sent.sentScore))*100,
-                    fontSize : Math.floor(fontSizeScale(sent.sentScore)) + "px"
-                }}>{sent.content}</span>
+                <Element name={"sentence_" + sent.sentenceId} style={{ display: "inline" }}>
+                    <span style={{
+                        fontWeight: Math.floor(fontWeightScale(sent.sentScore)) * 100,
+                        fontSize: Math.floor(fontSizeScale(sent.sentScore)) + "px"
+                    }}>{sent.content}</span>
+                </Element>
             )
         }
+    }
+
+    const findHeader = (divId, parsedBody) => {
+        let div = parsedBody.find(item => {
+            return item.divId == divId
+        })
+        let header = ""
+        div.content.map(content => {
+            if (content.type == "header") {
+                header = content.content
+            }
+        })
+        return header
     }
 
     return (
         <div className="compareMainComponent">
             {
-                loading ? (
+                loading || searchLoading ? (
                     <div className="compareLoadingContainer">
                         <div className="spinner-border uploadingSpinner" role="status" >
                             <span className="sr-only">Loading...</span>
@@ -93,7 +115,7 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
                                 <i class="fas fa-equals"></i>
                             </div>
                             <div className="compareMainComponentActionBtn">
-                                <p style={{ fontSize: "0.6em" }}>Similarity Score: <span style={{ fontSize: "1.6em", fontWeight: "bold" }}>0.98</span></p>
+                                <p style={{ fontSize: "0.6em" }}>Similarity Score: <span style={{ fontSize: "1.6em", fontWeight: "bold" }}>{similarityScore.substring(0, 4)}</span></p>
                             </div>
                             {/* <div className="compareMainComponentActionBtn" title={"find similar sentences to a selected sentence"} id="compareSentenceSelectionMode">
                                 <i class="fas fa-align-left"></i>
@@ -107,7 +129,7 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                id="nonLinearSearchInput"
+                                                id="mainCompareSearchInput"
                                                 placeholder="search and find relevant sentences ..."
                                                 autoFocus={true}
                                             />
@@ -135,56 +157,75 @@ const CompareMainComponent = ({ windows, loading, generalInfo, search, showPDF, 
                                                     <div className="paneWordCloudContainer" id={"pwcc" + index}></div>
                                                 </div>
                                             ) : showPDF ? (
-                                                    <div style={{width: "100%",height: "100%"}}>
-                                                        <iframe
-                                                            src={`${require("../../data/"+window.pdf+".pdf").default}#view=fitH`}
-                                                            height="100%"
-                                                            width="100%"
-                                                        />
-                                                    </div>
+                                                <div style={{ width: "100%", height: "100%" }}>
+                                                    <iframe
+                                                        // src={`${require('../../data/2.pdf').default}#view=fitH`}
+                                                        src={API_ADDRESS + "PDF?directory=" + reqID + "&pdfID=" + window.document.id + "#view=fitH"}
+                                                        height="100%"
+                                                        width="100%"
+                                                    />
+                                                </div>
                                             ) : (
                                                 <div className="paneContentContainer">
-                                                    <div className="paneContentBody">
-                                                                {
-                                                                    window.parsedBody.map(div => (
-                                                                        <div>
+                                                    <div className="paneContentBody" id={"paneContentBody_"+index}>
+                                                        {
+                                                            window.parsedBody.map(div => (
+                                                                <div>
+                                                                    {
+                                                                        div.content.map(divContent => divContent.type == "header" ? (
+                                                                            <h3>{divContent.content}</h3>
+                                                                        ) : divContent.type == "paragraph" ? (<p>
                                                                             {
-                                                                                div.content.map(divContent => divContent.type == "header" ? (
-                                                                                    <h3>{divContent.content}</h3>
-                                                                                ) : divContent.type == "paragraph" ? (<p>
-                                                                                    {
-                                                                                        similarEncoding ? divContent.content.map(pContent =>
-                                                                                            identifyKeywords(pContent, window.document.keywords, window.document.cluster.color)
-                                                                                        ) : divContent.content.map(pContent => (
-                                                                                            <span>{pContent.content}</span>
-                                                                                        ))
-                                                                                    }
-                                                                                </p>
-                                                                                ) : divContent.type == "formula" ? (
-                                                                                    <p>{divContent.content}</p>
-                                                                                ) :  (
-                                                                                    <ul>
-                                                                                        {
-                                                                                            divContent.content.map(listItem => (
-                                                                                                <li className="listItem">{listItem.content}</li>
-                                                                                            ))
-                                                                                        }
-                                                                                    </ul>
-                                                                                ) 
-                                                                                )
+                                                                                similarEncoding ? divContent.content.map(pContent =>
+                                                                                    identifyKeywords(pContent, window.document.keywords, window.document.cluster.color)
+                                                                                ) : divContent.content.map(pContent => (
+                                                                                    <Element name={"sentence_" + pContent.sentenceId} style={{ display: "inline" }}>
+                                                                                        <span>{pContent.content}</span>
+                                                                                    </Element>
+                                                                                ))
                                                                             }
-                                                                        </div>
-                                                                    ))
-                                                                }
+                                                                        </p>
+                                                                        ) : divContent.type == "formula" ? (
+                                                                            <p>{divContent.content}</p>
+                                                                        ) : (
+                                                                            <ul>
+                                                                                {
+                                                                                    divContent.content.map(listItem => (
+                                                                                        <li className="listItem">{listItem.content}</li>
+                                                                                    ))
+                                                                                }
+                                                                            </ul>
+                                                                        )
+                                                                        )
+                                                                    }
+                                                                </div>
+                                                            ))
+                                                        }
                                                     </div>
                                                     {
                                                         search ? (
-                                                            <div className="paneSuggestion" style={{background: hexToRgbA(window.document.cluster.color, .65)}}>
+                                                            <div className="paneSuggestion" style={{ background: hexToRgbA(window.document.cluster.color, .65) }}>
                                                                 {
                                                                     window.suggestion == null ? (
-                                                                        <p style={{color: "#fff", textAlign: "center", fontWeight : "bold", padding: "1%"}}>search and find semantically close sentences to your search query</p>
+                                                                        <p style={{ color: "#fff", textAlign: "center", fontWeight: "bold", padding: "1%" }}>search and find semantically close sentences to your search query</p>
                                                                     ) : (
-                                                                        <div></div>
+                                                                        <div>
+                                                                            {
+                                                                                window.suggestion.map(sug => (
+                                                                                    <div className="nonLinearSuggestionItem" style={{ borderColor: window.document.cluster.color }}>
+                                                                                        <div style={{ flex: 1, position: "relative", borderLeft: "solid 3px " + window.document.cluster.color }}>
+                                                                                            <div style={{ position: "absolute", top: parseInt(sug.position * 100) + "%", width: "100%", aspectRatio: "1/1", backgroundColor: window.document.cluster.color, display: "flex", alignItems: "center", fontSize: "70%", color: "#fff", fontWeight: "bold", justifyContent: "center" }}>
+                                                                                                {parseInt(sug.position * 100) + "%"}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div style={{ flex: 9, padding: "1%" }}>
+                                                                                            <h6 className="suggestionHeader">{findHeader(sug.divId, window.parsedBody)}</h6>
+                                                                                            <p className="suggestionP">{"... " + sug.content + " ..."}</p>
+                                                                                        </div>
+                                                                                        <div className="suggestionItemClickable" doc={index} positionId={sug.sentenceId} style={{ position: "absolute", width: "100%", height: "100%", cursor: "pointer" }}></div>
+                                                                                    </div>))
+                                                                            }
+                                                                        </div>
                                                                     )
                                                                 }
                                                             </div>

@@ -7,7 +7,10 @@ import {
 } from '../helper/helper'
 import WordCloud from 'wordcloud'
 import jRes from '../data/res.json'
-
+import axios from 'axios'
+import { API_ADDRESS } from '../helper/generalInfo'
+import Store from '../redux/store'
+import * as Scroll from 'react-scroll'
 
 export const compareLens = (visualProps, canvasProperties, documents, clusters, groups, compareLensOpen, windows, setWindows) => {
     var canvasSVG = d3.select(".canvasSVG")
@@ -114,7 +117,7 @@ export const compareLensHTMLandEvent = (visualProps, windows, setWindows) => {
     })
 }
 
-export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=false, search=false, showPDF=false, similarEncoding=false) => {
+export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=false, search=false, showPDF=false, similarEncoding=false, similarityScore=null, searchLoading=false, searchTerm="") => {
     var canvasSVG = d3.select(".canvasSVG")
     canvasSVG.selectAll(".mainCompare").remove();
     let mainCompare = canvasSVG.append("foreignObject")
@@ -132,24 +135,49 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
             search={search}
             showPDF={showPDF}
             similarEncoding={similarEncoding}
+            similarityScore={similarityScore}
+            searchTerm={searchTerm}
+            searchLoading={searchLoading}
         />
     )
     mainCompare.html(tmpDiv.innerHTML)
 
     // api calls here
     if (loading) {
-        windows.map(window => {
-            // some extra works should be done here later ...
-            // but for now ...
-            window.pdf = "2";
-            window.parsedBody = jRes
+        var formData = new FormData()
+        const reqID = Store.getState().dataReducer.requestId
+        let doc1 = windows[0].document.id 
+        let doc2 = windows[1].document.id
+        formData.append('reqID', reqID)
+        formData.append('doc1', doc1)
+        formData.append('doc2', doc2)
+        axios.post(API_ADDRESS+"comparison/basicComparison", formData)
+        .then(data => {
+            console.log(data.data)
+            windows[0].parsedBody = data.data.comparisonRes.parsedBodies.body1
+            windows[1].parsedBody = data.data.comparisonRes.parsedBodies.body2
+            windows[0].suggestion = null
+            windows[1].suggestion = null
+            mainCompareHTMLandEvents(windows, false, generalInfo, search, showPDF, similarEncoding, data.data.comparisonRes.cosineRes, searchLoading, searchTerm)
         })
-        mainCompareHTMLandEvents(windows, false)
     }
 
-    windows.map(window => {
-        window.suggestion = null
-    })
+    if (searchLoading) {
+        var formData = new FormData()
+        const reqID = Store.getState().dataReducer.requestId
+        let doc1 = windows[0].document.id 
+        let doc2 = windows[1].document.id
+        formData.append('reqID', reqID)
+        formData.append('doc1', doc1)
+        formData.append('doc2', doc2)
+        formData.append('searchTerm', searchTerm)
+        axios.post(API_ADDRESS+"comparison/searchAndCompare", formData)
+        .then(data => {
+            windows[0].suggestion = data.data.searchRes[0]
+            windows[1].suggestion = data.data.searchRes[1]
+            mainCompareHTMLandEvents(windows, loading, generalInfo, search, showPDF, similarEncoding, similarityScore, false, searchTerm)
+        })
+    }
 
     // load wordclouds if needed
     if (generalInfo) {
@@ -157,7 +185,7 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
             let doc = window.document
             let keywordsList = []
             let length_ = doc.keywords.length
-            let maxFont = 30; let minFont = 15;
+            let maxFont = 30; let minFont = 16;
             doc.keywords.map((kw,index) => {
                 keywordsList.push([kw, Math.ceil(((length_-index)/length_)*(maxFont - minFont) + minFont)])
             })
@@ -193,18 +221,38 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
     })
 
     mainCompare.selectAll("#infoContentToggle").on("click", ()=>{
-        mainCompareHTMLandEvents(windows, loading, !generalInfo)
+        mainCompareHTMLandEvents(windows, loading, !generalInfo, search, showPDF, similarEncoding, similarityScore, searchLoading, searchTerm)
     })
 
     mainCompare.selectAll("#comparisonSearch").on("click", ()=>{
-        mainCompareHTMLandEvents(windows, loading, false, !search, false, similarEncoding)
+        mainCompareHTMLandEvents(windows, loading, false, !search, false, similarEncoding, similarityScore, searchLoading, searchTerm)
     })
 
     mainCompare.selectAll("#comparisonPDFToggle").on("click", () => {
-        mainCompareHTMLandEvents(windows, loading, false, false, !showPDF)
+        mainCompareHTMLandEvents(windows, loading, false, false, !showPDF, similarEncoding, similarityScore, searchLoading, searchTerm)
     })
 
     mainCompare.selectAll("#comparisonSimilarEncodingToggle").on("click", () => {
-        mainCompareHTMLandEvents(windows, loading, false, false, false, !similarEncoding)
+        mainCompareHTMLandEvents(windows, loading, false, false, false, !similarEncoding, similarityScore, searchLoading, searchTerm)
+    })
+
+    mainCompare.select("#nonLinearSearchFuncIcon").on("click", ()=>{
+        let inputValue = document.getElementById("mainCompareSearchInput").value
+        if (inputValue != "") {
+            mainCompareHTMLandEvents(windows, loading, false, search, false, similarEncoding, similarityScore, true, inputValue)
+        }
+    })
+
+    mainCompare.selectAll(".suggestionItemClickable").on("click", (e)=>{
+        let id_ = e.target.attributes.positionid.value;
+        let doc = e.target.attributes.doc.value;
+        let containerID_ = "paneContentBody_"+doc
+        var scroller = Scroll.scroller
+        scroller.scrollTo("sentence_" + id_, {
+            duration: 1500,
+            smooth: true,
+            containerId: containerID_,
+            offset: -50
+        })
     })
 }
