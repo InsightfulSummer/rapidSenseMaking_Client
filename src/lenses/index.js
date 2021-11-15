@@ -6,22 +6,22 @@ export * from './overviewLens'
 export * from './comparisonLens'
 export const lenses = [
     {
-        "name" : "Summary",
+        "name" : "Summarization",
         "icon" : "fas fa-list-alt",
         "img" : "Summary.png"
     },
     {
-        "name" : "Hyper Similarity",
+        "name" : "Semantic Jump",
         "icon" : "fas fa-exchange-alt",
         "img" : "HyperSimilarity.png"
     },
     {
-        "name" : "Skimming",
+        "name" : "Skim",
         "icon" : "fas fa-book-open",
         "img" : "Skimming.png"
     },
     {
-        "name" : "Bibliographic Information",
+        "name" : "Bibliographic Connection",
         "icon" : "fab fa-connectdevelop",
         "img":"BibliographicInformation.png"
     },

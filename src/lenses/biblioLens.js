@@ -69,25 +69,25 @@ export const biblioLens = (canvasProperties, documents, clusters, groups) => {
                 let index_ = documents.findIndex(item => {
                     return item.id == ol.id
                 })
-                if (index_ >= n_z && index_ < n_z + n_x) {
-                    let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
-                    let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
-                    docsContainer.append("path")
-                        .attr("class", "linkPath to_be_switched")
-                        .attr("stroke", hexToRgbA(doc.cluster.color, 0.9))
-                        .attr("fill", "none")
-                        // .attr("opacity", 1 - slideHeightPorportion)
-                        .attr("stroke-width", t_z / 40)
-                        .transition()
-                        .attr("stroke-width", t_z / 3)
-                        .attr("d", linkPathGenerator(doc, documents[index_], barMargin, barWidth, y1 + t_z / 2, y2 + t_z / 2, height))
-                }
+                // if (index_ >= n_z && index_ < n_z + n_x) {
+                let y1 = index < n_z ? (index) * (t_z + margin) : index < n_z + n_x ? n_z * (t_z + margin) + (index - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index - n_z - n_x) * (t_z + margin)
+                let y2 = index_ < n_z ? (index_) * (t_z + margin) : index_ < n_z + n_x ? n_z * (t_z + margin) + (index_ - n_z) * (t_x * t_z + margin) : n_z * (t_z + margin) + n_x * (t_x * t_z + margin) + (index_ - n_z - n_x) * (t_z + margin)
+                docsContainer.append("path")
+                    .attr("class", "linkPath to_be_switched")
+                    .attr("stroke", hexToRgbA(doc.cluster.color, 0.9))
+                    .attr("fill", "none")
+                    // .attr("opacity", 1 - slideHeightPorportion)
+                    .attr("stroke-width", t_z / 40)
+                    .transition()
+                    .attr("stroke-width", t_z / 5)
+                    .attr("d", linkPathGenerator(doc, documents[index_], barMargin, barWidth, y1 + t_z / 2, y2 + t_z / 2, height))
+                // }
             })
         }
     })
 
     d3.selectAll(".biblioCover")
-        .on("mouseover", (event, doc) => {
+        .on("click", (event, doc) => {
             d3.selectAll(".to_be_closed").remove()
             biblioLens(canvasProperties, documents, clusters, groups)
             biblioLensEvents( canvasProperties,  doc, documents, clusters, groups)

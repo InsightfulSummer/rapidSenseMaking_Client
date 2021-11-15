@@ -72,7 +72,7 @@ export const overviewLens = (canvasProperties, documents, clusters, groups, clos
         .text(doc => doc.publishingDate.substring(2,4))
         .attr("style", "font-size:" + fontSizeCalculator((barWidth-barMargin)*1.5/8, t_x*t_z, 2 )+"px")
 
-    overviewRectDiv.append("div").attr("class","overviewCover")
+    overviewRectDiv.append("div").attr("class","overviewCover").attr("title", doc => doc.title)
 
     d3.selectAll(".overviewCover").on("click", (event, doc)=>{
         overviewOver(doc, canvasProperties, documents, clusters, groups, closeOpenLenses)
