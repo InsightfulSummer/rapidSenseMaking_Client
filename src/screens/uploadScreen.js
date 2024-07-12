@@ -152,13 +152,19 @@ const UploadScreen = ({history}) => {
         await axios.request(config)
             .then((response) => {
                 console.log(response.data)
-                setAuthState({authenticated: true, token: authState.token})
-                document.token = authState.token
+                if ('isAuthorized' in response.data) {
+                    setAuthState({authenticated: true, token: authState.token})
+                    document.token = authState.token
+                } else {
+                    setAuthState({authenticated: false, token: authState.token})
+                    document.token = ""
+                }
             })
             .catch((e) => {
                 console.log(e)
                 alert("You are not authorized to use this service. Please contact ahaghig3@uwo.ca.")
                 setAuthState({authenticated: false, token: authState.token})
+                document.token = ""
             })
     }
 
