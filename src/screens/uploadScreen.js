@@ -195,11 +195,11 @@ const UploadScreen = ({history}) => {
                                     {
                                         documents.map(doc => (
                                             <div className="uploadDocumentItem">
-                                                <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="open this document" onClick={()=>{window.open(window.URL.createObjectURL(doc))}}><i class="fas fa-file-pdf"></i></div>
+                                                <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="open this document" onClick={()=>{window.open(window.URL.createObjectURL(doc))}}><i className="fas fa-file-pdf"></i></div>
                                                 <div style={{ flex: 10, textAlign: "center", fontSize: "1em" }}>{
                                                     doc.name.substring(0, 50) + (doc.name.length > 51 ? "..." : "")
                                                 }</div>
-                                                <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="remove this document" onClick={() => { removeDoc(doc) }}><i class="fas fa-times"></i></div>
+                                                <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="remove this document" onClick={() => { removeDoc(doc) }}><i className="fas fa-times"></i></div>
                                             </div>
                                         ))
                                     }
