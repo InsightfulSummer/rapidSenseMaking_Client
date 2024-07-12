@@ -101,7 +101,8 @@ const UploadScreen = ({history}) => {
                 formData.append('pdfFile', document)
                 await axios.post(API_ADDRESS + "/pdfUploading", formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': 'Bearer ' + authState.token
                     }
                 })
                 .then(data => {
@@ -120,7 +121,8 @@ const UploadScreen = ({history}) => {
             formData.append('reqID', reqID)
             await axios.post(API_ADDRESS + "/clusterDocuments", formData , {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': 'Bearer ' + authState.token
                 }
             }).then(data => {
                 dispatch(SetDocuments(data.data))
@@ -151,6 +153,7 @@ const UploadScreen = ({history}) => {
             .then((response) => {
                 console.log(response.data)
                 setAuthState({authenticated: true, token: authState.token})
+                document.token = authState.token
             })
             .catch((e) => {
                 console.log(e)

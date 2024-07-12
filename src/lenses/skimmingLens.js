@@ -131,7 +131,11 @@ export const skimmingHTMLandEvent = (closeOpenLenses, doc, doc_x, doc_y, canvasP
         const reqID = Store.getState().dataReducer.requestId
         formData.append('reqID', reqID)
         formData.append('docID', doc.id)
-        axios.post(API_ADDRESS+"skimmingDocument", formData)
+        axios.post(API_ADDRESS+"skimmingDocument", formData, {
+            headers: {
+                'Authorization': 'Bearer ' + document.token
+            }
+        })
         .then(data => {
             skimmingHTMLandEvent(closeOpenLenses, doc, doc_x, doc_y, canvasProperties, scrollingDuration, compressDocumentRate, showKeywords, showHeaders, expanded, showPDF, false, data.data.parsedBody)
         })

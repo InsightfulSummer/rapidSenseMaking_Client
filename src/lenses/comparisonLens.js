@@ -151,7 +151,11 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
         formData.append('reqID', reqID)
         formData.append('doc1', doc1)
         formData.append('doc2', doc2)
-        axios.post(API_ADDRESS+"comparison/basicComparison", formData)
+        axios.post(API_ADDRESS+"comparison/basicComparison", formData, {
+            headers: {
+                'Authorization': 'Bearer ' + document.token
+            }
+        })
         .then(data => {
             console.log(data.data)
             windows[0].parsedBody = data.data.comparisonRes.parsedBodies.body1
@@ -171,7 +175,11 @@ export const mainCompareHTMLandEvents = (windows, loading=true, generalInfo=fals
         formData.append('doc1', doc1)
         formData.append('doc2', doc2)
         formData.append('searchTerm', searchTerm)
-        axios.post(API_ADDRESS+"comparison/searchAndCompare", formData)
+        axios.post(API_ADDRESS+"comparison/searchAndCompare", formData, {
+            headers: {
+                'Authorization': 'Bearer ' + document.token
+            }
+        })
         .then(data => {
             windows[0].suggestion = data.data.searchRes[0]
             windows[1].suggestion = data.data.searchRes[1]

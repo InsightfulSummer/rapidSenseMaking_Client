@@ -124,7 +124,11 @@ export const SummaryHTMLandEvents = (doc, doc_x, doc_y, canvasProperties, closeO
         formData.append('reqID', reqID)
         formData.append('docID', doc.id)
         formData.append('size', size)
-        axios.post(API_ADDRESS+"summarizeDocument", formData)
+        axios.post(API_ADDRESS+"summarizeDocument", formData, {
+            headers: {
+                'Authorization': 'Bearer ' + document.token
+            }
+        })
         .then(data => {
             SummaryHTMLandEvents(doc, doc_x, doc_y, canvasProperties, closeOpenLenses, false, expanded, showAbstract, showPDF, data.data.summary, size)
         })

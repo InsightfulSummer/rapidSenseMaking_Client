@@ -128,7 +128,11 @@ export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvas
         const reqID = Store.getState().dataReducer.requestId
         formData.append('reqID', reqID)
         formData.append('docID', doc.id)
-        axios.post(API_ADDRESS+"skimmingDocument", formData)
+        axios.post(API_ADDRESS+"skimmingDocument", formData, {
+            headers: {
+                'Authorization': 'Bearer ' + document.token
+            }
+        })
         .then(data => {
             nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, loading, expanded, showPDF, showSearch, false, data.data.parsedBody, activeSentence, showSimilarDocs, similarDocs)
         })
@@ -149,7 +153,11 @@ export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvas
         formData.append('sentence', sentence)
         formData.append('topN', topN)
         if (showSimilarDocs) {
-            axios.post(API_ADDRESS+"hyperSimilarity/findDocs", formData)
+            axios.post(API_ADDRESS+"hyperSimilarity/findDocs", formData, {
+                headers: {
+                    'Authorization': 'Bearer ' + document.token
+                }
+            })
             .then(data => {
                 console.log(data.data)
                 nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, suggestions, false, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, showSimilarDocs, data.data.similarDocuments)
@@ -159,7 +167,11 @@ export const nonLinearHTMLandEvent = (closeOpenLenses, doc_x, doc_y, doc, canvas
                 alert("some error happended! please try again later.")
             })
         } else {
-            axios.post(API_ADDRESS+"hyperSimilarity/findSents", formData)
+            axios.post(API_ADDRESS+"hyperSimilarity/findSents", formData, {
+                headers: {
+                    'Authorization': 'Bearer ' + document.token
+                }
+            })
             .then(data => {
                 nonLinearHTMLandEvent(closeOpenLenses, doc_x, doc_y, doc, canvasProperties, data.data.similarSentences, false, expanded, showPDF, showSearch, mainLoading, parsedBody, activeSentence, showSimilarDocs, similarDocs)
             })
