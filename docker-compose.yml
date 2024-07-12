@@ -1,0 +1,11 @@
+services:
+  lens:
+    build: '.'
+    ports:
+      - '3000:3000'
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label-stack=lens
+        - traefik.http.routers.lensweb-http.rule=Host(`lensweb.${DOMAIN?Variable not set}`)
+        - traefik.http.services.lensweb.loadbalancer.server.port=5000
