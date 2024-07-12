@@ -1,1 +1,3 @@
-export const API_ADDRESS = "http://localhost:5000/"
+const dotenv = require('dotenv')
+dotenv.config()
+export const API_ADDRESS = process.env.API_ADDRESS
