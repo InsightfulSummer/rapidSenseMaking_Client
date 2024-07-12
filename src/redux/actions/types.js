@@ -27,5 +27,6 @@ export default {
     RenameGroup : "RenameGroup",
     SetRequestId : "SetRequestId",
     SetDocuments : "SetDocuments",
-    ExtractClusters : "ExtractClusters"
+    ExtractClusters : "ExtractClusters",
+    SetAuthState: "SetAuthState",
 }

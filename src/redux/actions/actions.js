@@ -232,3 +232,10 @@ export const renameGroup = (group_id, new_name) => {
         }
     }
 }
+
+export const setAuthState = (obj) => {
+    return {
+        type : types.Authorize,
+        payload : { obj }
+    }
+}

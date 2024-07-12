@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MDBBtn, MDBContainer, MDBProgress } from 'mdbreact';
+import { MDBBtn, MDBContainer, MDBProgress, MDBInput } from 'mdbreact';
 import React, { useState } from 'react';
 import MainScreenHeader from '../components/mainScreenHeader';
 import {API_ADDRESS} from '../helper/generalInfo'
@@ -20,6 +20,7 @@ const UploadScreen = ({history}) => {
     const [uploading, toggleUploading] = useState(true)
     const [loading, toggleLoading] = useState(false)
     const [loadingPercentage, setLoadingPercentage] = useState(0)
+    const [authState, setAuthState] = useState({ authenticated: false, token: "" })
     
 
     const dropHandler = (event) => {
@@ -137,51 +138,86 @@ const UploadScreen = ({history}) => {
         }
     }
 
+    const authorize = async (e) => {
+        console.log('----------AUTH: ', authState.token)
+        const config = {
+            method: 'get',
+            url: API_ADDRESS + "/isauthorized",
+            headers: {
+                'Authorization': 'Bearer ' + authState.token
+            }
+        }
+        await axios.request(config)
+            .then((response) => {
+                console.log(response.data)
+                setAuthState({authenticated: true, token: authState.token})
+            })
+            .catch((e) => {
+                console.log(e)
+                alert("You are not authorized to use this service. Please contact ahaghig3@uwo.ca.")
+                setAuthState({authenticated: false, token: authState.token})
+            })
+    }
+
     return (
         <div className="uploadScreen">
             <MDBContainer>
                 {
-                    loading ? (
-                        <div className="uploadForm">
-                            <div className="spinner-border uploadingSpinner" role="status" >
-                                <span className="sr-only">Loading...</span>
+                    authState.authenticated ? (
+                        loading ? (
+                            <div className="uploadForm">
+                                <div className="spinner-border uploadingSpinner" role="status" >
+                                    <span className="sr-only">Loading...</span>
+                                </div>
+                                <p>{loadingPercentage < documents.length ? "Processing documents ..." : "clustering documents ..."}</p>
+                                <p>Please wait.</p>
+                                <MDBProgress value={(loadingPercentage/documents.length)*100} className="my-2" />
                             </div>
-                            <p>{loadingPercentage < documents.length ? "Processing documents ..." : "clustering documents ..."}</p>
-                            <p>Please wait.</p>
-                            <MDBProgress value={(loadingPercentage/documents.length)*100} className="my-2" />
-                        </div>
-                    ) : uploading ? (
-                        <form encType="multipart/form-data" className="uploadForm">
-                            <div className="dragNDropupload" onDrop={dropHandler} onDragOver={dragOverHandler} onDragLeave={dragLeaveHandler} style={dragOver ? { background: "#d6d6d6" } : { background: "#fff" }}>
-                                <i className="fas fa-chevron-down" style={{ fontSize: "2em", fontWeight: "bold" }}></i>
-                                <p style={{ fontSize: "1.2em" }}>Drag and Drop your documents here ...</p>
+                        ) : uploading ? (
+                            <form encType="multipart/form-data" className="uploadForm">
+                                <div className="dragNDropupload" onDrop={dropHandler} onDragOver={dragOverHandler} onDragLeave={dragLeaveHandler} style={dragOver ? { background: "#d6d6d6" } : { background: "#fff" }}>
+                                    <i className="fas fa-chevron-down" style={{ fontSize: "2em", fontWeight: "bold" }}></i>
+                                    <p style={{ fontSize: "1.2em" }}>Drag and Drop your documents here ...</p>
+                                </div>
+                                <div className="uploadingBtnContainer">
+                                    <input className="uploadBTN" type="file" multiple={true} onChange={fileInputHandler} />
+                                    {
+                                        documents.length ? (<MDBBtn className="uploadBTN uploadBTN_" onClick={() => { toggleUploading(false); console.log(documents) }}>Review current documents ({documents.length})</MDBBtn>) : null
+                                    }
+                                </div>
+                            </form>
+                        ) : (
+                            <div className="fileList uploadForm">
+                                <div className="currentDocumentsContainer">
+                                    {
+                                        documents.map(doc => (
+                                            <div className="uploadDocumentItem">
+                                                <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="open this document" onClick={()=>{window.open(window.URL.createObjectURL(doc))}}><i class="fas fa-file-pdf"></i></div>
+                                                <div style={{ flex: 10, textAlign: "center", fontSize: "1em" }}>{
+                                                    doc.name.substring(0, 50) + (doc.name.length > 51 ? "..." : "")
+                                                }</div>
+                                                <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="remove this document" onClick={() => { removeDoc(doc) }}><i class="fas fa-times"></i></div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                                <div className="uploadingBtnContainer">
+                                    <MDBBtn onClick={() => { toggleUploading(true) }} className="uploadBTN uploadBTN_">Add more documents</MDBBtn>
+                                    <MDBBtn onClick={processDocuments} className="uploadBTN">Process documents ({documents.length})</MDBBtn>
+                                </div>
                             </div>
-                            <div className="uploadingBtnContainer">
-                                <input className="uploadBTN" type="file" multiple={true} onChange={fileInputHandler} />
-                                {
-                                    documents.length ? (<MDBBtn className="uploadBTN uploadBTN_" onClick={() => { toggleUploading(false); console.log(documents) }}>Review current documents ({documents.length})</MDBBtn>) : null
-                                }
-                            </div>
-                        </form>
+                        )
                     ) : (
-                        <div className="fileList uploadForm">
-                            <div className="currentDocumentsContainer">
-                                {
-                                    documents.map(doc => (
-                                        <div className="uploadDocumentItem">
-                                            <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="open this document" onClick={()=>{window.open(window.URL.createObjectURL(doc))}}><i class="fas fa-file-pdf"></i></div>
-                                            <div style={{ flex: 10, textAlign: "center", fontSize: "1em" }}>{
-                                                doc.name.substring(0, 50) + (doc.name.length > 51 ? "..." : "")
-                                            }</div>
-                                            <div style={{ flex: 1, textAlign: "center", cursor: "pointer" }} title="remove this document" onClick={() => { removeDoc(doc) }}><i class="fas fa-times"></i></div>
-                                        </div>
-                                    ))
-                                }
-                            </div>
-                            <div className="uploadingBtnContainer">
-                                <MDBBtn onClick={() => { toggleUploading(true) }} className="uploadBTN uploadBTN_">Add more documents</MDBBtn>
-                                <MDBBtn onClick={processDocuments} className="uploadBTN">Process documents ({documents.length})</MDBBtn>
-                            </div>
+                        <div className='uploadForm'>
+                            <MDBInput
+                                value={authState.token}
+                                onChange={(e) => setAuthState({authenticated: authState.authenticated, token: e.target.value})}
+                                name='token'
+                                id='token'
+                                required
+                                label='Authorization Token'
+                            />
+                            <MDBBtn type='submit' onClick={authorize}>Submit</MDBBtn>
                         </div>
                     )
                 }
